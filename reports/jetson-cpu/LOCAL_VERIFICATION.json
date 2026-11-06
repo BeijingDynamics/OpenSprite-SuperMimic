@@ -1,0 +1,44 @@
+{
+  "archive_sha256": "4d061558625730a64f855e2acc93fc398fc76d2ccaf768a26b68883d64b0307d",
+  "files_verified": 119,
+  "failed": [],
+  "native_replay_cases": 14,
+  "native_replay_frames": 21000,
+  "native_vs_python_max_error": 0.0,
+  "recorded_action_max_error": 1.7881393432617188e-06,
+  "timing": [
+    {
+      "threads": 1,
+      "cpus": [
+        5
+      ],
+      "seconds": 60,
+      "frames": 3000,
+      "service_p99_ms": 10.198236,
+      "service_max_ms": 11.340161,
+      "finish_max_ms": 11.417153,
+      "deadline_misses": 0,
+      "passed": true,
+      "meets_20ms_under_test": true
+    },
+    {
+      "threads": 2,
+      "cpus": [
+        4,
+        5
+      ],
+      "seconds": 60,
+      "frames": 3000,
+      "service_p99_ms": 6.888892,
+      "service_max_ms": 7.132244,
+      "finish_max_ms": 7.197824,
+      "deadline_misses": 0,
+      "passed": true,
+      "meets_20ms_under_test": true
+    }
+  ],
+  "hardware_tx": 0,
+  "motor_enable_attempts": 0,
+  "live_devices_opened": 0,
+  "hardware_qualified": false
+}

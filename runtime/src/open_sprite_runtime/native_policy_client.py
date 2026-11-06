@@ -1,0 +1,626 @@
+"""50 Hz ONNX/IMU client for the native zero-gain policy IPC shadow."""
+
+from __future__ import annotations
+
+import argparse
+from contextlib import contextmanager
+import hashlib
+import json
+import math
+from pathlib import Path
+import selectors
+import socket
+import time
+
+import numpy as np
+
+from .action_trace_replay import CenteredActionTraceReplay
+from .command_schedule import PROFILE_SPEEDS, countdown, sample_stand_walk_stop
+from .contracts import PolicyContract
+from .damiao import DamiaoMitState
+from .motor_mapping import motor_map_from_hardware_config
+from .multirate_control import JointImpedanceTarget
+from .native_ipc import NativeStatePacket, PolicyTargetPacket, ordered_name_hash
+from .physical_startup import PhysicalStartupRamp
+from .imu_receive import drain_imu, require_fresh_imu
+from .session_heading import SessionHeading
+from .policy_shadow import LivePolicyShadow
+from .target_projection import (
+    ConsecutiveClampWatchdog,
+    ProtectedTargetProjector,
+    parse_joint_damping_multiplier_overrides,
+    parse_joint_gain_multiplier_overrides,
+)
+from .yahboom_imu import YahboomQuaternion, YahboomRawImu, YahboomStreamDecoder
+
+
+@contextmanager
+def _capture_runtime_errors(errors: list[str]):
+    """Preserve partial evidence while still forcing the native side to fail closed."""
+    try:
+        yield
+    except Exception as exc:
+        errors.append(f"{type(exc).__name__}: {exc}")
+
+
+def _native_motor_order(hardware: dict) -> tuple[str, ...]:
+    interfaces = hardware["can_adapter"]["interfaces"]
+    return tuple(
+        name
+        for name, _record in sorted(
+            hardware["motor_map"].items(),
+            key=lambda item: (
+                interfaces[int(item[1]["can_channel"])],
+                int(item[1]["can_id"]),
+            ),
+        )
+    )
+
+
+def _percentile(values: list[float], fraction: float) -> float | None:
+    if not values:
+        return None
+    ordered = sorted(values)
+    return ordered[min(len(ordered) - 1, math.ceil(fraction * len(ordered)) - 1)]
+
+
+def _startup_measured_position(
+    startup: PhysicalStartupRamp,
+    projector: ProtectedTargetProjector,
+    measured_position_rad: np.ndarray,
+) -> np.ndarray:
+    """Apply reviewed soft limits only to the pose captured at startup."""
+    if startup.initial_position_rad is None:
+        return projector.require_position_within_limits(
+            measured_position_rad,
+            label="physical startup measured pose",
+        )
+    return measured_position_rad
+
+
+def run(args: argparse.Namespace) -> dict:
+    hardware = json.loads(Path(args.hardware_config).read_text(encoding="utf-8"))
+    contract = PolicyContract.load(args.contract)
+    mapping = motor_map_from_hardware_config(
+        hardware, contract.data["joint_names"], require_armable=False
+    )
+    shadow = LivePolicyShadow(contract, hardware, mapping, (args.vx, args.vy, args.yaw_rate))
+    command_profile = getattr(args, "command_profile", None)
+    if command_profile and (
+        command_profile not in PROFILE_SPEEDS or args.vx != 0 or args.vy != 0
+        or args.yaw_rate != 0 or args.replay_action_trace
+    ):
+        raise ValueError("fixed command profile requires zero CLI commands and no action replay")
+    profile_start_ns = None
+    profile_elapsed_s = 0.0
+    profile_stage = None
+    profile_countdown = None
+    profile_events = []
+    action_replay = None
+    replay_center: np.ndarray | None = None
+    if args.replay_action_trace:
+        action_replay = CenteredActionTraceReplay.load(
+            args.replay_action_trace,
+            np.asarray(contract.data["action_scale"], dtype=np.float64),
+            source_hz=args.replay_source_hz,
+            start_seconds=args.replay_start_seconds,
+            duration_seconds=args.replay_duration_seconds,
+            amplitude_scale=args.replay_amplitude_scale,
+        )
+    projector = None
+    if args.joint_limit_candidates:
+        joint_names = tuple(contract.data["joint_names"])
+        projector = ProtectedTargetProjector.from_limit_report(
+            joint_names,
+            args.joint_limit_candidates,
+            gain_scale=args.gain_scale,
+            maximum_embedded_kd=float(
+                hardware["controller"]["damiao_embedded_kd_max"]
+            ),
+            joint_gain_multipliers=parse_joint_gain_multiplier_overrides(
+                joint_names, args.joint_gain_multiplier
+            ),
+            joint_damping_multipliers=parse_joint_damping_multiplier_overrides(
+                joint_names, args.joint_damping_multiplier
+            ),
+        )
+    elif args.gain_scale != 1.0:
+        raise ValueError("--gain-scale requires --joint-limit-candidates")
+    clamp_watchdog = None
+    if args.fail_on_consecutive_clamp_joint:
+        if projector is None:
+            raise ValueError("clamp watchdog requires --joint-limit-candidates")
+        clamp_watchdog = ConsecutiveClampWatchdog(
+            tuple(contract.data["joint_names"]),
+            tuple(args.fail_on_consecutive_clamp_joint),
+            args.clamp_watchdog_minimum_overshoot_rad,
+            args.clamp_watchdog_maximum_consecutive_ticks,
+            args.clamp_watchdog_ignored_initial_ticks,
+        )
+    startup = None
+    if args.physical_startup_hold_seconds or args.physical_startup_ramp_seconds:
+        if projector is None:
+            raise ValueError("physical startup ramp requires protected target projection")
+        startup = PhysicalStartupRamp(
+            policy_hz=contract.policy_hz,
+            hold_seconds=args.physical_startup_hold_seconds,
+            ramp_seconds=args.physical_startup_ramp_seconds,
+        )
+    motor_names = _native_motor_order(hardware)
+    motor_hash = ordered_name_hash(motor_names)
+    joint_hash = ordered_name_hash(contract.data["joint_names"])
+    decoder = YahboomStreamDecoder()
+    state_count = 0
+    heading = SessionHeading()
+    heading_started = False
+    target_count = 0
+    target_sequence = 0
+    raw_imu_count = 0
+    quaternion_count = 0
+    last_raw_imu: YahboomRawImu | None = None
+    last_quaternion: YahboomQuaternion | None = None
+    last_raw_imu_monotonic_ns = 0
+    last_quaternion_monotonic_ns = 0
+    last_state_sequence = 0
+    def accept_imu(packet, received_ns):
+        nonlocal raw_imu_count, quaternion_count, last_raw_imu, last_quaternion
+        nonlocal last_raw_imu_monotonic_ns, last_quaternion_monotonic_ns
+        if isinstance(packet, YahboomRawImu):
+            raw_imu_count += 1
+            last_raw_imu = packet
+            last_raw_imu_monotonic_ns = received_ns
+            shadow.update_imu(packet)
+        elif isinstance(packet, YahboomQuaternion):
+            quaternion_count += 1
+            last_quaternion = packet
+            last_quaternion_monotonic_ns = received_ns
+            shadow.update_imu(packet)
+
+    inference_ms: list[float] = []
+    last_tick_timing: dict = {}
+    errors: list[str] = []
+    trace: dict[str, list] | None = None
+    if args.trace_output:
+        trace = {
+            "state_sequence": [],
+            "command_vx_vy_yaw_rate": [],
+            "command_profile_elapsed_s": [],
+            "state_monotonic_ns": [],
+            "target_monotonic_ns": [],
+            "motor_position_rad": [],
+            "motor_velocity_rad_s": [],
+            "joint_position_rad": [],
+            "joint_velocity_rad_s": [],
+            "base_angular_velocity_rad_s": [],
+            "projected_gravity": [],
+            "relative_gyro_yaw_rad": [],
+            "relative_gyro_yaw_valid": [],
+            "imu_raw_monotonic_ns": [],
+            "imu_quaternion_monotonic_ns": [],
+            "imu_acceleration_m_s2": [],
+            "imu_angular_velocity_sensor_rad_s": [],
+            "imu_magnetic_field_ut": [],
+            "imu_quaternion_wxyz": [],
+            "imu_raw_age_ms": [],
+            "imu_quaternion_age_ms": [],
+            "observation": [],
+            "raw_action": [],
+            "handoff_action": [],
+            "target_position_rad": [],
+            "command_target_position_rad": [],
+            "projected_target_position_rad": [],
+            "projected_target_velocity_rad_s": [],
+            "projected_kp": [],
+            "projected_kd": [],
+            "projected_feedforward_torque_nm": [],
+            "startup_target_position_rad": [],
+            "startup_target_velocity_rad_s": [],
+            "startup_kp": [],
+            "startup_kd": [],
+            "startup_feedforward_torque_nm": [],
+            "startup_alpha": [],
+        }
+
+    imu_source = getattr(args, 'imu_source', 'yahboom')
+    use_bno = imu_source in ('bno055', 'native-bno055')
+    if imu_source == 'native-bno055':
+        from .native_bno_source import NativeBnoSource
+        source_context = NativeBnoSource(getattr(args, 'native_imu_socket', None))
+    elif use_bno:
+        from .bno055_source import Bno055Source
+        source_context = Bno055Source(
+            getattr(args, 'bno_bus', 7), getattr(args, 'bno_address', 0x28),
+            getattr(args, 'bno_initialize', False))
+    else:
+        import serial
+        source_context = serial.Serial(port=args.imu_device, baudrate=args.imu_baud,
+                                       timeout=0, write_timeout=0, exclusive=True)
+
+    with _capture_runtime_errors(errors), socket.socket(
+        socket.AF_UNIX, socket.SOCK_SEQPACKET
+    ) as connection, source_context as imu_port:
+        connection.connect(args.socket)
+        connection.setblocking(False)
+        if not use_bno:
+            imu_port.dtr = False
+            imu_port.rts = False
+            # Discard pre-session serial bytes; wait for fresh complete frames.
+            imu_port.reset_input_buffer()
+        def update_imu():
+            if use_bno:
+                imu_port.drain(accept_imu)
+            else:
+                drain_imu(imu_port, decoder, accept_imu)
+        with selectors.DefaultSelector() as selector:
+            selector.register(connection, selectors.EVENT_READ, "state")
+            if not use_bno:
+                selector.register(imu_port, selectors.EVENT_READ, "imu")
+            running = True
+            while running:
+                for key, _mask in selector.select(timeout=0.1):
+                    if key.data == "imu":
+                        update_imu()
+                        continue
+
+                    try:
+                        payload = connection.recv(4096)
+                    except ConnectionResetError:
+                        if state_count == 0:
+                            raise RuntimeError(
+                                "native IPC disconnected before publishing a state"
+                            ) from None
+                        running = False
+                        break
+                    if not payload:
+                        running = False
+                        break
+                    state = NativeStatePacket.unpack(payload)
+                    if state.motor_order_hash != motor_hash:
+                        raise RuntimeError("native state motor-order hash mismatch")
+                    if state.sequence <= last_state_sequence:
+                        raise RuntimeError("native state sequence did not increase")
+                    last_state_sequence = state.sequence
+                    state_count += 1
+                    last_tick_timing = {"state_sequence": state.sequence, "stage": "receive_imu"}
+                    shadow.motor_states = {
+                        name: DamiaoMitState(position, velocity)
+                        for name, position, velocity in zip(
+                            motor_names, state.position_rad, state.velocity_rad_s, strict=True
+                        )
+                    }
+                    # A state event may precede a simultaneously readable IMU event.
+                    update_imu()
+                    if not shadow.ready:
+                        continue
+                    observed_ns = time.monotonic_ns()
+                    last_tick_timing.update(
+                        stage="pre_inference_freshness",
+                        raw_age_before_ms=(observed_ns-last_raw_imu_monotonic_ns)/1e6,
+                        quaternion_age_before_ms=(observed_ns-last_quaternion_monotonic_ns)/1e6,
+                        source_state_age_before_ms=(observed_ns-state.monotonic_ns)/1e6,
+                    )
+                    require_fresh_imu(last_raw_imu_monotonic_ns,
+                                      last_quaternion_monotonic_ns, time.monotonic_ns())
+                    if command_profile:
+                        if profile_start_ns is None:
+                            profile_start_ns = state.monotonic_ns
+                        profile_elapsed_s = (state.monotonic_ns - profile_start_ns) / 1.0e9
+                        vx, stage = sample_stand_walk_stop(profile_elapsed_s, command_profile)
+                        shadow.command[:] = (vx, 0.0, 0.0)
+                        if stage != profile_stage:
+                            profile_stage = stage
+                            event = {"stage": stage, "elapsed_s": profile_elapsed_s, "vx": vx}
+                            profile_events.append(event)
+                            print(f"COMMAND_STAGE {stage} elapsed={profile_elapsed_s:.2f}s vx={vx:.4f}m/s", flush=True)
+                        remaining = countdown(profile_elapsed_s)
+                        if remaining is not None and remaining != profile_countdown:
+                            profile_countdown = remaining
+                            print(f"DISABLE_COUNTDOWN approximately {remaining}s; zero velocity command; fall arrest must be ready", flush=True)
+                    started_ns = time.perf_counter_ns()
+                    started_cpu_ns = time.thread_time_ns()
+                    last_tick_timing["stage"] = "inference"
+                    if not heading_started:
+                        heading.reset()
+                        heading_started = True
+                        print("HEADING_RESET relative gyro yaw=0; telemetry only; no heading compensation", flush=True)
+                    target = shadow.infer_policy_target(state.monotonic_ns)
+                    inference_ms.append((time.perf_counter_ns() - started_ns) / 1.0e6)
+                    last_tick_timing.update(
+                        stage="target_processing",
+                        inference_wall_ms=inference_ms[-1],
+                        inference_thread_cpu_ms=(time.thread_time_ns()-started_cpu_ns)/1e6,
+                    )
+                    processing_started_ns = time.monotonic_ns()
+                    policy_trace = shadow.last_policy_trace
+                    if policy_trace is None:
+                        raise RuntimeError("policy trace was not captured")
+                    heading.update(policy_trace.base_angular_velocity_rad_s,
+                                   policy_trace.projected_gravity,
+                                   last_raw_imu_monotonic_ns)
+                    if action_replay is not None:
+                        if replay_center is None:
+                            replay_center = policy_trace.joint_position_rad.copy()
+                        target = JointImpedanceTarget(
+                            position_rad=(
+                                replay_center
+                                + action_replay.position_delta(target_count)
+                            ),
+                            velocity_rad_s=np.zeros(31),
+                            kp=target.kp.copy(),
+                            kd=target.kd.copy(),
+                            feedforward_torque_nm=np.zeros(31),
+                        )
+                    raw_target = target
+                    if projector is not None:
+                        target = projector.project(raw_target)
+                    projected_target = target
+                    if startup is not None:
+                        target = startup.apply(
+                            projected_target,
+                            _startup_measured_position(
+                                startup,
+                                projector,
+                                policy_trace.joint_position_rad,
+                            ),
+                        )
+                    target_sequence += 1
+                    packet = PolicyTargetPacket(
+                        sequence=target_sequence,
+                        monotonic_ns=time.monotonic_ns(),
+                        joint_order_hash=joint_hash,
+                        source_state_sequence=state.sequence,
+                        position_rad=tuple(map(float, target.position_rad)),
+                        velocity_rad_s=tuple(map(float, target.velocity_rad_s)),
+                        kp=tuple(map(float, target.kp)),
+                        kd=tuple(map(float, target.kd)),
+                        feedforward_torque_nm=tuple(map(float, target.feedforward_torque_nm)),
+                    )
+                    # Do not send a new target if inference consumed the freshness budget.
+                    checked_ns = time.monotonic_ns()
+                    last_tick_timing.update(
+                        stage="post_inference_freshness",
+                        target_processing_ms=(checked_ns-processing_started_ns)/1e6,
+                        raw_age_after_ms=(checked_ns-last_raw_imu_monotonic_ns)/1e6,
+                        quaternion_age_after_ms=(checked_ns-last_quaternion_monotonic_ns)/1e6,
+                        source_state_age_after_ms=(checked_ns-state.monotonic_ns)/1e6,
+                    )
+                    require_fresh_imu(last_raw_imu_monotonic_ns,
+                                      last_quaternion_monotonic_ns, time.monotonic_ns())
+                    if trace is not None:
+                        trace["state_sequence"].append(state.sequence)
+                        trace["relative_gyro_yaw_rad"].append(heading.yaw_rad)
+                        trace["relative_gyro_yaw_valid"].append(heading.valid)
+                        trace["command_vx_vy_yaw_rate"].append(shadow.command.copy())
+                        trace["command_profile_elapsed_s"].append(profile_elapsed_s)
+                        trace["state_monotonic_ns"].append(state.monotonic_ns)
+                        trace["target_monotonic_ns"].append(packet.monotonic_ns)
+                        trace["motor_position_rad"].append(state.position_rad)
+                        trace["motor_velocity_rad_s"].append(state.velocity_rad_s)
+                        for field in (
+                            "joint_position_rad",
+                            "joint_velocity_rad_s",
+                            "base_angular_velocity_rad_s",
+                            "projected_gravity",
+                            "observation",
+                            "raw_action",
+                            "handoff_action",
+                            "target_position_rad",
+                        ):
+                            trace[field].append(getattr(policy_trace, field))
+                        nan3 = (float("nan"),) * 3
+                        nan4 = (float("nan"),) * 4
+                        trace["imu_raw_monotonic_ns"].append(last_raw_imu_monotonic_ns)
+                        trace["imu_quaternion_monotonic_ns"].append(
+                            last_quaternion_monotonic_ns
+                        )
+                        trace["imu_acceleration_m_s2"].append(
+                            last_raw_imu.acceleration_m_s2
+                            if last_raw_imu is not None
+                            else nan3
+                        )
+                        trace["imu_angular_velocity_sensor_rad_s"].append(
+                            last_raw_imu.angular_velocity_rad_s
+                            if last_raw_imu is not None
+                            else nan3
+                        )
+                        trace["imu_magnetic_field_ut"].append(
+                            last_raw_imu.magnetic_field_ut
+                            if last_raw_imu is not None
+                            else nan3
+                        )
+                        trace["imu_quaternion_wxyz"].append(
+                            last_quaternion.wxyz
+                            if last_quaternion is not None
+                            else nan4
+                        )
+                        trace["imu_raw_age_ms"].append(
+                            (packet.monotonic_ns - last_raw_imu_monotonic_ns) / 1.0e6
+                            if last_raw_imu_monotonic_ns
+                            else float("nan")
+                        )
+                        trace["imu_quaternion_age_ms"].append(
+                            (packet.monotonic_ns - last_quaternion_monotonic_ns) / 1.0e6
+                            if last_quaternion_monotonic_ns
+                            else float("nan")
+                        )
+                        trace["command_target_position_rad"].append(
+                            raw_target.position_rad
+                        )
+                        trace["projected_target_position_rad"].append(
+                            projected_target.position_rad
+                        )
+                        trace["projected_target_velocity_rad_s"].append(
+                            projected_target.velocity_rad_s
+                        )
+                        trace["projected_kp"].append(projected_target.kp)
+                        trace["projected_kd"].append(projected_target.kd)
+                        trace["projected_feedforward_torque_nm"].append(
+                            projected_target.feedforward_torque_nm
+                        )
+                        trace["startup_target_position_rad"].append(target.position_rad)
+                        trace["startup_target_velocity_rad_s"].append(
+                            target.velocity_rad_s
+                        )
+                        trace["startup_kp"].append(target.kp)
+                        trace["startup_kd"].append(target.kd)
+                        trace["startup_feedforward_torque_nm"].append(
+                            target.feedforward_torque_nm
+                        )
+                        trace["startup_alpha"].append(
+                            startup.last_alpha if startup is not None else 1.0
+                        )
+                    if clamp_watchdog is not None:
+                        clamp_watchdog.update(
+                            raw_target.position_rad, projected_target.position_rad
+                        )
+                    try:
+                        last_tick_timing["stage"] = "pre_send_freshness"
+                        checked_ns = time.monotonic_ns()
+                        last_tick_timing["raw_age_send_ms"] = (checked_ns-last_raw_imu_monotonic_ns)/1e6
+                        last_tick_timing["quaternion_age_send_ms"] = (checked_ns-last_quaternion_monotonic_ns)/1e6
+                        require_fresh_imu(last_raw_imu_monotonic_ns,
+                                          last_quaternion_monotonic_ns, time.monotonic_ns())
+                        connection.sendall(packet.pack())
+                    except BrokenPipeError:
+                        if target_count == 0:
+                            raise RuntimeError(
+                                "native IPC disconnected before accepting a target"
+                            ) from None
+                        running = False
+                        break
+                    target_count += 1
+                    last_tick_timing["stage"] = "sent"
+
+    coverage = target_count / state_count if state_count else 0.0
+    trace_sha256 = None
+    if trace is not None:
+        trace_path = Path(args.trace_output)
+        trace_path.parent.mkdir(parents=True, exist_ok=True)
+        np.savez_compressed(
+            trace_path,
+            motor_names=np.asarray(motor_names),
+            joint_names=np.asarray(contract.data["joint_names"]),
+            **{name: np.asarray(values) for name, values in trace.items()},
+        )
+        trace_sha256 = hashlib.sha256(trace_path.read_bytes()).hexdigest()
+
+    report = {
+        "imu_source": source_context.report() if use_bno else {"source": "yahboom"},
+        "mode": "python_onnx_native_ipc_policy_shadow_no_actuation",
+        "state_count": state_count,
+        "target_count": target_count,
+        "session_heading": heading.report(),
+        "target_coverage": coverage,
+        "raw_imu_count": raw_imu_count,
+        "quaternion_count": quaternion_count,
+        "imu_rejected_frame_count": decoder.rejected_frame_count,
+        "inference_mean_ms": float(np.mean(inference_ms)) if inference_ms else None,
+        "inference_p99_ms": _percentile(inference_ms, 0.99),
+        "inference_max_ms": max(inference_ms) if inference_ms else None,
+        "last_tick_timing": last_tick_timing,
+        "last_imu_drain_timing": getattr(decoder, "last_drain_timing", None),
+        "imu_drain_timing_summary": getattr(decoder, "drain_timing_summary", None),
+        "last_policy_stage_timing": getattr(shadow, "last_stage_timing", None),
+        "nonzero_can_tx_attempts": 0,
+        "protected_target_projection": (
+            projector.report() if projector is not None else {"enabled": False}
+        ),
+        "consecutive_clamp_watchdog": (
+            clamp_watchdog.report()
+            if clamp_watchdog is not None
+            else {"enabled": False}
+        ),
+        "physical_startup_ramp": (
+            startup.report() if startup is not None else {"enabled": False}
+        ),
+        "command_profile": {"name": command_profile, "events": profile_events,
+                            "last_elapsed_s": profile_elapsed_s},
+        "action_trace_replay": (
+            action_replay.report()
+            if action_replay is not None
+            else {"enabled": False}
+        ),
+        "trace_output": str(Path(args.trace_output).resolve()) if args.trace_output else None,
+        "trace_sha256": trace_sha256,
+        "trace_tick_count": len(trace["state_sequence"]) if trace is not None else 0,
+        "errors": errors,
+        "passed": (
+            not errors
+            and state_count > 0
+            and coverage >= 0.9
+            and raw_imu_count > 0
+            and quaternion_count > 0
+            and bool(inference_ms)
+            and max(inference_ms) <= 20.0
+        ),
+    }
+    Path(args.output).parent.mkdir(parents=True, exist_ok=True)
+    Path(args.output).write_text(json.dumps(report, indent=2) + "\n", encoding="utf-8")
+    return report
+
+
+def main() -> None:
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--socket", required=True)
+    parser.add_argument("--hardware-config", required=True)
+    parser.add_argument("--contract", required=True)
+    parser.add_argument("--imu-device", default="/dev/ttyCH341USB0")
+    parser.add_argument("--imu-baud", type=int, default=115200)
+    parser.add_argument("--imu-source", choices=('yahboom', 'bno055', 'native-bno055'), default='yahboom')
+    parser.add_argument("--native-imu-socket", help='Existing native BNO producer Unix socket; no auto-start')
+    parser.add_argument("--bno-bus", type=int, default=7)
+    parser.add_argument("--bno-address", type=lambda value: int(value, 0), default=0x28)
+    parser.add_argument("--bno-initialize", action='store_true',
+                        help='Allow startup IMUPLUS/P0 configuration before IPC connection')
+    parser.add_argument("--vx", type=float, default=0.0)
+    parser.add_argument("--command-profile", choices=list(PROFILE_SPEEDS))
+    parser.add_argument("--vy", type=float, default=0.0)
+    parser.add_argument("--yaw-rate", type=float, default=0.0)
+    parser.add_argument("--output", required=True)
+    parser.add_argument("--trace-output")
+    parser.add_argument("--joint-limit-candidates")
+    parser.add_argument("--gain-scale", type=float, default=1.0)
+    parser.add_argument(
+        "--joint-gain-multiplier",
+        action="append",
+        default=[],
+        metavar="JOINT=FACTOR",
+    )
+    parser.add_argument(
+        "--joint-damping-multiplier",
+        action="append",
+        default=[],
+        metavar="JOINT=FACTOR",
+        help="extra per-joint multiplier applied only to Kd after gain scaling",
+    )
+    parser.add_argument(
+        "--fail-on-consecutive-clamp-joint",
+        action="append",
+        default=[],
+        metavar="JOINT",
+    )
+    parser.add_argument(
+        "--clamp-watchdog-minimum-overshoot-rad", type=float, default=0.05
+    )
+    parser.add_argument(
+        "--clamp-watchdog-maximum-consecutive-ticks", type=int, default=5
+    )
+    parser.add_argument(
+        "--clamp-watchdog-ignored-initial-ticks", type=int, default=0
+    )
+    parser.add_argument("--physical-startup-hold-seconds", type=float, default=0.0)
+    parser.add_argument("--physical-startup-ramp-seconds", type=float, default=0.0)
+    parser.add_argument("--replay-action-trace")
+    parser.add_argument("--replay-source-hz", type=float, default=50.0)
+    parser.add_argument("--replay-start-seconds", type=float, default=10.0)
+    parser.add_argument("--replay-duration-seconds", type=float, default=20.0)
+    parser.add_argument("--replay-amplitude-scale", type=float, default=0.2)
+    args = parser.parse_args()
+    report = run(args)
+    print(json.dumps(report, indent=2))
+    if not report["passed"]:
+        raise SystemExit("native policy IPC client shadow failed")
+
+
+if __name__ == "__main__":
+    main()

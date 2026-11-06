@@ -1,0 +1,78 @@
+{
+  "method": "SuperMimic Appendix B/G joint motion and RL velocity interfaces",
+  "num_envs": 4096,
+  "buffer_steps": 1000,
+  "iterations": 100000,
+  "max_wall_seconds": 43200,
+  "hist": 10,
+  "goal_frames": 10,
+  "horizon": 32,
+  "wm_window": 8,
+  "wm_width": 2048,
+  "wm_batches": 10,
+  "wm_batch": 2048,
+  "wm_microbatch": 512,
+  "pi_batch_total": 4096,
+  "pi_microbatch": 512,
+  "critic_microbatch": 4096,
+  "critic_epochs": 5,
+  "critic_minibatches": 4,
+  "lr": 0.0002,
+  "gamma": 0.99,
+  "lam": 0.95,
+  "utd": 0.4,
+  "action_noise": 0.1,
+  "warmup_steps": 64,
+  "command_resample_steps": 250,
+  "reference_command_probability": 0.5,
+  "random_stand_probability": 0.1,
+  "latent_alignment_weight": 0.1,
+  "command_ranges": [
+    [
+      -0.3,
+      0.6
+    ],
+    [
+      -0.2,
+      0.2
+    ],
+    [
+      -0.6,
+      0.6
+    ]
+  ],
+  "command_range_note": "Embodiment-specific low-speed Sprite operating envelope; algorithmic sampling matches paper. Not the G1 benchmark's much wider range.",
+  "network_hidden": [
+    2048,
+    1024,
+    512,
+    256
+  ],
+  "compile": true,
+  "seed": 43,
+  "save_seconds": 600,
+  "log_every": 10,
+  "physics_dt": 0.002,
+  "policy_dt": 0.02,
+  "velocity_fall_height_m": 0.25,
+  "velocity_reward_revision": "paper_a6_torso_heading_v2",
+  "matmul_precision": "highest",
+  "tf32": false,
+  "embodiment_notes": "31-DoF Sprite v5, physical model/PD/timing differ from G1; published hyperparameter differences remain explicit.",
+  "experiment_id": "joint-waist-v5-002",
+  "initialization": "fresh_random_no_checkpoint",
+  "asset_revision": "sprite0825_v5_4340_shoulders_waist20261105",
+  "control_profile_sha256": "184ec989fd24b4bc6ea5034e6fdae796b5b9ce83ef2c884dfe4fc61d8d6987dc",
+  "training_pd_hz": 500,
+  "decimation": 10,
+  "published_timing_override": "200Hz snapshot gains/caps/defaults, explicitly500Hz training variant",
+  "reference_reuse": "Retained native v5 geometry; full new-asset FK/contact/visual revalidation required",
+  "first_phase_hours": 12,
+  "checkpoint_review_hours": [
+    1,
+    2,
+    4,
+    8,
+    12
+  ]
+}

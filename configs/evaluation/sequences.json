@@ -1,0 +1,234 @@
+[
+  {
+    "name": "speed_ladder",
+    "command": [
+      0.15,
+      0,
+      0
+    ],
+    "stages": [
+      {
+        "at_seconds": 2,
+        "command": [
+          0.15,
+          0,
+          0
+        ]
+      },
+      {
+        "at_seconds": 12,
+        "command": [
+          0.3,
+          0,
+          0
+        ]
+      },
+      {
+        "at_seconds": 22,
+        "command": [
+          0.45,
+          0,
+          0
+        ]
+      },
+      {
+        "at_seconds": 32,
+        "command": [
+          0.6,
+          0,
+          0
+        ]
+      },
+      {
+        "at_seconds": 42,
+        "command": [
+          0.15,
+          0,
+          0
+        ]
+      },
+      {
+        "at_seconds": 52,
+        "command": [
+          0,
+          0,
+          0
+        ]
+      }
+    ]
+  },
+  {
+    "name": "turn_switch",
+    "command": [
+      0.3,
+      0,
+      0
+    ],
+    "stages": [
+      {
+        "at_seconds": 2,
+        "command": [
+          0.3,
+          0,
+          0
+        ]
+      },
+      {
+        "at_seconds": 12,
+        "command": [
+          0.3,
+          0,
+          0.3
+        ]
+      },
+      {
+        "at_seconds": 22,
+        "command": [
+          0.3,
+          0,
+          0
+        ]
+      },
+      {
+        "at_seconds": 32,
+        "command": [
+          0.3,
+          0,
+          -0.3
+        ]
+      },
+      {
+        "at_seconds": 42,
+        "command": [
+          0.15,
+          0,
+          -0.15
+        ]
+      },
+      {
+        "at_seconds": 52,
+        "command": [
+          0,
+          0,
+          0
+        ]
+      }
+    ]
+  },
+  {
+    "name": "reverse_stop_forward",
+    "command": [
+      -0.15,
+      0,
+      0
+    ],
+    "stages": [
+      {
+        "at_seconds": 2,
+        "command": [
+          -0.15,
+          0,
+          0
+        ]
+      },
+      {
+        "at_seconds": 12,
+        "command": [
+          -0.3,
+          0,
+          0
+        ]
+      },
+      {
+        "at_seconds": 22,
+        "command": [
+          0,
+          0,
+          0
+        ]
+      },
+      {
+        "at_seconds": 32,
+        "command": [
+          0.15,
+          0,
+          0
+        ]
+      },
+      {
+        "at_seconds": 42,
+        "command": [
+          0.3,
+          0,
+          0
+        ]
+      },
+      {
+        "at_seconds": 52,
+        "command": [
+          0,
+          0,
+          0
+        ]
+      }
+    ]
+  },
+  {
+    "name": "low_speed_restart",
+    "command": [
+      0.15,
+      0,
+      0
+    ],
+    "stages": [
+      {
+        "at_seconds": 2,
+        "command": [
+          0.15,
+          0,
+          0
+        ]
+      },
+      {
+        "at_seconds": 12,
+        "command": [
+          0.3,
+          0,
+          0
+        ]
+      },
+      {
+        "at_seconds": 22,
+        "command": [
+          0.15,
+          0,
+          0
+        ]
+      },
+      {
+        "at_seconds": 32,
+        "command": [
+          0,
+          0,
+          0
+        ]
+      },
+      {
+        "at_seconds": 42,
+        "command": [
+          0.15,
+          0,
+          0
+        ]
+      },
+      {
+        "at_seconds": 52,
+        "command": [
+          0.3,
+          0,
+          0
+        ]
+      }
+    ]
+  }
+]

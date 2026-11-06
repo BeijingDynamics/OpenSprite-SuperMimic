@@ -1,0 +1,67 @@
+[
+  {
+    "name": "v5_straight",
+    "category": "straight",
+    "original_source": "walk1_subject1.bvh",
+    "original_sha256": "f840f7fbba3fb32ccc23034fc69ea96c01030fbf602818c2fb127faddacd9d8e",
+    "start_frame": 11910,
+    "end_frame_exclusive": 12390,
+    "fps": 59.998800023999515,
+    "duration_seconds": 8.000160000000001,
+    "mean_human_speed_m_s": 0.812705282592084,
+    "human_net_yaw_rad": -0.008127065532917754,
+    "sha256": "ddc8d3401f0454ea3352504e2dc910931ef8fc776da987a42ef5bd47fd772fc2"
+  },
+  {
+    "name": "v5_left",
+    "category": "left",
+    "original_source": "walk2_subject1.bvh",
+    "original_sha256": "ff0f8310f840353be932fee07ea0eaaf15096bffe586727e1f0848127866a63f",
+    "start_frame": 1680,
+    "end_frame_exclusive": 2160,
+    "fps": 59.998800023999515,
+    "duration_seconds": 8.000160000000001,
+    "mean_human_speed_m_s": 0.4684349526370347,
+    "human_net_yaw_rad": 0.9820264245723589,
+    "sha256": "8eca8924eb02a0b71d3f42579708608877a87b93d0cca23b0f815dbf396ae23d"
+  },
+  {
+    "name": "v5_right",
+    "category": "right",
+    "original_source": "walk2_subject1.bvh",
+    "original_sha256": "ff0f8310f840353be932fee07ea0eaaf15096bffe586727e1f0848127866a63f",
+    "start_frame": 750,
+    "end_frame_exclusive": 1230,
+    "fps": 59.998800023999515,
+    "duration_seconds": 8.000160000000001,
+    "mean_human_speed_m_s": 0.7028750927878441,
+    "human_net_yaw_rad": -0.9969089640123303,
+    "sha256": "972de8219ac94de5eb4c2667b176a7cb23438704c93b21f0a9f855bd4cba2cd0"
+  },
+  {
+    "name": "v5_start",
+    "category": "start",
+    "original_source": "walk2_subject1.bvh",
+    "original_sha256": "ff0f8310f840353be932fee07ea0eaaf15096bffe586727e1f0848127866a63f",
+    "start_frame": 1800,
+    "end_frame_exclusive": 2280,
+    "fps": 59.998800023999515,
+    "duration_seconds": 8.000160000000001,
+    "mean_human_speed_m_s": 0.6844052775410686,
+    "human_net_yaw_rad": -0.8060606893507174,
+    "sha256": "a5d5ab4d4461b67380ae9bd396dbadd024d573aba4a77e7145a4b8675df157c9"
+  },
+  {
+    "name": "v5_stop",
+    "category": "stop",
+    "original_source": "walk2_subject1.bvh",
+    "original_sha256": "ff0f8310f840353be932fee07ea0eaaf15096bffe586727e1f0848127866a63f",
+    "start_frame": 1380,
+    "end_frame_exclusive": 1860,
+    "fps": 59.998800023999515,
+    "duration_seconds": 8.000160000000001,
+    "mean_human_speed_m_s": 0.5933081456746775,
+    "human_net_yaw_rad": -0.4584037868613109,
+    "sha256": "3f6b4e76811dced8c52f3ba4fdef3bf21ecd545be5b0290d4deb0988db91a78c"
+  }
+]

@@ -1,0 +1,17 @@
+[build-system]
+requires = ["setuptools>=69"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "opensprite-supermimic"
+version = "0.2.0"
+description = "Joint SuperMimic motion tracking and commanded locomotion for Open Sprite v5"
+readme = "README.md"
+requires-python = ">=3.12"
+license = { text = "AGPL-3.0-only" }
+
+[tool.setuptools.packages.find]
+include = ["opensprite_tracker*", "retarget*"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]

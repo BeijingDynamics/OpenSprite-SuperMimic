@@ -1,0 +1,26 @@
+name: Offline checks
+on: [push, pull_request]
+permissions:
+  contents: read
+jobs:
+  runtime:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+          cache: pip
+      - run: python -m pip install -r requirements-cpu.txt -e 'runtime[can,imu,dev]'
+      - run: python -m pytest runtime/tests -q
+      - run: python -m compileall -q opensprite_tracker retarget scripts runtime/src
+      - run: python -c 'from retarget.umr_pipeline import check_node_runtime; check_node_runtime()'
+      - run: python scripts/fetch_robot_assets.py
+      - name: Check reference data stays out of Git
+        run: |
+          python - <<'PY'
+          import subprocess
+          paths = subprocess.check_output(['git','ls-files'], text=True).splitlines()
+          bad = [p for p in paths if p.startswith(('data/', 'assets/geno/', 'assets/umr_correspondence/')) and p.endswith(('.bvh','.fbx','.npz','.pt','.mp4'))]
+          assert not bad, bad
+          PY

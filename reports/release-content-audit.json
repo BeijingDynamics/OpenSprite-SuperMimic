@@ -1,0 +1,21 @@
+{
+  "no_reference_data_paths": true,
+  "checks": {
+    "run002-jetson-cpu.tar.gz": {
+      "text_files_scanned": 67,
+      "secret_candidates": []
+    },
+    "run002-models.tar.gz": {
+      "text_files_scanned": 5,
+      "secret_candidates": []
+    },
+    "run002-strict-startup.tar.gz": {
+      "text_files_scanned": 360,
+      "secret_candidates": []
+    },
+    "run002-velocity-evaluation.tar.gz": {
+      "text_files_scanned": 4,
+      "secret_candidates": []
+    }
+  }
+}

@@ -1,0 +1,88 @@
+{
+  "interface": "motion",
+  "iteration": 15398,
+  "seed": 101,
+  "steps": 399,
+  "seconds": 7.98,
+  "results": [
+    {
+      "env": 0,
+      "label": "v5_straight",
+      "survived": true,
+      "first_failure_seconds": null,
+      "scored_steps": 399,
+      "joint_rmse_rad": 0.0992732122540474,
+      "root_error_m": 0.10240958631038666,
+      "mean_vx_m_s": 0.43103787302970886,
+      "mean_yaw_rad_s": 0.039725955575704575
+    },
+    {
+      "env": 1,
+      "label": "v5_left",
+      "survived": true,
+      "first_failure_seconds": null,
+      "scored_steps": 399,
+      "joint_rmse_rad": 0.1147373840212822,
+      "root_error_m": 0.08005262911319733,
+      "mean_vx_m_s": 0.2187814563512802,
+      "mean_yaw_rad_s": 0.11646686494350433
+    },
+    {
+      "env": 2,
+      "label": "v5_right",
+      "survived": true,
+      "first_failure_seconds": null,
+      "scored_steps": 399,
+      "joint_rmse_rad": 0.1008245050907135,
+      "root_error_m": 0.13833585381507874,
+      "mean_vx_m_s": 0.19208486378192902,
+      "mean_yaw_rad_s": -0.1315966099500656
+    },
+    {
+      "env": 3,
+      "label": "v5_start",
+      "survived": true,
+      "first_failure_seconds": null,
+      "scored_steps": 399,
+      "joint_rmse_rad": 0.11105728894472122,
+      "root_error_m": 0.08260706812143326,
+      "mean_vx_m_s": 0.35090523958206177,
+      "mean_yaw_rad_s": -0.0810609757900238
+    },
+    {
+      "env": 4,
+      "label": "v5_stop",
+      "survived": true,
+      "first_failure_seconds": null,
+      "scored_steps": 399,
+      "joint_rmse_rad": 0.11817815154790878,
+      "root_error_m": 0.10341698676347733,
+      "mean_vx_m_s": 0.3251093327999115,
+      "mean_yaw_rad_s": -0.059607408940792084
+    }
+  ],
+  "initialization": {
+    "mode": "reference-clip-first-frame"
+  },
+  "training_random_command_ranges": [
+    [
+      -0.3,
+      0.6
+    ],
+    [
+      -0.2,
+      0.2
+    ],
+    [
+      -0.6,
+      0.6
+    ]
+  ],
+  "policy_dt": 0.02,
+  "physics_dt": 0.002,
+  "history": 10,
+  "checkpoint_sha256": "094b52267159d26f4d5bfb41edc5823a9becc32f706c87df05f8aa36b4016282",
+  "protocol": "No failure reset; velocity starts from physical rest and steps command after 2s; motion starts at each source first frame; pre-failure scoring only",
+  "hardware_qualified": false,
+  "wall_seconds": 11.349482851102948
+}

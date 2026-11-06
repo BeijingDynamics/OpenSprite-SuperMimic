@@ -1,0 +1,11 @@
+{
+  "asset_revision": "sprite0825_v5_4340_shoulders_waist20261105",
+  "control_profile_sha256": "184ec989fd24b4bc6ea5034e6fdae796b5b9ce83ef2c884dfe4fc61d8d6987dc",
+  "scene_sha256": "d657bd4fae1f906916aa4d0eab853031c7f87e768221745a3e11678c79507011",
+  "training_pd_hz": 500,
+  "body_mass_kg": 16.319556000000006,
+  "nq": 38,
+  "nv": 37,
+  "source": "actual mjlab new-model environment, randomization disabled",
+  "hardware_qualified": false
+}

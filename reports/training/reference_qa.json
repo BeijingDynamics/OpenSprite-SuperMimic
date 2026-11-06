@@ -1,0 +1,153 @@
+{
+  "accepted_for_training": true,
+  "asset_revision": "sprite0825_v5_4340_shoulders_waist20261105",
+  "motion_bank_sha256": "6f9cefe15646b532ccf57a40f20292c69c18f77ae0c33254abdedfcd1c66a8d0",
+  "references": [
+    {
+      "name": "v5_straight",
+      "category": "straight",
+      "frames": 400,
+      "lift_events": [
+        7,
+        12
+      ],
+      "min_sole_height_m": 0.0003637303854729622,
+      "stance_foot_rms_speed_m_s": 0.0011662640012352454,
+      "net_yaw_rad": 0.04390263557434082,
+      "max_joint_velocity_ratio": 0.9800018310546875,
+      "accepted": true,
+      "errors": [],
+      "root_component_speed_max_m_s": [
+        1.0000050067901611,
+        1.0000050067901611,
+        0.5000010132789612
+      ],
+      "root_component_acceleration_max_m_s2": [
+        8.000432968139648,
+        8.000432968139648,
+        8.00013542175293
+      ],
+      "max_training_velocity_cost_threshold_ratio": 1.053765388124417
+    },
+    {
+      "name": "v5_left",
+      "category": "left",
+      "frames": 400,
+      "lift_events": [
+        6,
+        3
+      ],
+      "min_sole_height_m": 0.0003061721573467506,
+      "stance_foot_rms_speed_m_s": 0.0015391507852949358,
+      "net_yaw_rad": 0.872406005859375,
+      "max_joint_velocity_ratio": 0.9800002098083496,
+      "accepted": true,
+      "errors": [],
+      "root_component_speed_max_m_s": [
+        1.0000050067901611,
+        1.0000004768371582,
+        0.5000010132789612
+      ],
+      "root_component_acceleration_max_m_s2": [
+        8.000432968139648,
+        8.00013542175293,
+        8.00006103515625
+      ],
+      "max_training_velocity_cost_threshold_ratio": 1.0537636448488206
+    },
+    {
+      "name": "v5_right",
+      "category": "right",
+      "frames": 400,
+      "lift_events": [
+        8,
+        8
+      ],
+      "min_sole_height_m": 0.0003712010676858151,
+      "stance_foot_rms_speed_m_s": 0.0027304698821429565,
+      "net_yaw_rad": -0.9900498986244202,
+      "max_joint_velocity_ratio": 0.9800053596496582,
+      "accepted": true,
+      "errors": [],
+      "root_component_speed_max_m_s": [
+        1.0000050067901611,
+        1.0000050067901611,
+        0.49625635147094727
+      ],
+      "root_component_acceleration_max_m_s2": [
+        8.000432968139648,
+        8.000731468200684,
+        8.00006103515625
+      ],
+      "max_training_velocity_cost_threshold_ratio": 1.0537691823124797
+    },
+    {
+      "name": "v5_start",
+      "category": "start",
+      "frames": 400,
+      "lift_events": [
+        9,
+        4
+      ],
+      "min_sole_height_m": 0.00030001270012844014,
+      "stance_foot_rms_speed_m_s": 0.0019770891193830174,
+      "net_yaw_rad": -0.7015109062194824,
+      "max_joint_velocity_ratio": 0.9800004959106445,
+      "accepted": true,
+      "errors": [],
+      "root_component_speed_max_m_s": [
+        1.0000050067901611,
+        1.0000004768371582,
+        0.5000010132789612
+      ],
+      "root_component_acceleration_max_m_s2": [
+        8.000432968139648,
+        8.00013542175293,
+        8.00013542175293
+      ],
+      "max_training_velocity_cost_threshold_ratio": 1.0537639524856905
+    },
+    {
+      "name": "v5_stop",
+      "category": "stop",
+      "frames": 400,
+      "lift_events": [
+        7,
+        4
+      ],
+      "min_sole_height_m": 0.00036290712423914934,
+      "stance_foot_rms_speed_m_s": 0.002334501480471811,
+      "net_yaw_rad": -0.5045661330223083,
+      "max_joint_velocity_ratio": 0.9800049781799316,
+      "accepted": true,
+      "errors": [],
+      "root_component_speed_max_m_s": [
+        1.0000050067901611,
+        1.0000109672546387,
+        0.5000010132789612
+      ],
+      "root_component_acceleration_max_m_s2": [
+        8.000432968139648,
+        8.000731468200684,
+        8.00006103515625
+      ],
+      "max_training_velocity_cost_threshold_ratio": 1.0537687721299864
+    }
+  ],
+  "source_manifest_sha256": "6b3c4b7f61bc373f2999ac5da8d5902becac1cbf6d6dc680d2b80a4e530b6e26",
+  "errors": [],
+  "limitations": "Kinematic ground/contact/velocity checks only; not dynamic feasibility or hardware admission",
+  "visual_review_passed": true,
+  "visual_review": {
+    "reviewed_utc": "2026-11-05T07:25:17.488199+00:00",
+    "reviewer": "Codex visual inspection of all five new-asset rendered contact sheets",
+    "images_sha256": {
+      "v5_left.png": "0f2f28e9374c1f427e36a6eb3f6c8a9b28f936afcad506cf7f299038907c1dd3",
+      "v5_right.png": "d7a950bbe1d1ed5658bd8ffa19402e6bdecf97cf7d452c6e00b9782cbfa59837",
+      "v5_start.png": "72d047cccd6669df89134f73d4ffa4ca2758b76d38b1bb5c4cc2e5ccb1e458db",
+      "v5_stop.png": "95777ae7ed59f14dab8c36c0280ec4bee4afda42fcff78cc9ba5f47b4e21221e",
+      "v5_straight.png": "737df426fb1aa6099be0a7fa6c7007045c8482d34d3f46bcf045663897382499"
+    },
+    "findings": "Alternating support, swing clearance and left/right heading changes are visible; no gross limb inversion or floor penetration visible. Kinematic reference approval only; dynamic feasibility is tested during policy training."
+  }
+}

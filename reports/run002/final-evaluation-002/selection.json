@@ -1,0 +1,135 @@
+{
+  "candidates": [
+    {
+      "name": "final",
+      "path": "/root/gpufree-data/v5_joint_run002/outputs/joint-waist-v5-002/model_015398.pt",
+      "sha256": "094b52267159d26f4d5bfb41edc5823a9becc32f706c87df05f8aa36b4016282",
+      "iteration": 15398,
+      "primary_score": {
+        "survival": 1.0,
+        "planar_error_m_s": 0.07375085325911641,
+        "yaw_error_rad_s": 0.07170172119513155,
+        "rank_cost": 0.09526136961765588
+      },
+      "seed_reports": [
+        "/root/gpufree-data/v5_joint_run002/outputs/final-evaluation-002/final/velocity-seed101/summary.json",
+        "/root/gpufree-data/v5_joint_run002/outputs/final-evaluation-002/final/velocity-seed202/summary.json",
+        "/root/gpufree-data/v5_joint_run002/outputs/final-evaluation-002/final/velocity-seed303/summary.json"
+      ],
+      "mean_rank_cost": 0.09461926735316713,
+      "confirmation_scores": [
+        {
+          "survival": 1.0,
+          "planar_error_m_s": 0.07375085325911641,
+          "yaw_error_rad_s": 0.07170172119513155,
+          "rank_cost": 0.09526136961765588
+        },
+        {
+          "survival": 1.0,
+          "planar_error_m_s": 0.07293486860580742,
+          "yaw_error_rad_s": 0.0710780224762857,
+          "rank_cost": 0.09425827534869313
+        },
+        {
+          "survival": 1.0,
+          "planar_error_m_s": 0.0729834467638284,
+          "yaw_error_rad_s": 0.07118236776441336,
+          "rank_cost": 0.09433815709315241
+        }
+      ]
+    },
+    {
+      "name": "prior_best_motion",
+      "path": "/root/gpufree-data/v5_joint_run002/outputs/joint-waist-v5-002/best_motion.pt",
+      "sha256": "39f9978fda92b3bc749e984c6e3dc0c4d0952997faee1a228537dedb58d8ba5c",
+      "iteration": 3869,
+      "primary_score": {
+        "survival": 1.0,
+        "planar_error_m_s": 0.0841662801444727,
+        "yaw_error_rad_s": 0.08812267586472444,
+        "rank_cost": 0.11060308290389002
+      },
+      "seed_reports": [
+        "/root/gpufree-data/v5_joint_run002/outputs/final-evaluation-002/prior_best_motion/velocity-seed101/summary.json",
+        "/root/gpufree-data/v5_joint_run002/outputs/final-evaluation-002/prior_best_motion/velocity-seed202/summary.json",
+        "/root/gpufree-data/v5_joint_run002/outputs/final-evaluation-002/prior_best_motion/velocity-seed303/summary.json"
+      ],
+      "mean_rank_cost": 0.11164871097273134,
+      "confirmation_scores": [
+        {
+          "survival": 1.0,
+          "planar_error_m_s": 0.0841662801444727,
+          "yaw_error_rad_s": 0.08812267586472444,
+          "rank_cost": 0.11060308290389002
+        },
+        {
+          "survival": 1.0,
+          "planar_error_m_s": 0.08554330595770807,
+          "yaw_error_rad_s": 0.08963211091177073,
+          "rank_cost": 0.11243293923123929
+        },
+        {
+          "survival": 1.0,
+          "planar_error_m_s": 0.08524807620269712,
+          "yaw_error_rad_s": 0.0888734486012254,
+          "rank_cost": 0.11191011078306473
+        }
+      ]
+    },
+    {
+      "name": "prior_best_velocity",
+      "path": "/root/gpufree-data/v5_joint_run002/outputs/joint-waist-v5-002/best_velocity.pt",
+      "sha256": "15916015e754dfdd73a14903e0649f9b6b78025c24f7bf9fde10b1ceb570bc73",
+      "iteration": 1283,
+      "primary_score": {
+        "survival": 1.0,
+        "planar_error_m_s": 0.10789909862796776,
+        "yaw_error_rad_s": 0.15306048542261125,
+        "rank_cost": 0.15381724425475113
+      },
+      "seed_reports": [
+        "/root/gpufree-data/v5_joint_run002/outputs/final-evaluation-002/prior_best_velocity/velocity-seed101/summary.json"
+      ]
+    }
+  ],
+  "selected": {
+    "name": "final",
+    "path": "/root/gpufree-data/v5_joint_run002/outputs/joint-waist-v5-002/model_015398.pt",
+    "sha256": "094b52267159d26f4d5bfb41edc5823a9becc32f706c87df05f8aa36b4016282",
+    "iteration": 15398,
+    "primary_score": {
+      "survival": 1.0,
+      "planar_error_m_s": 0.07375085325911641,
+      "yaw_error_rad_s": 0.07170172119513155,
+      "rank_cost": 0.09526136961765588
+    },
+    "seed_reports": [
+      "/root/gpufree-data/v5_joint_run002/outputs/final-evaluation-002/final/velocity-seed101/summary.json",
+      "/root/gpufree-data/v5_joint_run002/outputs/final-evaluation-002/final/velocity-seed202/summary.json",
+      "/root/gpufree-data/v5_joint_run002/outputs/final-evaluation-002/final/velocity-seed303/summary.json"
+    ],
+    "mean_rank_cost": 0.09461926735316713,
+    "confirmation_scores": [
+      {
+        "survival": 1.0,
+        "planar_error_m_s": 0.07375085325911641,
+        "yaw_error_rad_s": 0.07170172119513155,
+        "rank_cost": 0.09526136961765588
+      },
+      {
+        "survival": 1.0,
+        "planar_error_m_s": 0.07293486860580742,
+        "yaw_error_rad_s": 0.0710780224762857,
+        "rank_cost": 0.09425827534869313
+      },
+      {
+        "survival": 1.0,
+        "planar_error_m_s": 0.0729834467638284,
+        "yaw_error_rad_s": 0.07118236776441336,
+        "rank_cost": 0.09433815709315241
+      }
+    ]
+  },
+  "selection": "Physical survival plus planar and yaw tracking across3seeds; no gait/hardware qualification",
+  "hardware_qualified": false
+}

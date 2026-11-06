@@ -1,0 +1,229 @@
+/root/gpufree-data/v5_joint_run002/.venv/lib/python3.12/site-packages/mjlab/scene/scene.py:66: UserWarning: Entity 'robot' has non-default <option> fields (integrator, iterations, ls_iterations) that will not be propagated by MjSpec.attach(). Use MujocoCfg instead.
+  self._add_entities()
+WARNING: Attach conflict when attaching 'opensprite0825_waist20261105_run002' to 'mjlab scene', policy is 'warning'
+iterations: parent has 100 (default), child has 20, keeping parent value
+ls_iterations: parent has 50 (default), child has 10, keeping parent value
+integrator: parent has 0 (default), child has 3, keeping parent value
+
+/root/gpufree-data/v5_joint_run002/.venv/lib/python3.12/site-packages/mjlab/sim/sim.py:252: UserWarning: Attach conflict when attaching 'opensprite0825_waist20261105_run002' to 'mjlab scene', policy is 'warning'
+iterations: parent has 100 (default), child has 20, keeping parent value
+ls_iterations: parent has 50 (default), child has 10, keeping parent value
+integrator: parent has 0 (default), child has 3, keeping parent value
+  compiled = spec.compile()
+WARNING: Attach conflict when attaching 'opensprite0825_waist20261105_run002' to 'mjlab scene', policy is 'warning'
+iterations: parent has 100 (default), child has 20, keeping parent value
+ls_iterations: parent has 50 (default), child has 10, keeping parent value
+integrator: parent has 0 (default), child has 3, keeping parent value
+
+Setting seed: 43
+Warp 1.17.0 initialized:
+   CUDA Toolkit 12.9, Driver 13.0
+   Devices:
+     "cpu"      : "x86_64"
+     "cuda:0"   : "NVIDIA L40S" (44 GiB, sm_89, mempool enabled)
+   Kernel cache:
+     /root/.cache/warp/1.17.0
+Module mujoco_warp._src.smooth b9cc505 load on device 'cuda:0' took 3.23 ms  (cached)
+Module _nxn_broadphase__locals__kernel_3a0c7ab9 3a0c7ab load on device 'cuda:0' took 0.47 ms  (cached)
+Module ccd_kernel_builder__locals__ccd_kernel_f173d362 f173d36 load on device 'cuda:0' took 1.98 ms  (cached)
+Module ccd_kernel_builder__locals__ccd_kernel_f173d362 c570b25 load on device 'cuda:0' took 2.18 ms  (cached)
+Module _primitive_narrowphase__locals__primitive_narrowphase_45f7560c 45f7560 load on device 'cuda:0' took 1.13 ms  (cached)
+Module mujoco_warp._src.constraint 9435a53 load on device 'cuda:0' took 0.39 ms  (cached)
+Module _friction_dof__locals__kernel_85239eb5 85239eb load on device 'cuda:0' took 0.50 ms  (cached)
+Module _limit_slide_hinge__locals__kernel_b8014c9f b8014c9 load on device 'cuda:0' took 0.48 ms  (cached)
+Module _efc_contact_init__locals__kernel_34eca94d 34eca94 load on device 'cuda:0' took 0.42 ms  (cached)
+Module _efc_contact_jac_sparse__locals__kernel_eb752226 eb75222 load on device 'cuda:0' took 0.43 ms  (cached)
+Module _efc_contact_update__locals__kernel_1a7e7f98 1a7e7f9 load on device 'cuda:0' took 0.46 ms  (cached)
+Module mujoco_warp._src.forward f44d3e1 load on device 'cuda:0' took 1.48 ms  (cached)
+Module mujoco_warp._src.passive 80f3681 load on device 'cuda:0' took 1.75 ms  (cached)
+Module mujoco_warp._src.forward 0a75030 load on device 'cuda:0' took 1.22 ms  (cached)
+Module _qfrc_smooth__locals__kernel_2c4e0694 2c4e069 load on device 'cuda:0' took 0.36 ms  (cached)
+Module mujoco_warp._src.support f39c2de load on device 'cuda:0' took 0.39 ms  (cached)
+Module _tile_cholesky_factorize_solve_block__locals__kernel_410b5cee df4fccb load on device 'cuda:0' took 37.46 ms  (cached)
+Module _solve_init_dof__locals__kernel_48710307 4871030 load on device 'cuda:0' took 0.47 ms  (cached)
+Module mujoco_warp._src.solver c97221b load on device 'cuda:0' took 1.75 ms  (cached)
+Module _solve_init_jaref_kernel__locals__kernel_2a872ce1 2a872ce load on device 'cuda:0' took 0.42 ms  (cached)
+Module mul_m_kernel__locals___mul_m_74986a16 74986a1 load on device 'cuda:0' took 0.40 ms  (cached)
+Module _update_constraint_efc__locals__kernel_ed085732 ed08573 load on device 'cuda:0' took 0.41 ms  (cached)
+Module _update_constraint_init_qfrc_constraint_sparse__locals__kernel_67d0743a 67d0743 load on device 'cuda:0' took 0.40 ms  (cached)
+Module _update_gradient_zero_grad_dot__locals__kernel_ada3cc5f ada3cc5 load on device 'cuda:0' took 0.37 ms  (cached)
+Module _update_gradient_grad__locals__kernel_45d59ec9 45d59ec load on device 'cuda:0' took 0.36 ms  (cached)
+Module _update_gradient_init_h_sparse__locals__kernel_3d60cf50 3d60cf5 load on device 'cuda:0' took 0.37 ms  (cached)
+Module _JTDAJ_sparse__locals__kernel_eac33f90 eac33f9 load on device 'cuda:0' took 0.43 ms  (cached)
+Module _JTDAJ_sparse__locals__kernel_eac33f90 afcc61a load on device 'cuda:0' took 0.38 ms  (cached)
+Module _update_gradient_cholesky_blocked__locals__kernel_42d7c12a 8fc8818 load on device 'cuda:0' took 71.31 ms  (cached)
+Module _linesearch_jv_fused_kernel__locals__kernel_399fca1a 399fca1 load on device 'cuda:0' took 0.49 ms  (cached)
+Module _linesearch_iterative_kernel__locals__kernel_c106ebb9 1b6963f load on device 'cuda:0' took 0.67 ms  (cached)
+Module _update_constraint_efc__locals__kernel_b09277e7 b09277e load on device 'cuda:0' took 0.46 ms  (cached)
+Module _update_gradient_zero_grad_dot__locals__kernel_90b73b32 90b73b3 load on device 'cuda:0' took 0.39 ms  (cached)
+Module _update_gradient_grad__locals__kernel_89d63404 89d6340 load on device 'cuda:0' took 0.37 ms  (cached)
+Module _update_gradient_h_incremental_sparse__locals__kernel_8510a60f 8510a60 load on device 'cuda:0' took 0.44 ms  (cached)
+Module _update_gradient_cholesky_blocked_skip_unchanged__locals__kernel_99cf3aa8 220e8d0 load on device 'cuda:0' took 76.91 ms  (cached)
+Module mujoco_warp._src.sensor 764597f load on device 'cuda:0' took 2.34 ms  (cached)
+Module _contact_sort__locals__contact_sort_adeecb09 788a659 load on device 'cuda:0' took 0.48 ms  (cached)
+Module mujoco_warp._src.derivative 1d93a53 load on device 'cuda:0' took 1.02 ms  (cached)
+Module _next_time_builder__locals___next_time_cc50a46c cc50a46 load on device 'cuda:0' took 0.43 ms  (cached)
+Module reset_data__locals__reset_xfrc_applied_c7eeecfb c7eeecf load on device 'cuda:0' took 0.40 ms  (cached)
+Module reset_data__locals__reset_M_d1ea7a8e d1ea7a8 load on device 'cuda:0' took 0.32 ms  (cached)
+Module reset_data__locals__reset_mocap_b017f38a b017f38 load on device 'cuda:0' took 0.31 ms  (cached)
+Module reset_data__locals__reset_contact_757d9bde 757d9bd load on device 'cuda:0' took 0.32 ms  (cached)
+Module reset_data__locals__reset_sleep_6b3be194 6b3be19 load on device 'cuda:0' took 0.31 ms  (cached)
+Module reset_data__locals__reset_nworld_e471a890 e471a89 load on device 'cuda:0' took 0.40 ms  (cached)
+
++---------------------------------+
+|         Base Environment        |
++------------------------+--------+
+| Property               | Value  |
++------------------------+--------+
+| Number of environments | 32     |
+| Environment device     | cuda:0 |
+| Environment seed       | 43     |
+| Physics step-size      | 0.002  |
+| Environment step-size  | 0.02   |
++------------------------+--------+
+
+[INFO] <EventManager> contains 1 active terms.
++---------------------------------------+
+| Active Event Terms in Mode: 'startup' |
++----------+----------------------------+
+|  Index   | Name                       |
++----------+----------------------------+
+|    0     | foot_friction              |
+|    1     | encoder_bias               |
+|    2     | base_com                   |
+|    3     | joint_armature             |
+|    4     | joint_friction             |
++----------+----------------------------+
++-----------------------------+
+| Domain Randomization Fields |
++-------+---------------------+
+| Index | Field Name          |
++-------+---------------------+
+|   0   | geom_friction       |
+|   1   | body_ipos           |
+|   2   | body_subtreemass    |
+|   3   | dof_invweight0      |
+|   4   | body_invweight0     |
+|   5   | tendon_length0      |
+|   6   | tendon_invweight0   |
+|   7   | actuator_acc0       |
+|   8   | dof_armature        |
+|   9   | dof_frictionloss    |
++-------+---------------------+
+
+Module repeat_array_kernel_31f1cdc7 ab09835 load on device 'cuda:0' took 0.56 ms  (cached)
+Module repeat_array_kernel_31f1cdc7 a2cef03 load on device 'cuda:0' took 0.43 ms  (cached)
+Module repeat_array_kernel_31f1cdc7 eb7f276 load on device 'cuda:0' took 0.45 ms  (cached)
+[INFO] <NullCommandManager> (inactive)
+[INFO] <ActionManager> contains 1 active terms.
++---------------------------------+
+| Active Action Terms (shape: 31) |
++-------+-----------+-------------+
+| Index | Name      |   Dimension |
++-------+-----------+-------------+
+|   0   | joint_pos |          31 |
++-------+-----------+-------------+
+
+[INFO] <ObservationManager> contains 0 groups.
+
+[INFO] <TerminationManager> contains 0 active terms.
++--------------------------+
+| Active Termination Terms |
++-------+------+-----------+
+| Index | Name |  Time Out |
++-------+------+-----------+
++-------+------+-----------+
+
+[INFO] <RewardManager> contains 0 active terms.
++-----------------------+
+|  Active Reward Terms  |
++-------+------+--------+
+| Index | Name | Weight |
++-------+------+--------+
++-------+------+--------+
+
+[INFO] <NullCurriculumManager> (inactive)
+[INFO] <NullMetricsManager> (inactive)
+[INFO] <NullRecorderManager> (inactive)
+Module mujoco_warp._src.io c32a0eb load on device 'cuda:0' took 3.61 ms  (cached)
+Module _tile_cholesky_factorize_block__locals__kernel_1b457363 17167db load on device 'cuda:0' took 24.97 ms  (cached)
+Module _tile_cholesky_solve_block__locals__kernel_5658ae53 540c128 load on device 'cuda:0' took 24.11 ms  (cached)
+Setting seed: 44
+
++---------------------------------+
+|         Base Environment        |
++------------------------+--------+
+| Property               | Value  |
++------------------------+--------+
+| Number of environments | 32     |
+| Environment device     | cuda:0 |
+| Environment seed       | 44     |
+| Physics step-size      | 0.002  |
+| Environment step-size  | 0.02   |
++------------------------+--------+
+
+[INFO] <EventManager> contains 1 active terms.
++---------------------------------------+
+| Active Event Terms in Mode: 'startup' |
++----------+----------------------------+
+|  Index   | Name                       |
++----------+----------------------------+
+|    0     | foot_friction              |
+|    1     | encoder_bias               |
+|    2     | base_com                   |
+|    3     | joint_armature             |
+|    4     | joint_friction             |
++----------+----------------------------+
++-----------------------------+
+| Domain Randomization Fields |
++-------+---------------------+
+| Index | Field Name          |
++-------+---------------------+
+|   0   | geom_friction       |
+|   1   | body_ipos           |
+|   2   | body_subtreemass    |
+|   3   | dof_invweight0      |
+|   4   | body_invweight0     |
+|   5   | tendon_length0      |
+|   6   | tendon_invweight0   |
+|   7   | actuator_acc0       |
+|   8   | dof_armature        |
+|   9   | dof_frictionloss    |
++-------+---------------------+
+
+[INFO] <NullCommandManager> (inactive)
+[INFO] <ActionManager> contains 1 active terms.
++---------------------------------+
+| Active Action Terms (shape: 31) |
++-------+-----------+-------------+
+| Index | Name      |   Dimension |
++-------+-----------+-------------+
+|   0   | joint_pos |          31 |
++-------+-----------+-------------+
+
+[INFO] <ObservationManager> contains 0 groups.
+
+[INFO] <TerminationManager> contains 0 active terms.
++--------------------------+
+| Active Termination Terms |
++-------+------+-----------+
+| Index | Name |  Time Out |
++-------+------+-----------+
++-------+------+-----------+
+
+[INFO] <RewardManager> contains 0 active terms.
++-----------------------+
+|  Active Reward Terms  |
++-------+------+--------+
+| Index | Name | Weight |
++-------+------+--------+
++-------+------+--------+
+
+[INFO] <NullCurriculumManager> (inactive)
+[INFO] <NullMetricsManager> (inactive)
+[INFO] <NullRecorderManager> (inactive)
+JOINT_UPDATE {"motion/reward": 0.34622713923454285, "motion/terminated": 0.015625, "velocity/reward": 0.05497553837074734, "velocity/terminated": 0.017463235294117647, "motion/episode_length": 22.416666666666668, "velocity/episode_length": 25.428571428571427, "wm/loss": 3.763746905326843, "wm/error_last": 7.4958577156066895, "motion/actor_loss": -0.21914468705654144, "motion/imagined_reward": 0.15141664445400238, "motion/imagined_survival": 0.5282899141311646, "velocity/actor_loss": 0.13934922218322754, "velocity/imagined_reward": -0.14812888205051422, "velocity/imagined_survival": 0.21195614337921143, "actor_grad_norm": 0.04039520397782326, "motion/critic_loss": 0.003819853300228715, "velocity/critic_loss": 0.016142401844263077, "iteration": 1, "wall_seconds": 4.939249858260155, "iterations_per_second": 0.20245989344467966, "sim_steps": 2176, "peak_gpu_gib": 0.5062313079833984}
+SAVED outputs/repository-smoke/model_000001.pt
+JOINT_UPDATE {"motion/reward": 0.3504232943058014, "motion/terminated": 0.01875, "motion/episode_length": 33.666666666666664, "velocity/reward": 0.05713718608021736, "velocity/terminated": 0.0375, "velocity/episode_length": 34.0, "wm/loss": 2.1862537384033205, "wm/error_last": 3.8246424317359926, "motion/actor_loss": -0.2505557984113693, "motion/imagined_reward": 0.16704781353473663, "motion/imagined_survival": 0.31294432282447815, "velocity/actor_loss": 0.06780645623803139, "velocity/imagined_reward": -0.042431463953107595, "velocity/imagined_survival": 0.1808708757162094, "actor_grad_norm": 0.08509628474712372, "motion/critic_loss": 0.0027924575842916965, "velocity/critic_loss": 0.005995436804369092, "iteration": 3, "wall_seconds": 9.555219195783138, "iterations_per_second": 0.43327844137570415, "sim_steps": 2496, "peak_gpu_gib": 0.5858883857727051}
+SAVED outputs/repository-smoke/model_000003.pt
+JOINT_TRAINING_COMPLETE 3

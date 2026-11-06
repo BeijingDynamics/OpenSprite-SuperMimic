@@ -1,0 +1,23 @@
+{
+  "tag": "v0.2.0-run002",
+  "reference_data_included": false,
+  "hardware_qualified": false,
+  "assets": {
+    "run002-jetson-cpu.tar.gz": {
+      "sha256": "ef616978eaf3620deafc5628b769e41d87e6b5efebb3ee0c9abc628d84d010d9",
+      "bytes": 55212602
+    },
+    "run002-models.tar.gz": {
+      "sha256": "06fe8c8dd2846dfd0e290c20561707d4eda9e00420d14f43286f1333ff157362",
+      "bytes": 241313777
+    },
+    "run002-strict-startup.tar.gz": {
+      "sha256": "f43bd0b232a22afbaed9527a710f5eedb1d8127f8c8ef629854f5e700c2e8c81",
+      "bytes": 1236374629
+    },
+    "run002-velocity-evaluation.tar.gz": {
+      "sha256": "cee164a16141f58a6bd87bb13189f5d815485dfcad0b83770f8c5059158cfd4a",
+      "bytes": 221057750
+    }
+  }
+}

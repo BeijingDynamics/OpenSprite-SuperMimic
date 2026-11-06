@@ -1,0 +1,20 @@
+{
+  "note": "Changes from imported source inventory. No policy/actuator parameter change.",
+  "changes": {
+    "opensprite_tracker/constants.py": "Correct comment to run002 2ms /10 ticks; values unchanged.",
+    "retarget/processing.py": "Read pinned current URDF instead of sibling legacy vendor path.",
+    "retarget/convert_umr.py": "Stamp rebuilt references with actual selected asset identity.",
+    "runtime/tests/test_simulation_drives.py": "Use explicit small local fixture, not historical artifact directory.",
+    "tests/test_torque_lag_disabled.py": "Assert actual500Hz/10tick cadence instead of inherited200Hz/4tick.",
+    "tests/test_tracker_contract.py": "Same500Hz test cadence correction."
+  },
+  "current_sha256": {
+    "opensprite_tracker/constants.py": "70313986716a77928c22de7b52b9ea0749baf3c83352d474385ba0df06990f7e",
+    "retarget/processing.py": "2d93a9859f3f7899120981589646b0c8061ef28546c2fb3cbed2ded1c8d3a5d5",
+    "retarget/convert_umr.py": "dc136ad932136af28a563164ad3d0ed4dc9575c1f80fe8458e05614ccb318d86",
+    "runtime/tests/test_simulation_drives.py": "c34d04bf33e5b97ad0c747c12b15a7fa8c2162ead056230f45f6f5f6d5cc83e8",
+    "tests/test_torque_lag_disabled.py": "f61f500ce2fdb0cf5e5561546db06477d6ce06187a87e057459795a53336124b",
+    "tests/test_tracker_contract.py": "1618c034fb644df36a821f6ee1509f3315ccc30ecc6c15e5192bd73e0b5d1c39"
+  },
+  "formatting": "Git text uses LF; hash-bound assets/vendor bytes preserved. Some inherited extra EOF blank lines removed without behavior changes."
+}

@@ -1,0 +1,191 @@
+"""Freeze the reviewed run001 simulation baseline, without enabling hardware."""
+from datetime import datetime, timezone
+import hashlib
+import io
+import json
+from pathlib import Path
+import shutil
+import sys
+import tarfile
+
+ROOT = Path(__file__).resolve().parents[1]
+WORKSPACE = ROOT.parent
+LABEL = 'sprite-v5-supermimic-sim-v0.1-20261105'
+RUNTIME_COMMIT = '4515206c24404e18a2d5c168eccdb7468aea6ab7'
+MODEL_SHA = 'cdc51965fe3aca449c45b808e041424f47f46fefe9f5805def14651f9258e953'
+
+
+def sha(path):
+    h = hashlib.sha256()
+    with path.open('rb') as stream:
+        for block in iter(lambda: stream.read(1024 * 1024), b''):
+            h.update(block)
+    return h.hexdigest()
+
+
+def write(path, data):
+    path.write_text(json.dumps(data, ensure_ascii=False, indent=2) + '\n', encoding='utf-8')
+
+
+def main():
+    run = ROOT / 'results/outputs/joint-paper-v5-001'
+    envelope = ROOT / 'results/outputs/speed-envelope-001'
+    backward = ROOT / 'results/outputs/backward-demo-001'
+    contract = json.loads((run / 'export-final/contract.json').read_text())
+    assert sha(run / 'latest.pt') == MODEL_SHA == contract['checkpoint_sha256']
+    assert sha(run / 'export-final/policy.onnx') == contract['policy_onnx_sha256']
+    assert contract['hardware_qualified'] is False
+    summary = json.loads((envelope / 'envelope_summary.json').read_text())
+    assert summary['checkpoint_sha256'] == MODEL_SHA
+    back = json.loads((backward / 'trial/summary.json').read_text())
+    assert back['checkpoint_sha256'] == MODEL_SHA
+    assert all(x['survived'] for x in back['results'])
+    sys.path.insert(0, str(WORKSPACE / 'open_sprite_runtime/src'))
+    from open_sprite_runtime.contracts import PolicyContract, RuntimeTiming
+    policy = PolicyContract.load(run / 'export-final/contract.json')
+    try:
+        policy.validate_for_hardware(RuntimeTiming(50, 500, 1000))
+    except ValueError as error:
+        rejection = str(error).split('; ')
+    else:
+        raise RuntimeError('Unexpected hardware acceptance; review baseline qualification')
+    dest = ROOT / 'releases' / LABEL
+    dest.mkdir(parents=True, exist_ok=False)
+
+    def copy(source, target):
+        target = dest / target
+        target.parent.mkdir(parents=True, exist_ok=True)
+        shutil.copyfile(source, target)
+
+    files = {
+        'model_026951.pt': run / 'latest.pt',
+        'deploy/policy.onnx': run / 'export-final/policy.onnx',
+        'deploy/contract.json': run / 'export-final/contract.json',
+        'training/config.json': run / 'config.json',
+        'training/interface.json': run / 'interface.json',
+        'training/source-manifest.json': run / 'run001-source-manifest.json',
+        'training/v5_locomotion.npz': ROOT / 'results/data/motions/contact_v5_v11/v5_locomotion.npz',
+        'evidence/speed-envelope.json': envelope / 'envelope_summary.json',
+        'evidence/speed-envelope.csv': envelope / 'envelope_summary.csv',
+        'evidence/speed-envelope-report.md': envelope / 'SPEED_ENVELOPE_REPORT.md',
+        'evidence/live-command-changes-summary.json': envelope / 'live-command-changes/summary.json',
+        'evidence/backward-summary.json': backward / 'trial/summary.json',
+        'evidence/backward-commands.json': backward / 'commands.json',
+        'evidence/runtime-replay-parity-original.json': run / 'runtime_replay_parity.json',
+        'evidence/LOW_SPEED_AND_INITIAL_POSE_REVIEW.md': ROOT / 'LOW_SPEED_AND_INITIAL_POSE_REVIEW.md',
+        'evidence/BACKWARD_CONTROL.md': ROOT / 'BACKWARD_CONTROL.md',
+        'videos/backward-and-switching.mp4': backward / 'backward-and-switching.mp4',
+        'videos/live-command-changes-fullbody.mp4': envelope / 'live-command-changes-fullbody.mp4',
+        'source/export_joint.py': ROOT / 'scripts/export_joint.py',
+        'source/evaluate_joint.py': ROOT / 'scripts/evaluate_joint.py',
+        'source/render_velocity.py': ROOT / 'scripts/render_velocity.py',
+    }
+    for target, source in files.items():
+        copy(source, target)
+    with tarfile.open(ROOT / 'artifacts/run001-important.tar') as archive:
+        name = 'outputs/joint-paper-v5-001/run001-source-snapshot.tar.gz'
+        data = archive.extractfile(name).read()
+    (dest / 'training/run001-source-snapshot.tar.gz').write_bytes(data)
+    # Read only, with no extraction of filesystem paths from the nested archive.
+    with tarfile.open(fileobj=io.BytesIO(data), mode='r:gz') as archive:
+        original_sources = {m.name: hashlib.sha256(archive.extractfile(m).read()).hexdigest()
+                            for m in archive.getmembers() if m.isfile()}
+    write(dest / 'training/source-snapshot-contents.json', original_sources)
+    assert sha(dest / 'training/v5_locomotion.npz') == 'ccbecf8f37037398ffc62750b6df0508c05f063bb2c38ed0fd596e26de762989'
+    audit = {
+        'runtime_repository': 'https://github.com/BeijingDynamics/open_sprite_runtime',
+        'runtime_commit': RUNTIME_COMMIT,
+        'upstream_head_checked': '2026-11-05 via GitHub commits API; matches local clone',
+        'read_only_contract_check': True,
+        'hardware_tx_performed': False,
+        'hardware_contract_accepted': False,
+        'contract_rejections': rejection,
+        'native_runtime': {'history_frames': 8, 'input_dim': 795, 'policy_hz': 50},
+        'this_policy': {'history_frames': 10, 'input_dim': 993, 'policy_hz': 50},
+        'original_replay_scope': 'Python PolicyObservationHistory assembly plus ONNX CPU replay; NOT native C++ inference or powered hardware',
+        'original_replay_wording_correction': 'The original report contains the superseded phrase policy gait failed; see LOW_SPEED_AND_INITIAL_POSE_REVIEW.md. Numeric parity remains valid.',
+        'blocking_work': [
+            'Add a separate 10-frame/993-input native actor profile and admission schema; preserve the existing 8-frame candidate.',
+            'Validate native C++ observation/action/history/handoff parity and target Jetson CPU inference timing.',
+            'Replay the real ankle linkage, motor torque-speed limits, 500Hz ankle/50Hz other-motor schedule, sensor delay and startup protections in closed-loop simulation.',
+            'Confirm actual motor zeros/directions, IMU frame, current gains and hardware revision before protected standing and bounded walk tests.',
+        ],
+        'reverse_hardware_status': 'Existing Xbox powered path blocks reverse; simulation support does not authorize enabling it.',
+        'notes': 'Matching URDF and 50Hz policy timing are insufficient for hardware admission. Existing G74 hardware results do not transfer to this SuperMimic actor.',
+    }
+    write(dest / 'evidence/runtime-readiness.json', audit)
+    existing = [ROOT / 'artifacts/run001-important.tar',
+                envelope / 'seed-101/rollout.npz', envelope / 'seed-202/rollout.npz',
+                envelope / 'seed-303/rollout.npz', backward / 'trial/rollout.npz']
+    references = [{'workspace_path': p.relative_to(WORKSPACE).as_posix(),
+                   'bytes': p.stat().st_size, 'sha256': sha(p)} for p in existing]
+    manifest = {
+        'label': LABEL,
+        'human_label': 'Open Sprite v5 SuperMimic 仿真基线 v0.1',
+        'created_at': datetime.now(timezone.utc).isoformat(),
+        'status': 'simulation_baseline_frozen_hardware_not_admitted',
+        'hardware_qualified': False,
+        'kind': 'local artifact label; no upstream Git tag or release published',
+        'iteration': 26951,
+        'checkpoint_sha256': MODEL_SHA,
+        'onnx_sha256': contract['policy_onnx_sha256'],
+        'robot_asset_commit': 'afc882bcac3bac551f3c0c80b454b366c836dd83',
+        'robot_urdf_sha256': contract['asset_urdf_sha256'],
+        'robot_mjcf_sha256': contract['asset_mjcf_sha256'],
+        'runtime_commit': RUNTIME_COMMIT,
+        'capabilities_observed_in_simulation': ['stand', 'forward', 'backward', 'lateral', 'turn', 'continuous_command_switching'],
+        'speed_envelope_trials': {'cases': summary['cases'], 'seeds': summary['seeds'], 'seconds_each': summary['seconds'],
+                                  'survived': sum(r['survived'] for r in summary['results']),
+                                  'total': sum(r['trials'] for r in summary['results'])},
+        'backward_demo_trials': {'survived': sum(r['survived'] for r in back['results']), 'total': len(back['results']), 'seconds_each': back['seconds']},
+        'training_reward_revision': 'original run001 a6_root_legacy_v1; subsequent paper_a6_torso_heading_v2 fixes are NOT trained into these weights',
+        'training_physics': 'serial-joint simulation, torque lag disabled; no validated physical parallel-ankle envelope',
+        'limitations': ['Velocity undershoot and yaw drift/asymmetry', 'Low-clearance contact transitions need synchronized verification',
+                        'No physical hardware admission', 'Not a completed paper benchmark replication'],
+        'external_preserved_evidence': references,
+    }
+    write(dest / 'LABEL.json', manifest)
+    readme = '''# Open Sprite v5 SuperMimic 仿真基线 v0.1
+
+标签：`sprite-v5-supermimic-sim-v0.1-20261105`。冻结 run001 第26951次更新；只建立本地成果标签，未向 GitHub 发布。
+
+当前状态：前进、后退、侧移、转弯及连续命令切换已在现有仿真条件下测试。49组命令×3个种子，各30秒，147/147未倒；独立后退/切换演示4/4跑满32秒。存活结果不等同于速度精度、接触质量或真机资格。仍有跟速不足、偏航漂移和左右转弯不对称。
+
+## 真机判断
+
+可以作为下一步 runtime 适配与 Sim2Real 验证的冻结起点；当前不能直接替换 runtime 模型上机行走。
+
+1. 本模型50Hz、10帧、993维；所核对 runtime 的 C++ 执行器固定8帧、795维。Python历史构建器+ONNX回放误差2.38e-6，仅证明这条离线路径对齐，未验证 C++ 执行器。应新增10帧配置，不可截断或补零冒充模型兼容。
+2. 训练使用串联踝关节抽象，真实并联踝的电机力矩/速度包络尚未验证。50Hz策略频率一致，也不等于500Hz踝控制、50Hz其余电机、传感延迟等闭环行为一致。当前训练关闭了力矩滞后。
+3. runtime 真机准入检查实际拒绝当前 contract，详见 evidence/runtime-readiness.json。已有G74策略的真机记录不自动适用于本策略；原Xbox真机入口仍禁止倒退。
+
+合理下一步：增加独立10帧原生执行配置→C++回放及目标Jetson时延测量→带真实执行器/传感时序的闭环仿真→核对实机标定后做保护状态下站立与短距离低速试验。当前标签没有批准带电测试。
+
+## 保留内容
+
+`model_026951.pt`是训练检查点；`deploy/`保留原始ONNX与contract，hardware_qualified仍为false；`training/`有本轮原始配置、169KB训练源码快照、自制40秒v5参考动作。`source/`是本次评估/导出源码，区别于训练源码快照；原训练奖励的两个A.6问题在后续代码中修正，但未改写此权重。
+
+`videos/`保留连续控制及后退演示；`evidence/`保留测量摘要与低速步态复核。低抬脚不再被直接判为纯滑步失败。历史报告中的强定性以复核文件为准。
+
+通用原始动作库、依赖缓存不另行打包。完整rollout与既有重要成果归档已在本地，路径和SHA256列入LABEL.json。复现实验还需原workspace的机器人资产及依赖，本文件夹不是可直接部署的真机安装包。
+
+`SHA256SUMS.json`覆盖本文件夹冻结内容，`VERIFIED.json`记录本地逐项校验结果。未来改进应另建标签，避免覆盖本版本。
+'''
+    (dest / 'README.md').write_text(readme, encoding='utf-8')
+    copy(Path(__file__), 'source/freeze_sim_baseline.py')
+    hashes = {p.relative_to(dest).as_posix(): sha(p) for p in sorted(dest.rglob('*')) if p.is_file()}
+    write(dest / 'SHA256SUMS.json', hashes)
+    failures = [name for name, digest in hashes.items() if sha(dest / name) != digest]
+    write(dest / 'VERIFIED.json', {'verified_at': datetime.now(timezone.utc).isoformat(),
+                                  'files': len(hashes), 'failed': failures})
+    assert not failures
+    write(ROOT / 'CURRENT_BASELINE.json', {'label': LABEL, 'path': dest.relative_to(ROOT).as_posix(),
+                                         'checkpoint_sha256': MODEL_SHA, 'hardware_qualified': False,
+                                         'status': manifest['status']})
+    print(json.dumps({'label': LABEL, 'path': str(dest), 'verified_files': len(hashes),
+                      'bytes': sum(p.stat().st_size for p in dest.rglob('*') if p.is_file()),
+                      'hardware_qualified': False}, ensure_ascii=False))
+
+
+if __name__ == '__main__':
+    main()

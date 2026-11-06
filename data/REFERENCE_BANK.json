@@ -1,0 +1,12 @@
+{
+  "schema": "run002_reference_bank_local_v1",
+  "path": "data/motions/contact_v5_v11/v5_locomotion.npz",
+  "sha256": "6f9cefe15646b532ccf57a40f20292c69c18f77ae0c33254abdedfcd1c66a8d0",
+  "bytes": 3488256,
+  "asset_revision": "sprite0825_v5_4340_shoulders_waist20261105",
+  "history_frames": 10,
+  "goal_frames": 10,
+  "source": "LAFAN1 resolved walking; native UMR + source-contact constrained trajectory refinement",
+  "redistributed": false,
+  "terms": "External motion assets are not relicensed by the repository AGPL. See DATA_AND_LICENSES.md."
+}

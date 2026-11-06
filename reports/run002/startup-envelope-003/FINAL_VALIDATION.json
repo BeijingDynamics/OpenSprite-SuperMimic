@@ -1,0 +1,100 @@
+{
+  "selected_candidate": "1.5s handoff + sampled residual damping + conservative requested commands and slew",
+  "groups": [
+    {
+      "group": "nominal-slew-static",
+      "trials": 21,
+      "survived": 21,
+      "seconds_per_trial": 50,
+      "violations": {
+        "saturated_samples": 0,
+        "speed_exceedances": 0,
+        "feedforward_field_exceedances": 0
+      }
+    },
+    {
+      "group": "nominal-slew-continuous",
+      "trials": 12,
+      "survived": 12,
+      "seconds_per_trial": 50,
+      "violations": {
+        "saturated_samples": 0,
+        "speed_exceedances": 0,
+        "feedforward_field_exceedances": 0
+      }
+    },
+    {
+      "group": "slew-static",
+      "trials": 21,
+      "survived": 21,
+      "seconds_per_trial": 50,
+      "violations": {
+        "saturated_samples": 0,
+        "speed_exceedances": 0,
+        "feedforward_field_exceedances": 0
+      }
+    },
+    {
+      "group": "slew-continuous",
+      "trials": 12,
+      "survived": 12,
+      "seconds_per_trial": 50,
+      "violations": {
+        "saturated_samples": 0,
+        "speed_exceedances": 0,
+        "feedforward_field_exceedances": 0
+      }
+    },
+    {
+      "group": "holdout-static",
+      "trials": 14,
+      "survived": 14,
+      "seconds_per_trial": 50,
+      "violations": {
+        "saturated_samples": 0,
+        "speed_exceedances": 0,
+        "feedforward_field_exceedances": 0
+      }
+    },
+    {
+      "group": "holdout-continuous",
+      "trials": 8,
+      "survived": 8,
+      "seconds_per_trial": 50,
+      "violations": {
+        "saturated_samples": 0,
+        "speed_exceedances": 0,
+        "feedforward_field_exceedances": 0
+      }
+    }
+  ],
+  "total_trials": 88,
+  "all_strict_pass": true,
+  "all_physics_steps_no_raw_request_saturation": true,
+  "frozen_inputs_unchanged": true,
+  "old_baseline_still_trips_identically": true,
+  "baseline_event": {
+    "time_seconds": 1.3,
+    "motor": "left_hip_pitch_motor",
+    "policy_command": [
+      0.0,
+      0.0,
+      0.0
+    ],
+    "requested_motor_torque_nm": -20.494838468715557,
+    "modeled_motor_torque_cap_nm": 15.11292152833239,
+    "motor_speed_rad_s": -3.608626378391804,
+    "motor_position_rad": -0.3531259237210425,
+    "held_motor_target_rad": -0.59405452067405,
+    "kp": 130.0,
+    "kd": 3.0,
+    "p_torque_nm": -31.32071760389097,
+    "d_torque_nm": 10.825879135175411,
+    "ff_torque_nm": 0.0,
+    "cap_scope": "Conservative speed/nameplate and MIT feedforward-field proxy, not measured total motor torque"
+  },
+  "hardware_qualified": false,
+  "hardware_tx": 0,
+  "motor_enable_attempts": 0,
+  "scope": "Closed-loop simulation only. Tested discrete commands and continuous sequences, not all combinations or physical hardware."
+}

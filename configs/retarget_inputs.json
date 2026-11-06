@@ -1,0 +1,10 @@
+{
+  "Geno.fbx": {
+    "url": "https://raw.githubusercontent.com/lzjever/opensprite-tracker/4beb018567574215b5c9f95e0cc13cf5e04012d3/assets/geno/Geno.fbx",
+    "sha256": "f8773349df116c90a662f73b8ab658565d5ea99027ea19d1a08e9a3a21afff03"
+  },
+  "Geno_stance.bvh": {
+    "url": "https://raw.githubusercontent.com/lzjever/opensprite-tracker/4beb018567574215b5c9f95e0cc13cf5e04012d3/assets/geno/Geno_stance.bvh",
+    "sha256": "57a2c6d5d6c1270689cdb0efb6b33b6c585e8035f49e73149c23d63fab6a1326"
+  }
+}

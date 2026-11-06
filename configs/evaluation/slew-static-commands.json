@@ -1,0 +1,65 @@
+[
+  {
+    "name": "stand",
+    "command": [
+      0,
+      0,
+      0
+    ],
+    "category": "within_training_random_range"
+  },
+  {
+    "name": "forward015",
+    "command": [
+      0.15,
+      0,
+      0
+    ],
+    "category": "within_training_random_range"
+  },
+  {
+    "name": "forward030",
+    "command": [
+      0.25,
+      0,
+      0
+    ],
+    "category": "within_training_random_range"
+  },
+  {
+    "name": "reverse015",
+    "command": [
+      -0.15,
+      0,
+      0
+    ],
+    "category": "within_training_random_range"
+  },
+  {
+    "name": "left",
+    "command": [
+      0.25,
+      0,
+      0.15
+    ],
+    "category": "within_training_random_range"
+  },
+  {
+    "name": "right",
+    "command": [
+      0.25,
+      0,
+      -0.15
+    ],
+    "category": "within_training_random_range"
+  },
+  {
+    "name": "lateral_right",
+    "command": [
+      0,
+      -0.15,
+      0
+    ],
+    "category": "within_training_random_range"
+  }
+]

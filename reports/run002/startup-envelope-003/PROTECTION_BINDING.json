@@ -1,0 +1,14 @@
+{
+  "contract_sha256": "86e6bb69d73d0a3c3d5495c146e163ccb777c9a4f012672f6098328316173ccc",
+  "hardware_sha256": "9ddf06034f24bbca49cb06f80236caa4cea7aee0040516d11209f848da1f2c10",
+  "scene_sha256": "d657bd4fae1f906916aa4d0eab853031c7f87e768221745a3e11678c79507011",
+  "policy_sha256": "f3529c927a44f970908d48e5694e63302d0fc838121aba2fa87c0a0863968bba",
+  "control_profile_sha256": "184ec989fd24b4bc6ea5034e6fdae796b5b9ce83ef2c884dfe4fc61d8d6987dc",
+  "mode": "runtime_strict",
+  "physics_dt": 0.0005,
+  "training_pd_hz": 500,
+  "policy_hz": 50,
+  "envelope_unchanged": true,
+  "hardware_tx": 0,
+  "motor_enable_attempts": 0
+}

@@ -1,0 +1,182 @@
+[
+  {
+    "name": "stand",
+    "command": [
+      0,
+      0,
+      0
+    ],
+    "category": "within_training_random_range"
+  },
+  {
+    "name": "forward010",
+    "command": [
+      0.1,
+      0,
+      0
+    ],
+    "category": "within_training_random_range"
+  },
+  {
+    "name": "forward015",
+    "command": [
+      0.15,
+      0,
+      0
+    ],
+    "category": "within_training_random_range"
+  },
+  {
+    "name": "forward030",
+    "command": [
+      0.3,
+      0,
+      0
+    ],
+    "category": "within_training_random_range"
+  },
+  {
+    "name": "forward045",
+    "command": [
+      0.45,
+      0,
+      0
+    ],
+    "category": "within_training_random_range"
+  },
+  {
+    "name": "forward060",
+    "command": [
+      0.6,
+      0,
+      0
+    ],
+    "category": "within_training_random_range"
+  },
+  {
+    "name": "reverse015",
+    "command": [
+      -0.15,
+      0,
+      0
+    ],
+    "category": "within_training_random_range"
+  },
+  {
+    "name": "reverse030",
+    "command": [
+      -0.3,
+      0,
+      0
+    ],
+    "category": "within_training_random_range"
+  },
+  {
+    "name": "slow_left",
+    "command": [
+      0.15,
+      0,
+      0.15
+    ],
+    "category": "within_training_random_range"
+  },
+  {
+    "name": "slow_right",
+    "command": [
+      0.15,
+      0,
+      -0.15
+    ],
+    "category": "within_training_random_range"
+  },
+  {
+    "name": "left",
+    "command": [
+      0.3,
+      0,
+      0.15
+    ],
+    "category": "within_training_random_range"
+  },
+  {
+    "name": "right",
+    "command": [
+      0.3,
+      0,
+      -0.15
+    ],
+    "category": "within_training_random_range"
+  },
+  {
+    "name": "sharp_left",
+    "command": [
+      0.3,
+      0,
+      0.3
+    ],
+    "category": "within_training_random_range"
+  },
+  {
+    "name": "sharp_right",
+    "command": [
+      0.3,
+      0,
+      -0.3
+    ],
+    "category": "within_training_random_range"
+  },
+  {
+    "name": "turn_in_place_left",
+    "command": [
+      0,
+      0,
+      0.3
+    ],
+    "category": "within_training_random_range"
+  },
+  {
+    "name": "turn_in_place_right",
+    "command": [
+      0,
+      0,
+      -0.3
+    ],
+    "category": "within_training_random_range"
+  },
+  {
+    "name": "lateral_left",
+    "command": [
+      0,
+      0.15,
+      0
+    ],
+    "category": "within_training_random_range"
+  },
+  {
+    "name": "lateral_right",
+    "command": [
+      0,
+      -0.15,
+      0
+    ],
+    "category": "within_training_random_range"
+  },
+  {
+    "name": "diagonal_left",
+    "command": [
+      0.3,
+      0.15,
+      0
+    ],
+    "category": "within_training_random_range"
+  },
+  {
+    "name": "diagonal_right",
+    "command": [
+      0.3,
+      -0.15,
+      0
+    ],
+    "category": "within_training_random_range"
+  }
+]

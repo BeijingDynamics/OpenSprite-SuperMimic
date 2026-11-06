@@ -1,0 +1,117 @@
+{
+  "motion": "v5_start",
+  "final_geometry": {
+    "minimum_collision_z_m": 0.00030001413868532487,
+    "minimum_ground_time_s": 7.08,
+    "ground_fraction_below_minus_1cm": 0.0,
+    "self_minimum_signed_distance_m": 0.0,
+    "self_worst_time_s": 0.0,
+    "self_fraction_below_minus_1cm": 0.0,
+    "self_fraction_below_minus_3cm": 0.0,
+    "all_body_gap_over_2cm_seconds": 0.0,
+    "all_body_gap_longest_seconds": 0.0,
+    "worst_self_pairs": {}
+  },
+  "postprocess": "source_contact_constrained_trajectory_sqp_v9",
+  "refiner_sha256": "2434911554d6e16c192e94f7ddb42a2eee116cd98968765fa1248aaa9d0dbe0c",
+  "source_sha256": "a5d5ab4d4461b67380ae9bd396dbadd024d573aba4a77e7145a4b8675df157c9",
+  "native_input_sha256": "8443a651d8df6616ab7a1c790bacf5c4841e9a72e326934a91e32ee301eec75f",
+  "maximum_plant_error_m": 0.0007603435794951578,
+  "sqp_iterations": 56,
+  "human_to_robot_scale": 0.567486366162115,
+  "native_surface_scale": 0.54042649269104,
+  "robot_leg_length_m": 0.4432040377776584,
+  "human_leg_length_m": 0.7809950409470232,
+  "root_orientation_source": "BVH Hips SO(3), coordinate conversion and constant native world calibration",
+  "root_alignment_rotation": [
+    [
+      0.02771161710996458,
+      -0.9996159593949823
+    ],
+    [
+      0.9996159593949823,
+      0.02771161710996439
+    ]
+  ],
+  "root_alignment_offset": [
+    -0.06166536093221109,
+    -0.021732650024654604
+  ],
+  "root_alignment_rms_m": 0.05332186346377321,
+  "source_contacts": [
+    {
+      "side": "Left",
+      "contact_fraction": 0.6125,
+      "plant_intervals": [
+        [
+          0,
+          40
+        ],
+        [
+          52,
+          112
+        ],
+        [
+          143,
+          175
+        ],
+        [
+          213,
+          247
+        ],
+        [
+          279,
+          323
+        ],
+        [
+          355,
+          390
+        ]
+      ],
+      "vertical_clearance_scale": 1.0,
+      "maximum_target_swing_clearance_m": 0.07992485661077524
+    },
+    {
+      "side": "Right",
+      "contact_fraction": 0.605,
+      "plant_intervals": [
+        [
+          0,
+          58
+        ],
+        [
+          68,
+          93
+        ],
+        [
+          104,
+          144
+        ],
+        [
+          175,
+          204
+        ],
+        [
+          210,
+          216
+        ],
+        [
+          246,
+          280
+        ],
+        [
+          319,
+          356
+        ],
+        [
+          387,
+          400
+        ]
+      ],
+      "vertical_clearance_scale": 1.0,
+      "maximum_target_swing_clearance_m": 0.10724813197359981
+    }
+  ],
+  "termination_rule": "all kinematic quality gates satisfied at saved SQP iterate; full-bank and visual QA still required",
+  "optimizer_fully_converged": false
+}

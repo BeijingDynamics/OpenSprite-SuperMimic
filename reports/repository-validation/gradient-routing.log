@@ -1,0 +1,1 @@
+{"passed": true, "motion_updates_encoder_decoder": true, "velocity_updates_only_velocity_encoder": true, "input_gradient_through_frozen_decoder": true, "reference_latent_target_detached": true, "history": 10}

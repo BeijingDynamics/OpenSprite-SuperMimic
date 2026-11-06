@@ -1,0 +1,35 @@
+{
+  "schema": "sprite_supermimic_experiment_timing_v1",
+  "decision_date": "2026-11-05",
+  "decision_source": "User confirmed the prior stable ICM45686 SPI/800Hz IMU hardware version trained with 500Hz PD; retain 500Hz for this project",
+  "policy_hz": 50,
+  "policy_dt_s": 0.02,
+  "training_pd_hz": 500,
+  "training_physics_dt_s": 0.002,
+  "training_decimation": 10,
+  "proprioceptive_history_frames": 10,
+  "command_delay": {
+    "min_physics_ticks": 0,
+    "max_physics_ticks": 1,
+    "min_delay_s": 0.0,
+    "max_delay_s": 0.002,
+    "hold_probability": 0.9,
+    "refresh_physics_ticks": 10,
+    "refresh_period_s": 0.02
+  },
+  "deployment_reference": {
+    "icm45686_imu_hz": 800,
+    "policy_hz": 50,
+    "ankle_host_pd_hz": 500,
+    "other_motor_command_hz": 50,
+    "drive_internal_hz": 1000,
+    "can_scheduler_hz": 2000
+  },
+  "published_snapshot_sha256": "184ec989fd24b4bc6ea5034e6fdae796b5b9ce83ef2c884dfe4fc61d8d6987dc",
+  "published_snapshot_timing_is_not_adopted": true,
+  "training_gain_update_status": "user_approved_published_kp_kd_caps_defaults_for_fresh_run002; frozen_run001_unchanged",
+  "fresh_training_experiment": "joint-waist-v5-002",
+  "fresh_training_local_directory": "E:/supermimic_run/v5_joint_run002",
+  "hardware_qualified": false,
+  "allow_hardware_tx": false
+}

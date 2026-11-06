@@ -1,0 +1,2932 @@
+{
+  "schema": "opensprite_supermimic_source_inventory_v1",
+  "tracker_commit": "4beb018567574215b5c9f95e0cc13cf5e04012d3",
+  "asset_commit": "f42a266c860db70d73ce92f34e26d253a2659636",
+  "control_profile_commit": "05774a9a37f47ed8a66f82ed36324e7f712bdfcb",
+  "runtime_commit": "5f8225ce6258cb38db174ee18c55162fa34d96a6",
+  "files": [
+    {
+      "path": "opensprite_tracker/constants.py",
+      "source_project": "v5_joint_run002",
+      "source_path": "opensprite_tracker/constants.py",
+      "sha256": "6a907fbcfbf1e4b3971f79641278c7c15002d90d7447403d0e73dbced5e27f9f"
+    },
+    {
+      "path": "opensprite_tracker/motion_contract.py",
+      "source_project": "v5_joint_run002",
+      "source_path": "opensprite_tracker/motion_contract.py",
+      "sha256": "972f76e13378def3e3efec1b890ef8685c9714df57b3f46da2d8738228a81a8a"
+    },
+    {
+      "path": "opensprite_tracker/robot.py",
+      "source_project": "v5_joint_run002",
+      "source_path": "opensprite_tracker/robot.py",
+      "sha256": "e5cbc607a2fd565f8e738695925cb498b17f9958bd630324b0b802324d2dd950"
+    },
+    {
+      "path": "opensprite_tracker/runtime.py",
+      "source_project": "v5_joint_run002",
+      "source_path": "opensprite_tracker/runtime.py",
+      "sha256": "548e236814adacf0d82636597c64b1c35413ebd61eaf66188dd51087d1e9dfbe"
+    },
+    {
+      "path": "opensprite_tracker/task.py",
+      "source_project": "v5_joint_run002",
+      "source_path": "opensprite_tracker/task.py",
+      "sha256": "d68174975934a6061b0c61963388fbdde5ef3ff82b3991e1f1c60f779cedaa72"
+    },
+    {
+      "path": "opensprite_tracker/__init__.py",
+      "source_project": "v5_joint_run002",
+      "source_path": "opensprite_tracker/__init__.py",
+      "sha256": "5e43856bbe4cd583faae620a194ff5a09a48174a51c1c5712a05612294c91c6f"
+    },
+    {
+      "path": "opensprite_tracker/supermimic/buffer.py",
+      "source_project": "v5_joint_run002",
+      "source_path": "opensprite_tracker/supermimic/buffer.py",
+      "sha256": "c7148ab03e30ba172202533134fcb7914d81744134155cdce80eaef2f0394341"
+    },
+    {
+      "path": "opensprite_tracker/supermimic/coverage.py",
+      "source_project": "v5_joint_run002",
+      "source_path": "opensprite_tracker/supermimic/coverage.py",
+      "sha256": "bf37f356422453afa9fd165900cf5941218058e871db5a1f0d72095d89741f32"
+    },
+    {
+      "path": "opensprite_tracker/supermimic/engine.py",
+      "source_project": "v5_joint_run002",
+      "source_path": "opensprite_tracker/supermimic/engine.py",
+      "sha256": "55e47ee02bc840391ebcc83fa54950759cd2d0a826537b261de760775830369b"
+    },
+    {
+      "path": "opensprite_tracker/supermimic/env.py",
+      "source_project": "v5_joint_run002",
+      "source_path": "opensprite_tracker/supermimic/env.py",
+      "sha256": "c8e9dfce47705a5c919a7bc8127b1c2cf90643c83916e57d7b023c601aff9d7f"
+    },
+    {
+      "path": "opensprite_tracker/supermimic/evaluate.py",
+      "source_project": "v5_joint_run002",
+      "source_path": "opensprite_tracker/supermimic/evaluate.py",
+      "sha256": "7b6a20efdf286af8b5388fdd6c0491d1763791110d725de3cf9608672a9d30c3"
+    },
+    {
+      "path": "opensprite_tracker/supermimic/full_body.py",
+      "source_project": "v5_joint_run002",
+      "source_path": "opensprite_tracker/supermimic/full_body.py",
+      "sha256": "06e9953ca3fa0370f85e50feeee2097152892003529789094e4ab8d33bfa7c0a"
+    },
+    {
+      "path": "opensprite_tracker/supermimic/initialization.py",
+      "source_project": "v5_joint_run002",
+      "source_path": "opensprite_tracker/supermimic/initialization.py",
+      "sha256": "9f8adc7fec968aa6e8455566e449b14d90bacc8969afa79ef16a3d4cbab252b2"
+    },
+    {
+      "path": "opensprite_tracker/supermimic/joint_interfaces.py",
+      "source_project": "v5_joint_run002",
+      "source_path": "opensprite_tracker/supermimic/joint_interfaces.py",
+      "sha256": "f15cca59c73177d62049ef3a098c070d27756b66fd136a2741dcdcd29fd1aa61"
+    },
+    {
+      "path": "opensprite_tracker/supermimic/joint_learner.py",
+      "source_project": "v5_joint_run002",
+      "source_path": "opensprite_tracker/supermimic/joint_learner.py",
+      "sha256": "ef4095dfdbb33ada5bc809cfbb962885b95334bcbaf9e7e3062c322b46f832d6"
+    },
+    {
+      "path": "opensprite_tracker/supermimic/kinematics.py",
+      "source_project": "v5_joint_run002",
+      "source_path": "opensprite_tracker/supermimic/kinematics.py",
+      "sha256": "5372c8ade57e9a5441b0e10c9e9c5d66ae7755e5775a04a45e0c1e1ad52680c4"
+    },
+    {
+      "path": "opensprite_tracker/supermimic/legacy_rewards.py",
+      "source_project": "v5_joint_run002",
+      "source_path": "opensprite_tracker/supermimic/legacy_rewards.py",
+      "sha256": "7c482f24ca46d66b258937b90d7f6a68554d494bce4408461856d3dde89adf66"
+    },
+    {
+      "path": "opensprite_tracker/supermimic/mdp.py",
+      "source_project": "v5_joint_run002",
+      "source_path": "opensprite_tracker/supermimic/mdp.py",
+      "sha256": "b53a280497eec593c6879d35de90d4cccb4262e4c97b02b315d530a5fb3a4c06"
+    },
+    {
+      "path": "opensprite_tracker/supermimic/motion.py",
+      "source_project": "v5_joint_run002",
+      "source_path": "opensprite_tracker/supermimic/motion.py",
+      "sha256": "21f9fe4481867ef5190588212dfc24f1045525069d1c84760758f543e03d7a7c"
+    },
+    {
+      "path": "opensprite_tracker/supermimic/networks.py",
+      "source_project": "v5_joint_run002",
+      "source_path": "opensprite_tracker/supermimic/networks.py",
+      "sha256": "328de47da007e1f92609e51b7e2dfd3b44e228ba8afcf3681502c623ea1717c6"
+    },
+    {
+      "path": "opensprite_tracker/supermimic/README.md",
+      "source_project": "v5_joint_run002",
+      "source_path": "opensprite_tracker/supermimic/README.md",
+      "sha256": "a5a027fd0b9edf386f1202ae1a2d8bb265cf67741b33038d65ea80b230042cfa"
+    },
+    {
+      "path": "opensprite_tracker/supermimic/render.py",
+      "source_project": "v5_joint_run002",
+      "source_path": "opensprite_tracker/supermimic/render.py",
+      "sha256": "5ca6a3b6aebff9104c1a358a084e98d071e876519f01ca65cd9b8f58d4602ee2"
+    },
+    {
+      "path": "opensprite_tracker/supermimic/robot.py",
+      "source_project": "v5_joint_run002",
+      "source_path": "opensprite_tracker/supermimic/robot.py",
+      "sha256": "5a9c26a1c8f667bcee5b639f64341d89297c9eab4ebdd749292746cdae8d5698"
+    },
+    {
+      "path": "opensprite_tracker/supermimic/rotations.py",
+      "source_project": "v5_joint_run002",
+      "source_path": "opensprite_tracker/supermimic/rotations.py",
+      "sha256": "6dd82d32b3dbf24907ed5646de1945e74df8c629393bdaccdf3dfddcf348f1ce"
+    },
+    {
+      "path": "opensprite_tracker/supermimic/sampling.py",
+      "source_project": "v5_joint_run002",
+      "source_path": "opensprite_tracker/supermimic/sampling.py",
+      "sha256": "77832cc33d45db53c2f128365e592ec30c63bd25b52331d693d1ae3dfff7fb16"
+    },
+    {
+      "path": "opensprite_tracker/supermimic/state.py",
+      "source_project": "v5_joint_run002",
+      "source_path": "opensprite_tracker/supermimic/state.py",
+      "sha256": "2c43328b16d639cd876be03d87c0e3d347c6d19c0e5edcf2366b82bcb8191ca8"
+    },
+    {
+      "path": "opensprite_tracker/supermimic/THIRD_PARTY_LICENSE.txt",
+      "source_project": "v5_joint_run002",
+      "source_path": "opensprite_tracker/supermimic/THIRD_PARTY_LICENSE.txt",
+      "sha256": "c0af0be7a456d9997cdbddd90a3bec6252d39dea5a7e7d902577c5e38e1caceb"
+    },
+    {
+      "path": "opensprite_tracker/supermimic/train.py",
+      "source_project": "v5_joint_run002",
+      "source_path": "opensprite_tracker/supermimic/train.py",
+      "sha256": "135ddfb14bdf9892b9b143589a34b8855161a54f5c22f8622e2fb2c2c4ef6fd1"
+    },
+    {
+      "path": "opensprite_tracker/supermimic/transition_metrics.py",
+      "source_project": "v5_joint_run002",
+      "source_path": "opensprite_tracker/supermimic/transition_metrics.py",
+      "sha256": "16f30756c553d3d85d0e4203d52c0c16f15a63dc3462b38cb80e0e65e51d3803"
+    },
+    {
+      "path": "opensprite_tracker/supermimic/validate_model.py",
+      "source_project": "v5_joint_run002",
+      "source_path": "opensprite_tracker/supermimic/validate_model.py",
+      "sha256": "a6a1319f5cdf00754985550536790704e0b039856e9e911e2717342f44b142e2"
+    },
+    {
+      "path": "opensprite_tracker/supermimic/velocity.py",
+      "source_project": "v5_joint_run002",
+      "source_path": "opensprite_tracker/supermimic/velocity.py",
+      "sha256": "04477225d9fc6855d1b8982ea852193dac514fd0168daa1605cfef28a769d4c7"
+    },
+    {
+      "path": "opensprite_tracker/supermimic/__init__.py",
+      "source_project": "v5_joint_run002",
+      "source_path": "opensprite_tracker/supermimic/__init__.py",
+      "sha256": "d93f0f3d4dd0f6a6a04721bbb051352a8bf6339e505485abd5a0a6562ef42778"
+    },
+    {
+      "path": "scripts/analyze_joint_gait.py",
+      "source_project": "v5_joint_run002",
+      "source_path": "scripts/analyze_joint_gait.py",
+      "sha256": "8e0cf0fabee5709001816c069dc785db70447114ba02e633bd3c98098daa1caf"
+    },
+    {
+      "path": "scripts/analyze_velocity_rollout.py",
+      "source_project": "v5_joint_run002",
+      "source_path": "scripts/analyze_velocity_rollout.py",
+      "sha256": "39d1abeea9d9e12de412eb5aeb30160d42dbb121fbbd720bc13cd23f74674692"
+    },
+    {
+      "path": "scripts/apply_low_speed_review.py",
+      "source_project": "v5_joint_run002",
+      "source_path": "scripts/apply_low_speed_review.py",
+      "sha256": "44b54c65764218e62b18b0d4ca946bf179cad9de0adc62e5fee6c3eff58ae613"
+    },
+    {
+      "path": "scripts/archive_results.py",
+      "source_project": "v5_joint_run002",
+      "source_path": "scripts/archive_results.py",
+      "sha256": "e403d9230575ca27cffa64baa7d1840de00eec32bcdc02d7f51b1c0355a9a782"
+    },
+    {
+      "path": "scripts/brief_training.py",
+      "source_project": "v5_joint_run002",
+      "source_path": "scripts/brief_training.py",
+      "sha256": "c33c864c4f98b8a275ed6196dc901f9f6b83af036991828522b97cae50dae970"
+    },
+    {
+      "path": "scripts/build_command_seed.py",
+      "source_project": "v5_joint_run002",
+      "source_path": "scripts/build_command_seed.py",
+      "sha256": "84a77fac21059c91a12efde01ec01eb3c5abf1032fb77b8092a0092bc93c9e44"
+    },
+    {
+      "path": "scripts/build_opensprite_model.py",
+      "source_project": "v5_joint_run002",
+      "source_path": "scripts/build_opensprite_model.py",
+      "sha256": "54c8b3956e77c7f2812c649dc2af3144300b5115acd15b23cf553b122a9f67dd"
+    },
+    {
+      "path": "scripts/check_correspondence_geometry.py",
+      "source_project": "v5_joint_run002",
+      "source_path": "scripts/check_correspondence_geometry.py",
+      "sha256": "a780c3c4cf09735aa85ff6406872e7a4e9b911f1acc7ef4d5a69221d0e794ba8"
+    },
+    {
+      "path": "scripts/check_install.py",
+      "source_project": "v5_joint_run002",
+      "source_path": "scripts/check_install.py",
+      "sha256": "3cd839396f53bf8ac0f06fb3c78ee584f7daac6d296d8339ed4e7308a86e7477"
+    },
+    {
+      "path": "scripts/check_reference_fk_precision.py",
+      "source_project": "v5_joint_run002",
+      "source_path": "scripts/check_reference_fk_precision.py",
+      "sha256": "64b82f2724cd88859703cbe6824a87e1c4f6af085164d76a2846a9a2675e9231"
+    },
+    {
+      "path": "scripts/check_retiming_consistency.py",
+      "source_project": "v5_joint_run002",
+      "source_path": "scripts/check_retiming_consistency.py",
+      "sha256": "1ea1dc5f3aa7cfba41d892a775057ee23648f83b0337f5aef751ede45bcd9f36"
+    },
+    {
+      "path": "scripts/check_velocity_task.py",
+      "source_project": "v5_joint_run002",
+      "source_path": "scripts/check_velocity_task.py",
+      "sha256": "82965fd2f1ab37b284d749072792323b6bd471a4e5de85a5b96f023b133131ae"
+    },
+    {
+      "path": "scripts/configure_contact_retarget.py",
+      "source_project": "v5_joint_run002",
+      "source_path": "scripts/configure_contact_retarget.py",
+      "sha256": "ba698955ac2c4c6ec9cc729260089c2c71240df8ae6a9ee04cafba6ba70ba639"
+    },
+    {
+      "path": "scripts/defer_intermediate_evaluations.py",
+      "source_project": "v5_joint_run002",
+      "source_path": "scripts/defer_intermediate_evaluations.py",
+      "sha256": "79d34c9c07b0bcf08b5731600a6909472b86d1ddd461ffd50bd854fa36030ba6"
+    },
+    {
+      "path": "scripts/demo.py",
+      "source_project": "v5_joint_run002",
+      "source_path": "scripts/demo.py",
+      "sha256": "6e0ae5bb683c53b2ab652dde29d3c48f257d35309ad1d1f6ceb31649553bb05f"
+    },
+    {
+      "path": "scripts/diagnose_joint_latent.py",
+      "source_project": "v5_joint_run002",
+      "source_path": "scripts/diagnose_joint_latent.py",
+      "sha256": "5c13870a76f7f56ecf5b76226b7a2453b9604bbf980721d5283beceed42a1bf7"
+    },
+    {
+      "path": "scripts/download_lafan_walks.py",
+      "source_project": "v5_joint_run002",
+      "source_path": "scripts/download_lafan_walks.py",
+      "sha256": "ec8d1507ed4afec2dde45fa677636ee1958eb6f7b58577f199fd65cb780ae0cc"
+    },
+    {
+      "path": "scripts/evaluate_joint.py",
+      "source_project": "v5_joint_run002",
+      "source_path": "scripts/evaluate_joint.py",
+      "sha256": "f24ca507f1955ae62909a1947c33528a13ce321b023cf3683082106f84da2d32"
+    },
+    {
+      "path": "scripts/evaluate_opensprite.py",
+      "source_project": "v5_joint_run002",
+      "source_path": "scripts/evaluate_opensprite.py",
+      "sha256": "a74f6a3aeb26f49d34104ff04e3554493c322ee21cdf04bcd83f081990a5e70e"
+    },
+    {
+      "path": "scripts/evaluate_status_20261105.py",
+      "source_project": "v5_joint_run002",
+      "source_path": "scripts/evaluate_status_20261105.py",
+      "sha256": "dcc28856d432ec76f05f6a86393e2abe010b44a2d78c316033affdff1ea3d1d9"
+    },
+    {
+      "path": "scripts/evaluate_velocity.py",
+      "source_project": "v5_joint_run002",
+      "source_path": "scripts/evaluate_velocity.py",
+      "sha256": "d51f86e03779a1b1598d0498de0b7c35ba06e23203d97128f85b1b35f6739359"
+    },
+    {
+      "path": "scripts/export_joint.py",
+      "source_project": "v5_joint_run002",
+      "source_path": "scripts/export_joint.py",
+      "sha256": "a8dfb234d2b61c42b3773bd8d061de343fa9bc3e4729fb728fc10be9de3e4779"
+    },
+    {
+      "path": "scripts/export_velocity.py",
+      "source_project": "v5_joint_run002",
+      "source_path": "scripts/export_velocity.py",
+      "sha256": "dfe449ab199b6714cb6bc24e891c4260a04fb4cea1bb51403404ec98d5771a49"
+    },
+    {
+      "path": "scripts/extract_motion_clip.py",
+      "source_project": "v5_joint_run002",
+      "source_path": "scripts/extract_motion_clip.py",
+      "sha256": "a5f5535813a14650319b34ef73a38230811602940a2c6435c9235b7fc23eee52"
+    },
+    {
+      "path": "scripts/finalize_contact_candidate.py",
+      "source_project": "v5_joint_run002",
+      "source_path": "scripts/finalize_contact_candidate.py",
+      "sha256": "afc43ba59c123e16b1d0e60215ff725bdfa326e8165d65b0fcb1d54cb3d3a101"
+    },
+    {
+      "path": "scripts/finalize_joint_run.py",
+      "source_project": "v5_joint_run002",
+      "source_path": "scripts/finalize_joint_run.py",
+      "sha256": "55828f6ab53cb42b8e72d4c2470429f0c06ac00541d881128de957f33e254fbf"
+    },
+    {
+      "path": "scripts/freeze_sim_baseline.py",
+      "source_project": "v5_joint_run002",
+      "source_path": "scripts/freeze_sim_baseline.py",
+      "sha256": "3363d3d467bd51e7e087e94429748f8776eab7074e3b22ae1240e6a2ee3d7bbb"
+    },
+    {
+      "path": "scripts/hourly_audit.py",
+      "source_project": "v5_joint_run002",
+      "source_path": "scripts/hourly_audit.py",
+      "sha256": "01708411dad9d1f3bd7dd4db82c93816180ed7cb5f5615bc29bc8aedbee80b86"
+    },
+    {
+      "path": "scripts/inspect_reference_clip.py",
+      "source_project": "v5_joint_run002",
+      "source_path": "scripts/inspect_reference_clip.py",
+      "sha256": "6c392be6cc7d5eebf66ebb8f9bc32fa43f5d8ba89e383c5fb2676c070c9eaf23"
+    },
+    {
+      "path": "scripts/inspect_retarget_geometry.py",
+      "source_project": "v5_joint_run002",
+      "source_path": "scripts/inspect_retarget_geometry.py",
+      "sha256": "1890a1b6d8f8c0b650fde0b7dfb56097f99eb1ec96d4f8bdb321450a4ec3d403"
+    },
+    {
+      "path": "scripts/inspect_source_alignment.py",
+      "source_project": "v5_joint_run002",
+      "source_path": "scripts/inspect_source_alignment.py",
+      "sha256": "844fdf1f5bd3d8baa3ec806d840b8549a2b3dbd5746faadc246dad8896bb106e"
+    },
+    {
+      "path": "scripts/inspect_umr_correspondence.py",
+      "source_project": "v5_joint_run002",
+      "source_path": "scripts/inspect_umr_correspondence.py",
+      "sha256": "a01784d125779e40eda0cdd466c0ae5519d962c3dcc4fd4f6bd9c19ee5912264"
+    },
+    {
+      "path": "scripts/monitor_training.py",
+      "source_project": "v5_joint_run002",
+      "source_path": "scripts/monitor_training.py",
+      "sha256": "c7293c2fad59aee53818125adbfde381726ea6ed4ea9e7676ed8ad065439e0b8"
+    },
+    {
+      "path": "scripts/package_joint_results.py",
+      "source_project": "v5_joint_run002",
+      "source_path": "scripts/package_joint_results.py",
+      "sha256": "7500b04a61476cbc99d76fcbb644318760c1715de496c02e28239ed12aed305a"
+    },
+    {
+      "path": "scripts/pack_contact_references.py",
+      "source_project": "v5_joint_run002",
+      "source_path": "scripts/pack_contact_references.py",
+      "sha256": "3737e25ca4d78de82cc1ee7c464664ca8d74be0087ceca39e3232bab5f0a8ba6"
+    },
+    {
+      "path": "scripts/plot_umr_correspondence.py",
+      "source_project": "v5_joint_run002",
+      "source_path": "scripts/plot_umr_correspondence.py",
+      "sha256": "71d17884e5fd75b2468f95ae64cc34c65611e24c050f2962381dcbc6c4f7e34d"
+    },
+    {
+      "path": "scripts/post_training_run002.py",
+      "source_project": "v5_joint_run002",
+      "source_path": "scripts/post_training_run002.py",
+      "sha256": "374adf13eca34d7b2083b8de4d4352ab94d1a7810bdd43d9d16ea17233b15d22"
+    },
+    {
+      "path": "scripts/preflight_run002.py",
+      "source_project": "v5_joint_run002",
+      "source_path": "scripts/preflight_run002.py",
+      "sha256": "48a9c0db7330f79e98ffcb891a105791bc9ef4a638f0eb602832da27e4aa0c67"
+    },
+    {
+      "path": "scripts/prepare_autonomy_config.py",
+      "source_project": "v5_joint_run002",
+      "source_path": "scripts/prepare_autonomy_config.py",
+      "sha256": "50b744180e59cf672057bb05dd97c0b279952cff35473575d7a8dbb6bd7562e6"
+    },
+    {
+      "path": "scripts/prepare_runtime_scene_run002.py",
+      "source_project": "v5_joint_run002",
+      "source_path": "scripts/prepare_runtime_scene_run002.py",
+      "sha256": "4072b901834c8cb8f16b43c050e6e51fc9e81759a8b2044d4a69eb7b3293e302"
+    },
+    {
+      "path": "scripts/prepare_slow_reference_candidate.py",
+      "source_project": "v5_joint_run002",
+      "source_path": "scripts/prepare_slow_reference_candidate.py",
+      "sha256": "98163c3902388ce02b6cb0e5114393deee3c14cc3bb3da15786882983fb647a2"
+    },
+    {
+      "path": "scripts/record_reference_review.py",
+      "source_project": "v5_joint_run002",
+      "source_path": "scripts/record_reference_review.py",
+      "sha256": "be46ca17511fe8dcc89ca5348811b3463e06fa13f11ae18885d6eb21c6de80a0"
+    },
+    {
+      "path": "scripts/record_retarget.py",
+      "source_project": "v5_joint_run002",
+      "source_path": "scripts/record_retarget.py",
+      "sha256": "036ba35d5d2fcfb8443be3ad052d5030288a0b4d6130ba98f6cbc770860ba1cd"
+    },
+    {
+      "path": "scripts/refine_reference_contacts.py",
+      "source_project": "v5_joint_run002",
+      "source_path": "scripts/refine_reference_contacts.py",
+      "sha256": "2434911554d6e16c192e94f7ddb42a2eee116cd98968765fa1248aaa9d0dbe0c"
+    },
+    {
+      "path": "scripts/render_reference_preview.py",
+      "source_project": "v5_joint_run002",
+      "source_path": "scripts/render_reference_preview.py",
+      "sha256": "19ed54e7ec1071a07a1559cc2aa0e352957c16ecc58fa96ca2d2cbdc2642eca5"
+    },
+    {
+      "path": "scripts/render_velocity.py",
+      "source_project": "v5_joint_run002",
+      "source_path": "scripts/render_velocity.py",
+      "sha256": "ed68dc889932ca239803b1baee9ac8289a41c8cd632e84894195ec96462fe800"
+    },
+    {
+      "path": "scripts/retarget_lafan.py",
+      "source_project": "v5_joint_run002",
+      "source_path": "scripts/retarget_lafan.py",
+      "sha256": "7c6246e35b1f31b9a010027502be8a14976f20ce3aba83843fc84c17ffbd788e"
+    },
+    {
+      "path": "scripts/review_loaded_foot_slip.py",
+      "source_project": "v5_joint_run002",
+      "source_path": "scripts/review_loaded_foot_slip.py",
+      "sha256": "43201ae0a4bd3ebe47cb6cc58351ae58487182d9a514c93fd1f81c025938f3e3"
+    },
+    {
+      "path": "scripts/run_velocity_envelope.py",
+      "source_project": "v5_joint_run002",
+      "source_path": "scripts/run_velocity_envelope.py",
+      "sha256": "9c06a282a6bfbf86db7ede9342d292e9c76fdb4787a5fca54b7573c18b7c30b8"
+    },
+    {
+      "path": "scripts/seal_velocity_envelope.py",
+      "source_project": "v5_joint_run002",
+      "source_path": "scripts/seal_velocity_envelope.py",
+      "sha256": "04ee177a091ffc3338ef969843c51d9d66dadc91504eaa506703854cb33d6597"
+    },
+    {
+      "path": "scripts/select_lafan_segments.py",
+      "source_project": "v5_joint_run002",
+      "source_path": "scripts/select_lafan_segments.py",
+      "sha256": "2021e6f76c19037aaa7cdd239401baba36df9bb9cd4264ebc228c88619a0e424"
+    },
+    {
+      "path": "scripts/snapshot_joint_run.py",
+      "source_project": "v5_joint_run002",
+      "source_path": "scripts/snapshot_joint_run.py",
+      "sha256": "a6c4da654962a89d1f1aec716bf1079d01b0b1a23dc772407d8a1c86170f97fa"
+    },
+    {
+      "path": "scripts/status.py",
+      "source_project": "v5_joint_run002",
+      "source_path": "scripts/status.py",
+      "sha256": "83eb5fcd28488178e1cc70f325c229e077d6131e232505e4499a3e61c1d492dd"
+    },
+    {
+      "path": "scripts/summarize_velocity_envelope.py",
+      "source_project": "v5_joint_run002",
+      "source_path": "scripts/summarize_velocity_envelope.py",
+      "sha256": "ee21c48eb84fe6c7d6a51c3fc165d8e16b084e6283e47b2aa268c221391f82d1"
+    },
+    {
+      "path": "scripts/test_joint_gradient_routing.py",
+      "source_project": "v5_joint_run002",
+      "source_path": "scripts/test_joint_gradient_routing.py",
+      "sha256": "a9690961b09f0e1b5c86e5d702bcc59d83c160aee522015fbed444eeaa087640"
+    },
+    {
+      "path": "scripts/test_joint_simulation.py",
+      "source_project": "v5_joint_run002",
+      "source_path": "scripts/test_joint_simulation.py",
+      "sha256": "175d1d187dfd4b638c178fb7f8366ec0ab8d047a0036d1ebf1811ff7712a632a"
+    },
+    {
+      "path": "scripts/test_velocity_torso_reward.py",
+      "source_project": "v5_joint_run002",
+      "source_path": "scripts/test_velocity_torso_reward.py",
+      "sha256": "f27e5465c7610afc3acb22be2ea7d0340cdcbd4fcba8ea4599efbc4a7a3a1dde"
+    },
+    {
+      "path": "scripts/training_snapshot.py",
+      "source_project": "v5_joint_run002",
+      "source_path": "scripts/training_snapshot.py",
+      "sha256": "c2550382b2ffb88bbb68285cd07dd664df1870ba33193ace82be2dfd3dad6100"
+    },
+    {
+      "path": "scripts/train_joint.py",
+      "source_project": "v5_joint_run002",
+      "source_path": "scripts/train_joint.py",
+      "sha256": "0a2a02a1f78030ca31b35dafe8533ab7f300068e1b28f1198adce8c43143b938"
+    },
+    {
+      "path": "scripts/train_opensprite.py",
+      "source_project": "v5_joint_run002",
+      "source_path": "scripts/train_opensprite.py",
+      "sha256": "a7809c876bef921fab23f06fa49d627fb44d134ca43b4dac8f1e5cba0a195508"
+    },
+    {
+      "path": "scripts/validate_opensprite_model.py",
+      "source_project": "v5_joint_run002",
+      "source_path": "scripts/validate_opensprite_model.py",
+      "sha256": "e06aedc20d57b403ec9e755e0de50fa446de7295c2fed7eff969183089d4baa1"
+    },
+    {
+      "path": "scripts/validate_opensprite_umr.py",
+      "source_project": "v5_joint_run002",
+      "source_path": "scripts/validate_opensprite_umr.py",
+      "sha256": "41497c99f2b083a2bcce1f9df3de735d2ae9ca6f8cfadbb5fbbee85b9103ce76"
+    },
+    {
+      "path": "scripts/validate_reference_bank.py",
+      "source_project": "v5_joint_run002",
+      "source_path": "scripts/validate_reference_bank.py",
+      "sha256": "c0a6e5617ee4b029664515045415b64449d8019880e4662010f6870ae9cae678"
+    },
+    {
+      "path": "scripts/validate_runtime_replay.py",
+      "source_project": "v5_joint_run002",
+      "source_path": "scripts/validate_runtime_replay.py",
+      "sha256": "4421d01b7661b0098dc68b01ae356689b8b6d42a696036f2d5ce9759afa400c2"
+    },
+    {
+      "path": "scripts/watch_joint_training.py",
+      "source_project": "v5_joint_run002",
+      "source_path": "scripts/watch_joint_training.py",
+      "sha256": "f2408825dc0d7e825f2d07b6f14acc1921341e5cb44ce6717939d8833bd57fe1"
+    },
+    {
+      "path": "tests/test_engine_microbatch.py",
+      "source_project": "v5_joint_run002",
+      "source_path": "tests/test_engine_microbatch.py",
+      "sha256": "24ba3b403602faecdbd082d3bd8edcf891fc93b401b184f076b82229b74f5392"
+    },
+    {
+      "path": "tests/test_evaluation_continuation.py",
+      "source_project": "v5_joint_run002",
+      "source_path": "tests/test_evaluation_continuation.py",
+      "sha256": "8b147cf6b9e66a53894dcef76746f692ff976806375fe42c40fc727cd90fdcfc"
+    },
+    {
+      "path": "tests/test_failure_replay.py",
+      "source_project": "v5_joint_run002",
+      "source_path": "tests/test_failure_replay.py",
+      "sha256": "8d173a5371282a268fa6ca151da5fc7ede296f0676cb49455428d4f43816ede5"
+    },
+    {
+      "path": "tests/test_hourly_audit.py",
+      "source_project": "v5_joint_run002",
+      "source_path": "tests/test_hourly_audit.py",
+      "sha256": "bc37d689cff5c626f1cbf6feb628c747331cafa4edeabf38d3ed063118c15c5f"
+    },
+    {
+      "path": "tests/test_render_continuation.py",
+      "source_project": "v5_joint_run002",
+      "source_path": "tests/test_render_continuation.py",
+      "sha256": "22fd1a6462b49506490ae6bbe9c006d27b28f0b86e9885d480657cbd9859d7d4"
+    },
+    {
+      "path": "tests/test_replay_storage.py",
+      "source_project": "v5_joint_run002",
+      "source_path": "tests/test_replay_storage.py",
+      "sha256": "1584110dcfe3bf758da1e90b016324fdca0cfe8b51e7b1e1f7d303f0e0dcddbc"
+    },
+    {
+      "path": "tests/test_resume_budget_transfer.py",
+      "source_project": "v5_joint_run002",
+      "source_path": "tests/test_resume_budget_transfer.py",
+      "sha256": "4ecb23bd635c4de50b40242fbbd83483225b1bc58a10bf86594ee65c6d1f4e63"
+    },
+    {
+      "path": "tests/test_retarget_contract.py",
+      "source_project": "v5_joint_run002",
+      "source_path": "tests/test_retarget_contract.py",
+      "sha256": "1609cbca82e8e4cf33b8d5a7f70533d486f7d3ba07b901d7c0a5df083125a7fb"
+    },
+    {
+      "path": "tests/test_torque_lag_disabled.py",
+      "source_project": "v5_joint_run002",
+      "source_path": "tests/test_torque_lag_disabled.py",
+      "sha256": "89a517f752e9bbbfb5f1babe17613acb4950393f22b662302f5e80300c4b2309"
+    },
+    {
+      "path": "tests/test_torque_lag_training_contract.py",
+      "source_project": "v5_joint_run002",
+      "source_path": "tests/test_torque_lag_training_contract.py",
+      "sha256": "4a8375540884a81ee6f04304d121b8856d95ce084e3f39c11e8306e9978cafc8"
+    },
+    {
+      "path": "tests/test_tracker_contract.py",
+      "source_project": "v5_joint_run002",
+      "source_path": "tests/test_tracker_contract.py",
+      "sha256": "c21105914bf1d1435f5b8f3a6ad1001a8e6adaa981b8901e1a14e16e617bb525"
+    },
+    {
+      "path": "tests/test_training_coverage.py",
+      "source_project": "v5_joint_run002",
+      "source_path": "tests/test_training_coverage.py",
+      "sha256": "00ef81c8004c28f94653c3d9c2f366cef8d8f0adaaf6829052c7691c1ed2e3f6"
+    },
+    {
+      "path": "tests/test_training_supervision.py",
+      "source_project": "v5_joint_run002",
+      "source_path": "tests/test_training_supervision.py",
+      "sha256": "aa55881477ac4c97dd408fd5d00a0f88ad45fcadc119f4c5f1d62e1e991760b1"
+    },
+    {
+      "path": "tests/test_wm_loss_scale.py",
+      "source_project": "v5_joint_run002",
+      "source_path": "tests/test_wm_loss_scale.py",
+      "sha256": "6ad5ee2cf0e4597253d22cc182a5d32d58991c74042c3aa0b08d93e9f5454012"
+    },
+    {
+      "path": "tests/test_world_model_initialization.py",
+      "source_project": "v5_joint_run002",
+      "source_path": "tests/test_world_model_initialization.py",
+      "sha256": "022aba9753df9c35053bd9ccf084532ec6a6e169cd9db7c7338ddc092849e3bc"
+    },
+    {
+      "path": "configs/run002.json",
+      "source_project": "v5_joint_run002",
+      "source_path": "configs/run002.json",
+      "sha256": "fd0783717d806a4a7d9b3fdbadbc854b25d0edd04f388d61b7d6127f0f225faf"
+    },
+    {
+      "path": "configs/runtime-plant-commands.json",
+      "source_project": "v5_joint_run002",
+      "source_path": "configs/runtime-plant-commands.json",
+      "sha256": "3e832082541bf4a436ea9bb00b6dbd958daf418fbed339f3a6ad6b5c793bbc27"
+    },
+    {
+      "path": "requirements-training.txt",
+      "source_project": "v5_joint_run002",
+      "source_path": "requirements.txt",
+      "sha256": "424e067b493f76513aa9656d0219c8918c17f4e6aa357f0cbc08826a19368b3c"
+    },
+    {
+      "path": "provenance/requirements-training-lock.txt",
+      "source_project": "v5_joint_run002",
+      "source_path": "requirements-lock.txt",
+      "sha256": "1e458a0814b3c00c9cb53bc7ebd1177a507ec8775962860d433787526082e071"
+    },
+    {
+      "path": "provenance/run002-experiment.json",
+      "source_project": "v5_joint_run002",
+      "source_path": "EXPERIMENT.json",
+      "sha256": "abc98edfb6a545504360d9cc0361214c738e959e6dacab38b5ec78abd661b0b6"
+    },
+    {
+      "path": "provenance/original-training-source-sha256.json",
+      "source_project": "v5_joint_run002",
+      "source_path": "SOURCE_SHA256.json",
+      "sha256": "d688617420adc2b7482a1404510d9f6199984a6a65cfc4622760ca216d8b151d"
+    },
+    {
+      "path": "assets/opensprite/opensprite.xml",
+      "source_project": "v5_joint_run002",
+      "source_path": "assets/opensprite/opensprite.xml",
+      "sha256": "2cdfb00df9867076271d49dd699c95e2a8ec2f4c6d88be25d5c9ccc6d73fd9e1"
+    },
+    {
+      "path": "upstream_asset/control_profiles/SHA256SUMS",
+      "source_project": "v5_joint_run002",
+      "source_path": "upstream_asset/control_profiles/SHA256SUMS",
+      "sha256": "2aedb4c60d5a3a17f35752cd7ceca33f4886e499f306cf069398cf47419c23c5"
+    },
+    {
+      "path": "upstream_asset/control_profiles/sprite0825_serial_training_20261105.json",
+      "source_project": "v5_joint_run002",
+      "source_path": "upstream_asset/control_profiles/sprite0825_serial_training_20261105.json",
+      "sha256": "184ec989fd24b4bc6ea5034e6fdae796b5b9ce83ef2c884dfe4fc61d8d6987dc"
+    },
+    {
+      "path": "upstream_asset/scripts/control_profile.py",
+      "source_project": "v5_joint_run002",
+      "source_path": "upstream_asset/scripts/control_profile.py",
+      "sha256": "3a9d0f9b9a46c65c35258f907f0742deef23ec37cfec1dde86ff86eb3504163f"
+    },
+    {
+      "path": "upstream_asset/models/sprite0825_v5_4340_shoulders_waist20261105/manifest.json",
+      "source_project": "v5_joint_run002",
+      "source_path": "upstream_asset/models/sprite0825_v5_4340_shoulders_waist20261105/manifest.json",
+      "sha256": "5ea99a2d27bcf89b0681033bfa968830fce55081dcaf133726c4b4a1ece53f78"
+    },
+    {
+      "path": "upstream_asset/models/sprite0825_v5_4340_shoulders_waist20261105/sprite0825_float.urdf",
+      "source_project": "v5_joint_run002",
+      "source_path": "upstream_asset/models/sprite0825_v5_4340_shoulders_waist20261105/sprite0825_float.urdf",
+      "sha256": "f873954bf60d9ff2bb4e49d3ec68ba2bf8cf0bdfb1144aaa1103f6a302663bd9"
+    },
+    {
+      "path": "upstream_asset/models/sprite0825_v5_4340_shoulders_waist20261105/mujoco/scene.xml",
+      "source_project": "v5_joint_run002",
+      "source_path": "upstream_asset/models/sprite0825_v5_4340_shoulders_waist20261105/mujoco/scene.xml",
+      "sha256": "dbf94ace80c2190d7e771a49957e0b8df9ba2c0326fda4ac813ca9b1abb11135"
+    },
+    {
+      "path": "upstream_asset/models/sprite0825_v5_4340_shoulders_waist20261105/mujoco/scene_external_pd.xml",
+      "source_project": "v5_joint_run002",
+      "source_path": "upstream_asset/models/sprite0825_v5_4340_shoulders_waist20261105/mujoco/scene_external_pd.xml",
+      "sha256": "7f1e24b04dbd4ea76a6a385692b00682d68546eb24ca9454934fa8d33343a95a"
+    },
+    {
+      "path": "upstream_asset/models/sprite0825_v5_4340_shoulders_waist20261105/mujoco/sprite0825_v5_external_pd.xml",
+      "source_project": "v5_joint_run002",
+      "source_path": "upstream_asset/models/sprite0825_v5_4340_shoulders_waist20261105/mujoco/sprite0825_v5_external_pd.xml",
+      "sha256": "5859ea2088ebf90ac62c7094343200a9a6e14078ed47bdf65d5a39ee9522ba93"
+    },
+    {
+      "path": "upstream_asset/models/sprite0825_v5_4340_shoulders_waist20261105/mujoco/sprite0825_v5_visual_locked.xml",
+      "source_project": "v5_joint_run002",
+      "source_path": "upstream_asset/models/sprite0825_v5_4340_shoulders_waist20261105/mujoco/sprite0825_v5_visual_locked.xml",
+      "sha256": "91b24d1f521ea737cec71f1c94f501e76b544e4041e48591bbf665ee16243525"
+    },
+    {
+      "path": "data/command_default_pose.json",
+      "source_project": "v5_joint_run002",
+      "source_path": "data/command_default_pose.json",
+      "sha256": "d4e42293d919850c908a60aa7c0aa42725bf7842af51427e74374e1d30ae5b34"
+    },
+    {
+      "path": "data/motions/contact_v5_v11/v5_left.json",
+      "source_project": "v5_joint_run002",
+      "source_path": "data/motions/contact_v5_v11/v5_left.json",
+      "sha256": "3d7a7fd3e5a7385df29270a8f9bfc49ee43cf2a186093f47036311d7741bb644"
+    },
+    {
+      "path": "data/motions/contact_v5_v11/v5_locomotion.npz",
+      "source_project": "v5_joint_run002",
+      "source_path": "data/motions/contact_v5_v11/v5_locomotion.npz",
+      "sha256": "6f9cefe15646b532ccf57a40f20292c69c18f77ae0c33254abdedfcd1c66a8d0"
+    },
+    {
+      "path": "data/motions/contact_v5_v11/v5_locomotion.qa.json",
+      "source_project": "v5_joint_run002",
+      "source_path": "data/motions/contact_v5_v11/v5_locomotion.qa.json",
+      "sha256": "2c4341dd9844b1c924869dff5b62f90a88533d4c447c3d56d0ab681d587a75f3"
+    },
+    {
+      "path": "data/motions/contact_v5_v11/v5_right.json",
+      "source_project": "v5_joint_run002",
+      "source_path": "data/motions/contact_v5_v11/v5_right.json",
+      "sha256": "a151c4de3f7fa06b5c1e2fcb5b2c31caf6a9c6207c759077b852e2a2c3adbe54"
+    },
+    {
+      "path": "data/motions/contact_v5_v11/v5_start.json",
+      "source_project": "v5_joint_run002",
+      "source_path": "data/motions/contact_v5_v11/v5_start.json",
+      "sha256": "d53ff93b8e98e5e4007f0a72fb92025e2e7db3daf1b0349528cca74440759652"
+    },
+    {
+      "path": "data/motions/contact_v5_v11/v5_stop.json",
+      "source_project": "v5_joint_run002",
+      "source_path": "data/motions/contact_v5_v11/v5_stop.json",
+      "sha256": "e8df3b9f7f2748e0a1b5853bf02d98cab769403c6aa57a11c0b3baff2f8b07a3"
+    },
+    {
+      "path": "data/motions/contact_v5_v11/v5_straight.json",
+      "source_project": "v5_joint_run002",
+      "source_path": "data/motions/contact_v5_v11/v5_straight.json",
+      "sha256": "512098028cb45f1fa2eeb85ac7c8cafb08c4caf57705752a8102a49fdf766685"
+    },
+    {
+      "path": "data/sources/lafan1-resolved/selected_segments.json",
+      "source_project": "v5_joint_run002",
+      "source_path": "data/sources/lafan1-resolved/selected_segments.json",
+      "sha256": "6b3c4b7f61bc373f2999ac5da8d5902becac1cbf6d6dc680d2b80a4e530b6e26"
+    },
+    {
+      "path": "retarget/convert_umr.py",
+      "source_project": "v5_joint",
+      "source_path": "retarget/convert_umr.py",
+      "sha256": "50cefc26e45f473746d922037740b001ad074cff18513fa3c67c1effcc977edb"
+    },
+    {
+      "path": "retarget/processing.py",
+      "source_project": "v5_joint",
+      "source_path": "retarget/processing.py",
+      "sha256": "5384c9907871d1101f1f586b436e53de2c65eed8691fb3dd6e5cc454944f669d"
+    },
+    {
+      "path": "retarget/umr_pipeline.py",
+      "source_project": "v5_joint",
+      "source_path": "retarget/umr_pipeline.py",
+      "sha256": "66ecaf7b6666cfa505fad416ea04204f467c2e35fe719b77136cae3acd57b98f"
+    },
+    {
+      "path": "retarget/__init__.py",
+      "source_project": "v5_joint",
+      "source_path": "retarget/__init__.py",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "retarget/bvh_tools/bvh_adapters.py",
+      "source_project": "v5_joint",
+      "source_path": "retarget/bvh_tools/bvh_adapters.py",
+      "sha256": "60e364cc0d18c0417e3ee802d145edd025e998170ad1b580a825e80ec23246f1"
+    },
+    {
+      "path": "retarget/bvh_tools/motion_postprocess.py",
+      "source_project": "v5_joint",
+      "source_path": "retarget/bvh_tools/motion_postprocess.py",
+      "sha256": "c9e65d46bde515bcafb4d754adf06fcd4eb3c811749a32a0059504923735ecdc"
+    },
+    {
+      "path": "retarget/bvh_tools/README.md",
+      "source_project": "v5_joint",
+      "source_path": "retarget/bvh_tools/README.md",
+      "sha256": "fce270564cad3c3bb9a9cc795949a5bac388a6c73a4b16e8543d3e082b172418"
+    },
+    {
+      "path": "retarget/bvh_tools/__init__.py",
+      "source_project": "v5_joint",
+      "source_path": "retarget/bvh_tools/__init__.py",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "third_party/umr/humanoid_retarget_defaults.json",
+      "source_project": "v5_joint",
+      "source_path": "third_party/umr/humanoid_retarget_defaults.json",
+      "sha256": "d0593ec1e2b38df9cd7f1eccd518f82e0a14f63a9fe3a3eea4b45fc57abaa8e8"
+    },
+    {
+      "path": "third_party/umr/humanoid_retarget_defaults_nr.json",
+      "source_project": "v5_joint",
+      "source_path": "third_party/umr/humanoid_retarget_defaults_nr.json",
+      "sha256": "3bbc4f46fc34fdfa02eb7dc630dae6922529bd71c07bf198798c1c4e06b70bc4"
+    },
+    {
+      "path": "third_party/umr/LICENSE",
+      "source_project": "v5_joint",
+      "source_path": "third_party/umr/LICENSE",
+      "sha256": "459e0673ea1d3511d39918a01080a16ced21a5b2a317feb1618b04f5568344b6"
+    },
+    {
+      "path": "third_party/umr/README.md",
+      "source_project": "v5_joint",
+      "source_path": "third_party/umr/README.md",
+      "sha256": "c68ffa5150de9dbe5ce0141b872b8b1f66f61d34046c0374aa9540f806f09fb9"
+    },
+    {
+      "path": "third_party/umr/view_smpl_mujoco.py",
+      "source_project": "v5_joint",
+      "source_path": "third_party/umr/view_smpl_mujoco.py",
+      "sha256": "d4216b0445d595d1d02a2bbefaff7e6ffb3f3234a75922b1c165bef109babb16"
+    },
+    {
+      "path": "third_party/umr/scripts/build_adapt_correspondence_dataset.py",
+      "source_project": "v5_joint",
+      "source_path": "third_party/umr/scripts/build_adapt_correspondence_dataset.py",
+      "sha256": "d3766d20e261e1cb0fe47c4b7fbeb0dfbc3fba88899745867e4ddec0d4535db6"
+    },
+    {
+      "path": "third_party/umr/scripts/build_correspondence_ae_dataset.py",
+      "source_project": "v5_joint",
+      "source_path": "third_party/umr/scripts/build_correspondence_ae_dataset.py",
+      "sha256": "3da895d52b3ebd7517490c3bde5005cd93e2313cade16c8914e5ab3294767193"
+    },
+    {
+      "path": "third_party/umr/scripts/character_surface_retarget_common.py",
+      "source_project": "v5_joint",
+      "source_path": "third_party/umr/scripts/character_surface_retarget_common.py",
+      "sha256": "6d56ef9cc9b6827e64f0ce3dec80a939f7e5ad9c693ddfe074c3f654158bb798"
+    },
+    {
+      "path": "third_party/umr/scripts/export_adapt_correspondence_viewer.py",
+      "source_project": "v5_joint",
+      "source_path": "third_party/umr/scripts/export_adapt_correspondence_viewer.py",
+      "sha256": "5b6f5b3d4ef3b4edb5a1d2976b0ae4b990d3c29a77c9669fdb3e164958575e11"
+    },
+    {
+      "path": "third_party/umr/scripts/export_nr_fbx_skin.mjs",
+      "source_project": "v5_joint",
+      "source_path": "third_party/umr/scripts/export_nr_fbx_skin.mjs",
+      "sha256": "85a67a4e3496f1446e11d5a35dceca938dbbb164cae16da41a4d0fced76c67e7"
+    },
+    {
+      "path": "third_party/umr/scripts/FBXLoaderPatched.js",
+      "source_project": "v5_joint",
+      "source_path": "third_party/umr/scripts/FBXLoaderPatched.js",
+      "sha256": "cbb70d6e002567c41ddfa29009a0f4a09f5869aab2cc64b6f68fa4038c3c6a63"
+    },
+    {
+      "path": "third_party/umr/scripts/humanoid_retarget_config.py",
+      "source_project": "v5_joint",
+      "source_path": "third_party/umr/scripts/humanoid_retarget_config.py",
+      "sha256": "6f4bd7930ca6c1c64645892f4150d5bc797dfceae81482e2ee78d970e1ab8577"
+    },
+    {
+      "path": "third_party/umr/scripts/humanoid_retarget_pipeline.py",
+      "source_project": "v5_joint",
+      "source_path": "third_party/umr/scripts/humanoid_retarget_pipeline.py",
+      "sha256": "fb3d930fcb4086e55014575dc35df2997269918d2d4817a19bbd79a8f4e2de4a"
+    },
+    {
+      "path": "third_party/umr/scripts/humanoid_retarget_pipeline_adapt.py",
+      "source_project": "v5_joint",
+      "source_path": "third_party/umr/scripts/humanoid_retarget_pipeline_adapt.py",
+      "sha256": "b79a6b49f5ca5bed3a79058c0fa83027b78f3e60da6e045fc1056dc30c3c4c02"
+    },
+    {
+      "path": "third_party/umr/scripts/humanoid_retarget_pipeline_batch.py",
+      "source_project": "v5_joint",
+      "source_path": "third_party/umr/scripts/humanoid_retarget_pipeline_batch.py",
+      "sha256": "add729ce7e06287ce81dc1e890bc7f5b997194f8bcc34eaf99c9fcde18f043c6"
+    },
+    {
+      "path": "third_party/umr/scripts/humanoid_retarget_pipeline_character.py",
+      "source_project": "v5_joint",
+      "source_path": "third_party/umr/scripts/humanoid_retarget_pipeline_character.py",
+      "sha256": "f5cf667cec877c02f7c688d95468372344f1f438efb93ad0b27391cf452de322"
+    },
+    {
+      "path": "third_party/umr/scripts/humanoid_retarget_pipeline_hsi_hoi.py",
+      "source_project": "v5_joint",
+      "source_path": "third_party/umr/scripts/humanoid_retarget_pipeline_hsi_hoi.py",
+      "sha256": "be2308aaa42813891a2067bff48a8ecf57cbc9d2635a012bb5709cc0d6be27e1"
+    },
+    {
+      "path": "third_party/umr/scripts/humanoid_retarget_pipeline_nr.py",
+      "source_project": "v5_joint",
+      "source_path": "third_party/umr/scripts/humanoid_retarget_pipeline_nr.py",
+      "sha256": "4890a2f94052f58926715e2735058891d9c92da69a6781399fe739c03ce526c2"
+    },
+    {
+      "path": "third_party/umr/scripts/mujoco_geom_surface.py",
+      "source_project": "v5_joint",
+      "source_path": "third_party/umr/scripts/mujoco_geom_surface.py",
+      "sha256": "3d3966c8b22aca3549ad0a2fe54a5af30377ece025e8ea0e6fb8f0bd632cd351"
+    },
+    {
+      "path": "third_party/umr/scripts/mujoco_point_cloud_center.py",
+      "source_project": "v5_joint",
+      "source_path": "third_party/umr/scripts/mujoco_point_cloud_center.py",
+      "sha256": "e410a03977c4f1fd2cfd4afe4acadbc1f30a2325fb85aead424589eb3970b1f5"
+    },
+    {
+      "path": "third_party/umr/scripts/nr_source.py",
+      "source_project": "v5_joint",
+      "source_path": "third_party/umr/scripts/nr_source.py",
+      "sha256": "ed820ca7cfa5d83ae32202e96496414ffe3fe5b1d0090c0ff43c250550446a01"
+    },
+    {
+      "path": "third_party/umr/scripts/nr_three_loader.mjs",
+      "source_project": "v5_joint",
+      "source_path": "third_party/umr/scripts/nr_three_loader.mjs",
+      "sha256": "843b7eaf2112d95bf687ccd402c5c96aabed251b37cd769438f334caeb4d9dfb"
+    },
+    {
+      "path": "third_party/umr/scripts/package-lock.json",
+      "source_project": "v5_joint",
+      "source_path": "third_party/umr/scripts/package-lock.json",
+      "sha256": "3252c464d27f16baa095172acbe2f75221ddb7f572847b32d79181dc39378c70"
+    },
+    {
+      "path": "third_party/umr/scripts/package.json",
+      "source_project": "v5_joint",
+      "source_path": "third_party/umr/scripts/package.json",
+      "sha256": "9ad6419f658ebd5c4c3ba2bc18b29d9f0b9c223009a4b7b79f376aac771cc3dd"
+    },
+    {
+      "path": "third_party/umr/scripts/prepare_grail_object_mjcf.py",
+      "source_project": "v5_joint",
+      "source_path": "third_party/umr/scripts/prepare_grail_object_mjcf.py",
+      "sha256": "d356c67ee6f18b15e77a49411b7b63df501f06ec645be0115ca61007c34816e8"
+    },
+    {
+      "path": "third_party/umr/scripts/retarget_body_segment_surface.py",
+      "source_project": "v5_joint",
+      "source_path": "third_party/umr/scripts/retarget_body_segment_surface.py",
+      "sha256": "66445ab75d27ab8ba006cf93c14df5cfc38b14758043a3f936af9307d945319e"
+    },
+    {
+      "path": "third_party/umr/scripts/retarget_body_segment_surface_adapt.py",
+      "source_project": "v5_joint",
+      "source_path": "third_party/umr/scripts/retarget_body_segment_surface_adapt.py",
+      "sha256": "cf2bbe099f9f5800226461b85aa1aed3dc38a6a6123112f1ea2b16717a8d1237"
+    },
+    {
+      "path": "third_party/umr/scripts/retarget_body_segment_surface_character.py",
+      "source_project": "v5_joint",
+      "source_path": "third_party/umr/scripts/retarget_body_segment_surface_character.py",
+      "sha256": "2b8a5797e47e1ab1507313b0275ff053a709698913a71fc55aa45b18e20ab6b9"
+    },
+    {
+      "path": "third_party/umr/scripts/retarget_body_segment_surface_hoi_hsi.py",
+      "source_project": "v5_joint",
+      "source_path": "third_party/umr/scripts/retarget_body_segment_surface_hoi_hsi.py",
+      "sha256": "9a9a46e5f0e8ac989aa2ad8fb9c18fe4740c9d7070813e690532b755751720ce"
+    },
+    {
+      "path": "third_party/umr/scripts/retarget_character_to_humanoid_surface_vector.py",
+      "source_project": "v5_joint",
+      "source_path": "third_party/umr/scripts/retarget_character_to_humanoid_surface_vector.py",
+      "sha256": "e7b86bb9b01876b598e753b97d892e08abb1a3de5592aa4e33a7e0e1bb9bec27"
+    },
+    {
+      "path": "third_party/umr/scripts/retarget_composite_racket.py",
+      "source_project": "v5_joint",
+      "source_path": "third_party/umr/scripts/retarget_composite_racket.py",
+      "sha256": "b022ed2f11c613f8b667f26716a29f77d9bdeaca1f7938fcdf803b57352b0840"
+    },
+    {
+      "path": "third_party/umr/scripts/retarget_smpl_to_humanoid_surface_vector.py",
+      "source_project": "v5_joint",
+      "source_path": "third_party/umr/scripts/retarget_smpl_to_humanoid_surface_vector.py",
+      "sha256": "5fe94ada6fb089d1ea35dcbb5fd3921ae92b25feeeed6496bd5daf8fa082eaa9"
+    },
+    {
+      "path": "third_party/umr/scripts/retarget_smpl_to_humanoid_surface_vector_batch.py",
+      "source_project": "v5_joint",
+      "source_path": "third_party/umr/scripts/retarget_smpl_to_humanoid_surface_vector_batch.py",
+      "sha256": "61b8473b0fff96e216c044249d6dbae7963c151534e61ad7305003af25e0313c"
+    },
+    {
+      "path": "third_party/umr/scripts/smplx_model_loader.py",
+      "source_project": "v5_joint",
+      "source_path": "third_party/umr/scripts/smplx_model_loader.py",
+      "sha256": "21e76d5e46f89d3e5a89eb720a86201ee483cb5c8941be63f62bc879a4d86521"
+    },
+    {
+      "path": "third_party/umr/scripts/smpl_surface_retarget_common.py",
+      "source_project": "v5_joint",
+      "source_path": "third_party/umr/scripts/smpl_surface_retarget_common.py",
+      "sha256": "2e66a536cfb31793ea1dccce17682e4a623f5a5f203ae34381f1feddb81da601"
+    },
+    {
+      "path": "third_party/umr/scripts/soma_source.py",
+      "source_project": "v5_joint",
+      "source_path": "third_party/umr/scripts/soma_source.py",
+      "sha256": "8be71239707efa0fab0e6cc7d2452bb00fb2c9ef69ce434d4c26e88c24a890f9"
+    },
+    {
+      "path": "third_party/umr/scripts/source_self_contact.py",
+      "source_project": "v5_joint",
+      "source_path": "third_party/umr/scripts/source_self_contact.py",
+      "sha256": "3de350ae920828eb7f495077e2f81e14c7f63323d6507ecf7697499a827a7463"
+    },
+    {
+      "path": "third_party/umr/scripts/surface_sampling.py",
+      "source_project": "v5_joint",
+      "source_path": "third_party/umr/scripts/surface_sampling.py",
+      "sha256": "bef60d43f919ba6fc943a7eb9c6cb2e4dd51802a358182e53260ebd2355bc4a7"
+    },
+    {
+      "path": "third_party/umr/scripts/train_correspondence_template_residual_ae.py",
+      "source_project": "v5_joint",
+      "source_path": "third_party/umr/scripts/train_correspondence_template_residual_ae.py",
+      "sha256": "99a1ab98334276f4b20000fe0f386344fdced2c490e5d51bb68a89235db93f42"
+    },
+    {
+      "path": "third_party/umr/scripts/viser_mujoco_viewer.py",
+      "source_project": "v5_joint",
+      "source_path": "third_party/umr/scripts/viser_mujoco_viewer.py",
+      "sha256": "b696be8f65a18e22790f5e69f10bd104148ce83ef98551d36fe40319941b8b71"
+    },
+    {
+      "path": "third_party/umr/scripts/viser_result_folder.py",
+      "source_project": "v5_joint",
+      "source_path": "third_party/umr/scripts/viser_result_folder.py",
+      "sha256": "762409e05517468eb6c9653698b6c2dc44d47ae41dcbbe6ff74c9713a76d8d03"
+    },
+    {
+      "path": "third_party/umr/scripts/visualize_robot_retarget_result.py",
+      "source_project": "v5_joint",
+      "source_path": "third_party/umr/scripts/visualize_robot_retarget_result.py",
+      "sha256": "11cab100beee0eabd692ff5191dd74eb2673653324fa1bc9877a0bc5cf11ee7b"
+    },
+    {
+      "path": "third_party/umr/scripts/mimickit_compat/kin_char_model.py",
+      "source_project": "v5_joint",
+      "source_path": "third_party/umr/scripts/mimickit_compat/kin_char_model.py",
+      "sha256": "50e639c405560636dc3488217c99b25b086f75372713940281dd03fe1e7dc7ef"
+    },
+    {
+      "path": "third_party/umr/scripts/mimickit_compat/mjcf_char_model.py",
+      "source_project": "v5_joint",
+      "source_path": "third_party/umr/scripts/mimickit_compat/mjcf_char_model.py",
+      "sha256": "03ff0e307e051fbe411ce217e1893c16fbb70606313d29a6944dba3adc763b54"
+    },
+    {
+      "path": "third_party/umr/scripts/mimickit_compat/torch_util.py",
+      "source_project": "v5_joint",
+      "source_path": "third_party/umr/scripts/mimickit_compat/torch_util.py",
+      "sha256": "50031184cfa20a487d38f85e87ce6e3f0c0f410bfdb506f542e917f8c4af3c8f"
+    },
+    {
+      "path": "third_party/umr/scripts/mimickit_compat/__init__.py",
+      "source_project": "v5_joint",
+      "source_path": "third_party/umr/scripts/mimickit_compat/__init__.py",
+      "sha256": "547df635e0bd6b3ac3ba848f3b744986e85255dbff3f195dd02705f9719043c6"
+    },
+    {
+      "path": "third_party/umr/scripts/vendor/three/LICENSE",
+      "source_project": "v5_joint",
+      "source_path": "third_party/umr/scripts/vendor/three/LICENSE",
+      "sha256": "f57eb9202058667d12aebd854fe8a86d6feaeab51078180df5615bfdbd5cff05"
+    },
+    {
+      "path": "third_party/umr/scripts/vendor/three/package.json",
+      "source_project": "v5_joint",
+      "source_path": "third_party/umr/scripts/vendor/three/package.json",
+      "sha256": "6fed02d6e1cfe0f561a0c3ca33b3e38953876995391d7956815096c61dd01087"
+    },
+    {
+      "path": "third_party/umr/scripts/vendor/three/build/three.module.js",
+      "source_project": "v5_joint",
+      "source_path": "third_party/umr/scripts/vendor/three/build/three.module.js",
+      "sha256": "61718c7d4f2c65be011b954f51661079fbd3fa9839380cce38cf71c06153eddb"
+    },
+    {
+      "path": "third_party/umr/scripts/vendor/three/examples/jsm/curves/NURBSCurve.js",
+      "source_project": "v5_joint",
+      "source_path": "third_party/umr/scripts/vendor/three/examples/jsm/curves/NURBSCurve.js",
+      "sha256": "7f7a9bdefe1de8327808327508174d8521744dd96a8c9eddaa2385d3b1048a6a"
+    },
+    {
+      "path": "third_party/umr/scripts/vendor/three/examples/jsm/curves/NURBSUtils.js",
+      "source_project": "v5_joint",
+      "source_path": "third_party/umr/scripts/vendor/three/examples/jsm/curves/NURBSUtils.js",
+      "sha256": "f1ea8b9ecb8c4d48a19ce3bdba8c289b0a2642e12fce84e77ee2e1fdb345d479"
+    },
+    {
+      "path": "third_party/umr/scripts/vendor/three/examples/jsm/libs/fflate.module.js",
+      "source_project": "v5_joint",
+      "source_path": "third_party/umr/scripts/vendor/three/examples/jsm/libs/fflate.module.js",
+      "sha256": "4bea07664a7dbdd4e4f677a0fd8798ca42ec7cf207553ece5852d7e56c5042e7"
+    },
+    {
+      "path": "configs/umr/opensprite.json",
+      "source_project": "v5_joint",
+      "source_path": "configs/umr/opensprite.json",
+      "sha256": "d79c848ffc6cbd9f5a2162eec19b1e9cd5be13b82829b982a11f4eb34233d5f4"
+    },
+    {
+      "path": "requirements-retarget.txt",
+      "source_project": "v5_joint",
+      "source_path": "requirements-umr.txt",
+      "sha256": "a96834e78e5d1b27aa47a0dea4a7592750d18f205ac9b3874a02ab6e7f3c2f4e"
+    },
+    {
+      "path": "assets/opensprite/retarget_scene.xml",
+      "source_project": "v5_joint",
+      "source_path": "assets/opensprite/retarget_scene.xml",
+      "sha256": "fd41352bf6f130524f7fa41982d750599587573c342e6ba8fa26c34ca99250f3"
+    },
+    {
+      "path": "assets/geno/Geno_stance.bvh",
+      "source_project": "v5_joint",
+      "source_path": "assets/geno/Geno_stance.bvh",
+      "sha256": "57a2c6d5d6c1270689cdb0efb6b33b6c585e8035f49e73149c23d63fab6a1326"
+    },
+    {
+      "path": "assets/geno/license.txt",
+      "source_project": "v5_joint",
+      "source_path": "assets/geno/license.txt",
+      "sha256": "1c61a60c07391c9831b8fb31e34a0fb6454aa1b8a49f10b9f01f798dbffa03cb"
+    },
+    {
+      "path": "runtime/LICENSE",
+      "source_project": "open_sprite_runtime",
+      "source_path": "LICENSE",
+      "sha256": "6f1e622c82a380075843bb084a7ec3b1f1d12a4a02526d75e78b0924a860aa75"
+    },
+    {
+      "path": "runtime/config/hardware.example.json",
+      "source_project": "open_sprite_runtime",
+      "source_path": "config/hardware.example.json",
+      "sha256": "e693a7fa42feccbcf89e6981e9264d064e7187220dd57e0e4afbb94dec969ae3"
+    },
+    {
+      "path": "runtime/config/hardware.sprite0825.measurement.json",
+      "source_project": "open_sprite_runtime",
+      "source_path": "config/hardware.sprite0825.measurement.json",
+      "sha256": "098f24c016e7009f7431bda373dffc42012e3e28cef8f272dadffb1c469fd3cd"
+    },
+    {
+      "path": "runtime/config/hardware.sprite0825.measurement_pre_right_ankle_pitch_sign_fix_20260916_192411.json",
+      "source_project": "open_sprite_runtime",
+      "source_path": "config/hardware.sprite0825.measurement_pre_right_ankle_pitch_sign_fix_20260916_192411.json",
+      "sha256": "2f3bf0f4fc06aaafb1dc195e864a3080b9cc3255806a7588946e6a11d69a74d8"
+    },
+    {
+      "path": "runtime/config/runtime.example.json",
+      "source_project": "open_sprite_runtime",
+      "source_path": "config/runtime.example.json",
+      "sha256": "82c0f4c18d410db13c159371f4030432dbefa9d5d5286d96f47fd7b7b9b3659c"
+    },
+    {
+      "path": "runtime/config/supermimic_run002_strict_startup.experiment.json",
+      "source_project": "open_sprite_runtime",
+      "source_path": "config/supermimic_run002_strict_startup.experiment.json",
+      "sha256": "6da8c76240d89ccb5ef63a0835ed6e950e056cc0d006857009cf43fded44005a"
+    },
+    {
+      "path": "runtime/config/supermimic_v5_500hz.experiment.json",
+      "source_project": "open_sprite_runtime",
+      "source_path": "config/supermimic_v5_500hz.experiment.json",
+      "sha256": "23af2b8c0debb2feec5d8b229296339fe3cade81e67c7aa083b60433602d00ce"
+    },
+    {
+      "path": "runtime/config/xbox_one_253_mapping.json",
+      "source_project": "open_sprite_runtime",
+      "source_path": "config/xbox_one_253_mapping.json",
+      "sha256": "e3d627c60a055b88ea2a4c45e1968abcf35f7ae552ce10ac7b716c533897e15e"
+    },
+    {
+      "path": "runtime/native/CMakeLists.txt",
+      "source_project": "open_sprite_runtime",
+      "source_path": "native/CMakeLists.txt",
+      "sha256": "3a4b683c5956086f1a0f83dca3f45412b41bb04d9eeaf1d2691c39f1bdd28a13"
+    },
+    {
+      "path": "runtime/native/icm45686/CMakeLists.txt",
+      "source_project": "open_sprite_runtime",
+      "source_path": "native/icm45686/CMakeLists.txt",
+      "sha256": "487f6835673af920909c7f84d7c5979e678416c44e3f69b3675ec3035fed0b60"
+    },
+    {
+      "path": "runtime/native/icm45686/core.hpp",
+      "source_project": "open_sprite_runtime",
+      "source_path": "native/icm45686/core.hpp",
+      "sha256": "e97f4c6e5a05a349481c7ea83b16db0d1d3041cbfcc8e0d43bd2046f70c9204f"
+    },
+    {
+      "path": "runtime/native/icm45686/ipc.hpp",
+      "source_project": "open_sprite_runtime",
+      "source_path": "native/icm45686/ipc.hpp",
+      "sha256": "8597b6947b7e1f4241ae28a6603c8b833ee1d6312d1bfe1b9ecdf02af0278ced"
+    },
+    {
+      "path": "runtime/native/icm45686/main.cpp",
+      "source_project": "open_sprite_runtime",
+      "source_path": "native/icm45686/main.cpp",
+      "sha256": "efe60fe0928cacedcbde136315635a635c00385aa5c8c902955cfcb57ed21183"
+    },
+    {
+      "path": "runtime/native/icm45686/packet_test.cpp",
+      "source_project": "open_sprite_runtime",
+      "source_path": "native/icm45686/packet_test.cpp",
+      "sha256": "d238b591ce9733260ba4ca8f906b1da4d6f68bb782f7c541c5a324d0fff5cfaf"
+    },
+    {
+      "path": "runtime/native/icm45686/test.cpp",
+      "source_project": "open_sprite_runtime",
+      "source_path": "native/icm45686/test.cpp",
+      "sha256": "330e49c76261dde841b966e0b6cf7ff30bd9c0831bc9ce808488d59143dfac2e"
+    },
+    {
+      "path": "runtime/native/src/bno_read_length_benchmark.cpp",
+      "source_project": "open_sprite_runtime",
+      "source_path": "native/src/bno_read_length_benchmark.cpp",
+      "sha256": "79f40ae2e6e67eb0b678b2fcaca26cb9df15d096c9b775352c556d57e5390328"
+    },
+    {
+      "path": "runtime/native/src/gamepad_disable_probe.cpp",
+      "source_project": "open_sprite_runtime",
+      "source_path": "native/src/gamepad_disable_probe.cpp",
+      "sha256": "b9ce3de4347382e1ba3ccea62dccd2425a98391aaeac6ef974f0bffd24902d48"
+    },
+    {
+      "path": "runtime/native/src/gamepad_probe.cpp",
+      "source_project": "open_sprite_runtime",
+      "source_path": "native/src/gamepad_probe.cpp",
+      "sha256": "1ae73db8482221dbb2255138f4f56a8c017d0b2a86155424a463d55d788e0fed"
+    },
+    {
+      "path": "runtime/native/src/gamepad_test.cpp",
+      "source_project": "open_sprite_runtime",
+      "source_path": "native/src/gamepad_test.cpp",
+      "sha256": "53a21a9a7c2eeaf6cecb20b2c69420ab1e407046b70d8b3edf9f8b6eeb7287e8"
+    },
+    {
+      "path": "runtime/native/src/icm_packet.hpp",
+      "source_project": "open_sprite_runtime",
+      "source_path": "native/src/icm_packet.hpp",
+      "sha256": "d2808088497e9b83920321698e648028ea023db6aad53829505031ff6f1be15b"
+    },
+    {
+      "path": "runtime/native/src/imu_packet.hpp",
+      "source_project": "open_sprite_runtime",
+      "source_path": "native/src/imu_packet.hpp",
+      "sha256": "f3c75f1c207758596b5694175abcda2ce9f4200c4f260658650c7c19436273d3"
+    },
+    {
+      "path": "runtime/native/src/imu_six_axis.hpp",
+      "source_project": "open_sprite_runtime",
+      "source_path": "native/src/imu_six_axis.hpp",
+      "sha256": "5ffff696c5972ce3ab800ca0d1fd322e5f60a344b2cc5a3da95471b5ccd87bde"
+    },
+    {
+      "path": "runtime/native/src/policy_command_schedule.hpp",
+      "source_project": "open_sprite_runtime",
+      "source_path": "native/src/policy_command_schedule.hpp",
+      "sha256": "b20e906d42f93bc35be01c65198a191563cb058aa38502b144b31cef5dd82e24"
+    },
+    {
+      "path": "runtime/native/src/policy_core.hpp",
+      "source_project": "open_sprite_runtime",
+      "source_path": "native/src/policy_core.hpp",
+      "sha256": "48a06074e99ea2fe2652d8db0454ce579c46a8790293cf8c990d8c86d76a7810"
+    },
+    {
+      "path": "runtime/native/src/policy_evidence_buffer.hpp",
+      "source_project": "open_sprite_runtime",
+      "source_path": "native/src/policy_evidence_buffer.hpp",
+      "sha256": "e4146243be3c65244332700cc4fbcff73d7e3c889aa7c1e23c1e0c73b99406bc"
+    },
+    {
+      "path": "runtime/native/src/policy_feedback.hpp",
+      "source_project": "open_sprite_runtime",
+      "source_path": "native/src/policy_feedback.hpp",
+      "sha256": "68697d194bc2abc965503846b2ce5f700fa64fb26f26a90997d8d0fc606e5a19"
+    },
+    {
+      "path": "runtime/native/src/policy_gamepad.hpp",
+      "source_project": "open_sprite_runtime",
+      "source_path": "native/src/policy_gamepad.hpp",
+      "sha256": "831c43c120fbf4e26cb5ada793f6b538f64d0b162675c893e2884582c5695191"
+    },
+    {
+      "path": "runtime/native/src/policy_gamepad_fake.hpp",
+      "source_project": "open_sprite_runtime",
+      "source_path": "native/src/policy_gamepad_fake.hpp",
+      "sha256": "d37fde7d77802c79c0394e68a81de1ba69f2a8338e2922c981c98ff7b99c7dce"
+    },
+    {
+      "path": "runtime/native/src/policy_gamepad_linux.hpp",
+      "source_project": "open_sprite_runtime",
+      "source_path": "native/src/policy_gamepad_linux.hpp",
+      "sha256": "091eb7dfbfd9e07885b3e3d701f0e511272dfb8638c728c8c4a98c31dea29342"
+    },
+    {
+      "path": "runtime/native/src/policy_imu_client.hpp",
+      "source_project": "open_sprite_runtime",
+      "source_path": "native/src/policy_imu_client.hpp",
+      "sha256": "ff1e5df06bd31b19c98750af65bfbb06259d7dd6db8b3c93f6f222ddbb062faf"
+    },
+    {
+      "path": "runtime/native/src/policy_protection.hpp",
+      "source_project": "open_sprite_runtime",
+      "source_path": "native/src/policy_protection.hpp",
+      "sha256": "6004ed8fad325680194e06931bebdd3c810749e304dcbdabfe6c0415b66cb1a4"
+    },
+    {
+      "path": "runtime/native/src/policy_state_ipc.hpp",
+      "source_project": "open_sprite_runtime",
+      "source_path": "native/src/policy_state_ipc.hpp",
+      "sha256": "b075c1af0ac455604f9d11cf4ebcc75881a298c13b800478bddf8f877ec3d50b"
+    },
+    {
+      "path": "runtime/native/src/sprite_can_shadow.cpp",
+      "source_project": "open_sprite_runtime",
+      "source_path": "native/src/sprite_can_shadow.cpp",
+      "sha256": "26f03792e789149c2e35912ee38259d166889c001335323604afdac40e1beb94"
+    },
+    {
+      "path": "runtime/native/src/sprite_feedback_replay.cpp",
+      "source_project": "open_sprite_runtime",
+      "source_path": "native/src/sprite_feedback_replay.cpp",
+      "sha256": "0ed5d82522f0aea4852daa161d32db0d0a704eb73920bd7822b5ebd11386c5e5"
+    },
+    {
+      "path": "runtime/native/src/sprite_imu_bno.cpp",
+      "source_project": "open_sprite_runtime",
+      "source_path": "native/src/sprite_imu_bno.cpp",
+      "sha256": "bc4450ef53979c7731f8ee83dd0a6390e6547853bc6231325de08a942d563c35"
+    },
+    {
+      "path": "runtime/native/src/sprite_imu_ipc_probe.cpp",
+      "source_project": "open_sprite_runtime",
+      "source_path": "native/src/sprite_imu_ipc_probe.cpp",
+      "sha256": "34d2741266ea7f4f4349da1d334544ffb9cacd2a8bc16415a3deaf6f21d18a0d"
+    },
+    {
+      "path": "runtime/native/src/sprite_policy_replay.cpp",
+      "source_project": "open_sprite_runtime",
+      "source_path": "native/src/sprite_policy_replay.cpp",
+      "sha256": "e9cf9e06fe0a848fe03290930c5f11a6ec9b57b88da8b911244991dfdc68096f"
+    },
+    {
+      "path": "runtime/native/src/sprite_protection_replay.cpp",
+      "source_project": "open_sprite_runtime",
+      "source_path": "native/src/sprite_protection_replay.cpp",
+      "sha256": "fe9dc0580f603b2419e17c5f7f27d9322f16d7e73001a2d1af38f655406db3b9"
+    },
+    {
+      "path": "runtime/native/src/sprite_rt_timing.cpp",
+      "source_project": "open_sprite_runtime",
+      "source_path": "native/src/sprite_rt_timing.cpp",
+      "sha256": "e446f047b1eedc82ef10743ae8b8b2d366813348d2457ace2e8e6514c87fa669"
+    },
+    {
+      "path": "runtime/native/src/sprite_state_ipc_probe.cpp",
+      "source_project": "open_sprite_runtime",
+      "source_path": "native/src/sprite_state_ipc_probe.cpp",
+      "sha256": "f32ec5618bd1b0b940f3ac3129c6d2d8ad51e0df835902c00cb681f61f4f7851"
+    },
+    {
+      "path": "runtime/native/src/sprite_supermimic_replay.cpp",
+      "source_project": "open_sprite_runtime",
+      "source_path": "native/src/sprite_supermimic_replay.cpp",
+      "sha256": "4b671116b07b78cd4680abe273df357923553b307753329d47e2296444fe4125"
+    },
+    {
+      "path": "runtime/native/src/test_xbox120_options.cpp",
+      "source_project": "open_sprite_runtime",
+      "source_path": "native/src/test_xbox120_options.cpp",
+      "sha256": "0042caceecf33fe6a94a1aa7638c2ebccbf0936f20fe03cc95392da53813464e"
+    },
+    {
+      "path": "runtime/native/tests/test_bounded_preview.cpp",
+      "source_project": "open_sprite_runtime",
+      "source_path": "native/tests/test_bounded_preview.cpp",
+      "sha256": "79ff5dd841d13f9430f285df16f98ebd333eae40e98b021e3386e7a1e911931f"
+    },
+    {
+      "path": "runtime/native/tests/test_imu_packet.cpp",
+      "source_project": "open_sprite_runtime",
+      "source_path": "native/tests/test_imu_packet.cpp",
+      "sha256": "6965c0aaa8bb512a9c6407b7dffe51441508e6f0b71ff3291a93d35deda6d798"
+    },
+    {
+      "path": "runtime/native/tests/test_imu_six_axis.cpp",
+      "source_project": "open_sprite_runtime",
+      "source_path": "native/tests/test_imu_six_axis.cpp",
+      "sha256": "3de6a44d64776926c65f1923e94cc90c609e91bfb4dbba528b376c5c17368f93"
+    },
+    {
+      "path": "runtime/native/tests/test_policy_command_schedule.cpp",
+      "source_project": "open_sprite_runtime",
+      "source_path": "native/tests/test_policy_command_schedule.cpp",
+      "sha256": "62f355ac4e2e14e5cb0ba25f2ed5b4ac8d7af926464297b963e4cef0cffd6141"
+    },
+    {
+      "path": "runtime/native/tests/test_policy_completion.cpp",
+      "source_project": "open_sprite_runtime",
+      "source_path": "native/tests/test_policy_completion.cpp",
+      "sha256": "d6ac26dc51febf81760d435410be0233d798f86c4658dd7f667d7670d1ac3de3"
+    },
+    {
+      "path": "runtime/native/tests/test_policy_core.cpp",
+      "source_project": "open_sprite_runtime",
+      "source_path": "native/tests/test_policy_core.cpp",
+      "sha256": "403f0238f4ef22c9dddabfb918640e43481a3874b531f572756e406fbc94008e"
+    },
+    {
+      "path": "runtime/native/tests/test_policy_evidence_buffer.cpp",
+      "source_project": "open_sprite_runtime",
+      "source_path": "native/tests/test_policy_evidence_buffer.cpp",
+      "sha256": "62f5155ce79813607c00876603c9de9d798bf94573a3c1ad5d35f4451a6fcc0f"
+    },
+    {
+      "path": "runtime/native/tests/test_supermimic_core.cpp",
+      "source_project": "open_sprite_runtime",
+      "source_path": "native/tests/test_supermimic_core.cpp",
+      "sha256": "13b12c5ee0d5a8116cc3e752eed38ff486a0c21bae7578420a40657701a22b58"
+    },
+    {
+      "path": "runtime/native/third_party/tdk_icm45686/LICENSE",
+      "source_project": "open_sprite_runtime",
+      "source_path": "native/third_party/tdk_icm45686/LICENSE",
+      "sha256": "a1edf8467a808759e1d72c8bec90a3e53d2d782ab6bb899dab69d202109519c2"
+    },
+    {
+      "path": "runtime/native/third_party/tdk_icm45686/README.md",
+      "source_project": "open_sprite_runtime",
+      "source_path": "native/third_party/tdk_icm45686/README.md",
+      "sha256": "c852e610609c1d91d476607999f875c05bc2be0771c993654b486409e719e2c8"
+    },
+    {
+      "path": "runtime/native/third_party/tdk_icm45686/imu/inv_imu.h",
+      "source_project": "open_sprite_runtime",
+      "source_path": "native/third_party/tdk_icm45686/imu/inv_imu.h",
+      "sha256": "2fa95d35b7b422fe6a70a69871b95f4fc3c80ca4733f5b30de5f46b691b5de6c"
+    },
+    {
+      "path": "runtime/native/third_party/tdk_icm45686/imu/inv_imu_defs.h",
+      "source_project": "open_sprite_runtime",
+      "source_path": "native/third_party/tdk_icm45686/imu/inv_imu_defs.h",
+      "sha256": "a1ebe41ae8564bd75c55e1d02a4ca22341f2e090b08e59a0b28803af7f99f648"
+    },
+    {
+      "path": "runtime/native/third_party/tdk_icm45686/imu/inv_imu_driver.c",
+      "source_project": "open_sprite_runtime",
+      "source_path": "native/third_party/tdk_icm45686/imu/inv_imu_driver.c",
+      "sha256": "6345057b821ec956a36a82f069316cd9ca5273a3b9e1c0cbc55a8fab5b67f8a0"
+    },
+    {
+      "path": "runtime/native/third_party/tdk_icm45686/imu/inv_imu_driver.h",
+      "source_project": "open_sprite_runtime",
+      "source_path": "native/third_party/tdk_icm45686/imu/inv_imu_driver.h",
+      "sha256": "0ffc3037af706762749815f73141d6b5c53b15817efff70ad1d9a660e75191de"
+    },
+    {
+      "path": "runtime/native/third_party/tdk_icm45686/imu/inv_imu_regmap_le.h",
+      "source_project": "open_sprite_runtime",
+      "source_path": "native/third_party/tdk_icm45686/imu/inv_imu_regmap_le.h",
+      "sha256": "876657a4ef7a8259ac03b5a1fb0c2fafe435af98bd252f6fa1edb4d2d1cc2b4c"
+    },
+    {
+      "path": "runtime/native/third_party/tdk_icm45686/imu/inv_imu_transport.c",
+      "source_project": "open_sprite_runtime",
+      "source_path": "native/third_party/tdk_icm45686/imu/inv_imu_transport.c",
+      "sha256": "f39dbb67153a0fa2930922d30347400f3d2471076d36e6b95ce8d882db652252"
+    },
+    {
+      "path": "runtime/native/third_party/tdk_icm45686/imu/inv_imu_transport.h",
+      "source_project": "open_sprite_runtime",
+      "source_path": "native/third_party/tdk_icm45686/imu/inv_imu_transport.h",
+      "sha256": "a7fd0bcdcbc6727bc8d364a50d48b6f8dca28e51496fcf0258aeab7b2d9652f8"
+    },
+    {
+      "path": "runtime/native/third_party/tdk_icm45686/imu/inv_imu_version.h",
+      "source_project": "open_sprite_runtime",
+      "source_path": "native/third_party/tdk_icm45686/imu/inv_imu_version.h",
+      "sha256": "cf4cb06f51004644705d720f6dcd1ed4d65166072aba7c0d9d2674f3d9349e83"
+    },
+    {
+      "path": "runtime/pyproject.toml",
+      "source_project": "open_sprite_runtime",
+      "source_path": "pyproject.toml",
+      "sha256": "9e345314725c65f5d11ec14dfb067433066fcf6e8df8de86a4bef0a68c826e32"
+    },
+    {
+      "path": "runtime/src/open_sprite_runtime/__init__.py",
+      "source_project": "open_sprite_runtime",
+      "source_path": "src/open_sprite_runtime/__init__.py",
+      "sha256": "83f9b8da4c745eb3f8849e82fcd0b81be21456da06cebed07a8976925674fa96"
+    },
+    {
+      "path": "runtime/src/open_sprite_runtime/action_trace_replay.py",
+      "source_project": "open_sprite_runtime",
+      "source_path": "src/open_sprite_runtime/action_trace_replay.py",
+      "sha256": "f7c4b578b909aa56310fa37176c51e7bdbc94c3c7ac1180386a8aa46d1d3771b"
+    },
+    {
+      "path": "runtime/src/open_sprite_runtime/ankle.py",
+      "source_project": "open_sprite_runtime",
+      "source_path": "src/open_sprite_runtime/ankle.py",
+      "sha256": "bc6d591adc6815c7521f301c51fb2825cf176d7f551f6b97eef5915f2f70f03a"
+    },
+    {
+      "path": "runtime/src/open_sprite_runtime/ankle_pair_commissioning.py",
+      "source_project": "open_sprite_runtime",
+      "source_path": "src/open_sprite_runtime/ankle_pair_commissioning.py",
+      "sha256": "8bd4141e4022d6bb22aca4bc53dccf2b16ba28d19cf56e55b687f2ea7d4d55ff"
+    },
+    {
+      "path": "runtime/src/open_sprite_runtime/bno055.py",
+      "source_project": "open_sprite_runtime",
+      "source_path": "src/open_sprite_runtime/bno055.py",
+      "sha256": "53b51c5ef93f6b9477fcfcc3f1c5716e45b1aad9e227b7e1a5a9111baec45e09"
+    },
+    {
+      "path": "runtime/src/open_sprite_runtime/bno055_source.py",
+      "source_project": "open_sprite_runtime",
+      "source_path": "src/open_sprite_runtime/bno055_source.py",
+      "sha256": "50e37a3df5b11db7440432d410b5aa716c913ba11a7527ca7194611915c1ec10"
+    },
+    {
+      "path": "runtime/src/open_sprite_runtime/cli.py",
+      "source_project": "open_sprite_runtime",
+      "source_path": "src/open_sprite_runtime/cli.py",
+      "sha256": "920dfc0f824ca425199f0dcc96355995866708dfb2b725d69b080ad076336ab6"
+    },
+    {
+      "path": "runtime/src/open_sprite_runtime/command_schedule.py",
+      "source_project": "open_sprite_runtime",
+      "source_path": "src/open_sprite_runtime/command_schedule.py",
+      "sha256": "0dd5a6ad64766c6a4d088396bf3c7827bc5effb1cf9a1b1b14e975db8fc1c7cd"
+    },
+    {
+      "path": "runtime/src/open_sprite_runtime/command_slew.py",
+      "source_project": "open_sprite_runtime",
+      "source_path": "src/open_sprite_runtime/command_slew.py",
+      "sha256": "434ac79cdbc50b4d9096e28e103ac877f960ec8bc804a8a3acaab6a25efbe302"
+    },
+    {
+      "path": "runtime/src/open_sprite_runtime/contracts.py",
+      "source_project": "open_sprite_runtime",
+      "source_path": "src/open_sprite_runtime/contracts.py",
+      "sha256": "5780003a5a6c40d39383e51922c5701bac742db4ab9b72972ab306182b762a8d"
+    },
+    {
+      "path": "runtime/src/open_sprite_runtime/damiao.py",
+      "source_project": "open_sprite_runtime",
+      "source_path": "src/open_sprite_runtime/damiao.py",
+      "sha256": "ecf1c6ed98a73a18428fe24a6ba9439ba2cd3efc94444a46f57a444fb9817193"
+    },
+    {
+      "path": "runtime/src/open_sprite_runtime/damiao_registers.py",
+      "source_project": "open_sprite_runtime",
+      "source_path": "src/open_sprite_runtime/damiao_registers.py",
+      "sha256": "4549eeb3d9a8ea3d48c0986a74eebbc925f73d65d33938f3ed6144a8eeff544e"
+    },
+    {
+      "path": "runtime/src/open_sprite_runtime/full_body_probe.py",
+      "source_project": "open_sprite_runtime",
+      "source_path": "src/open_sprite_runtime/full_body_probe.py",
+      "sha256": "780f25f1c9e24c1670cc31765a7c3c4d37376e148a2a3891d414c6a22889eb70"
+    },
+    {
+      "path": "runtime/src/open_sprite_runtime/handoff.py",
+      "source_project": "open_sprite_runtime",
+      "source_path": "src/open_sprite_runtime/handoff.py",
+      "sha256": "4a645fe97ea2c22649f351b0f1ff14fd324156f01d74f3308d81eda8f205efc9"
+    },
+    {
+      "path": "runtime/src/open_sprite_runtime/hardware.py",
+      "source_project": "open_sprite_runtime",
+      "source_path": "src/open_sprite_runtime/hardware.py",
+      "sha256": "d4c76a2f0d91feed10f4aed108d7e7de5942ed09b0f8f6ed6d2fec94a0e66cb9"
+    },
+    {
+      "path": "runtime/src/open_sprite_runtime/heading.py",
+      "source_project": "open_sprite_runtime",
+      "source_path": "src/open_sprite_runtime/heading.py",
+      "sha256": "27f3fbca55edceec2ce90de8fe107830228b9cb73012198156e320dd20e6bfc6"
+    },
+    {
+      "path": "runtime/src/open_sprite_runtime/imu.py",
+      "source_project": "open_sprite_runtime",
+      "source_path": "src/open_sprite_runtime/imu.py",
+      "sha256": "b5b9a1f5a025a9ec1a0ea8326ae25017a0533992240a9be89811bec9a1f95660"
+    },
+    {
+      "path": "runtime/src/open_sprite_runtime/imu_commissioning.py",
+      "source_project": "open_sprite_runtime",
+      "source_path": "src/open_sprite_runtime/imu_commissioning.py",
+      "sha256": "9929f498d95c582c6da8677da68f50244ddcdf608010f2601607dfec2a038b0d"
+    },
+    {
+      "path": "runtime/src/open_sprite_runtime/imu_fusion.py",
+      "source_project": "open_sprite_runtime",
+      "source_path": "src/open_sprite_runtime/imu_fusion.py",
+      "sha256": "6de08fa1cdba913c3ba5ca6c91d593339c0f174fd7baa06401f6167e343b1e33"
+    },
+    {
+      "path": "runtime/src/open_sprite_runtime/imu_receive.py",
+      "source_project": "open_sprite_runtime",
+      "source_path": "src/open_sprite_runtime/imu_receive.py",
+      "sha256": "8b2332d22becfc74ee20527b32c0511520d518c807787238e4adf144bb776d7f"
+    },
+    {
+      "path": "runtime/src/open_sprite_runtime/imu_serial.py",
+      "source_project": "open_sprite_runtime",
+      "source_path": "src/open_sprite_runtime/imu_serial.py",
+      "sha256": "17cf19915efd02e733287dcb314a0f76570ea8e7fa70afdca6856074a5bfc416"
+    },
+    {
+      "path": "runtime/src/open_sprite_runtime/limit_derivation.py",
+      "source_project": "open_sprite_runtime",
+      "source_path": "src/open_sprite_runtime/limit_derivation.py",
+      "sha256": "37002dba1e6d4f79d8e04b4c60fbc09aaa9734523b8234a66d69cb7caae69ad2"
+    },
+    {
+      "path": "runtime/src/open_sprite_runtime/motor_group_hold.py",
+      "source_project": "open_sprite_runtime",
+      "source_path": "src/open_sprite_runtime/motor_group_hold.py",
+      "sha256": "c2ee75d886d32c8841ca1d7e89da8d13376a9d04dea0947a8a5614f70ed579bc"
+    },
+    {
+      "path": "runtime/src/open_sprite_runtime/motor_mapping.py",
+      "source_project": "open_sprite_runtime",
+      "source_path": "src/open_sprite_runtime/motor_mapping.py",
+      "sha256": "8abe3e690c526f88384f99b5b2a8cb587d58b14e79a6a641ccf438f888758783"
+    },
+    {
+      "path": "runtime/src/open_sprite_runtime/mujoco_rx_viewer.py",
+      "source_project": "open_sprite_runtime",
+      "source_path": "src/open_sprite_runtime/mujoco_rx_viewer.py",
+      "sha256": "f54500e4dba213cf59357191dff20cdeafbe6448c1d982fab278f065af4c5cff"
+    },
+    {
+      "path": "runtime/src/open_sprite_runtime/multirate_control.py",
+      "source_project": "open_sprite_runtime",
+      "source_path": "src/open_sprite_runtime/multirate_control.py",
+      "sha256": "bb812638d79da33a28c239d6f1ebb101bd43cf18c864c79e72b2ab1b9a17cf15"
+    },
+    {
+      "path": "runtime/src/open_sprite_runtime/native_bno_source.py",
+      "source_project": "open_sprite_runtime",
+      "source_path": "src/open_sprite_runtime/native_bno_source.py",
+      "sha256": "9005718dea1677d3a2945337ff5f43a5a6b1b78d7319273abfbfc87cc2cbb2ca"
+    },
+    {
+      "path": "runtime/src/open_sprite_runtime/native_imu_packet.py",
+      "source_project": "open_sprite_runtime",
+      "source_path": "src/open_sprite_runtime/native_imu_packet.py",
+      "sha256": "5c38c4c52e7d9e7cec778d47bca8a3bba04c56c838556d206f34075d640a7df8"
+    },
+    {
+      "path": "runtime/src/open_sprite_runtime/native_ipc.py",
+      "source_project": "open_sprite_runtime",
+      "source_path": "src/open_sprite_runtime/native_ipc.py",
+      "sha256": "66a674f510d7dadb1a09e868d16721e2419868cde7259a0012b4958ee9e724e7"
+    },
+    {
+      "path": "runtime/src/open_sprite_runtime/native_ipc_fault_client.py",
+      "source_project": "open_sprite_runtime",
+      "source_path": "src/open_sprite_runtime/native_ipc_fault_client.py",
+      "sha256": "75095aa444c22c4e3e3577b706535ccc2bbda922b93b4373485ab2aed9ae6686"
+    },
+    {
+      "path": "runtime/src/open_sprite_runtime/native_policy_client.py",
+      "source_project": "open_sprite_runtime",
+      "source_path": "src/open_sprite_runtime/native_policy_client.py",
+      "sha256": "fec8b681389f7ff4fe5e8d876d2b20cac34c8709035a110879d67471110acda0"
+    },
+    {
+      "path": "runtime/src/open_sprite_runtime/physical_startup.py",
+      "source_project": "open_sprite_runtime",
+      "source_path": "src/open_sprite_runtime/physical_startup.py",
+      "sha256": "1af714cf79a9399066477f06d4bcd7071e7cad9d2dad16eb47b1e864abc4afee"
+    },
+    {
+      "path": "runtime/src/open_sprite_runtime/policy_shadow.py",
+      "source_project": "open_sprite_runtime",
+      "source_path": "src/open_sprite_runtime/policy_shadow.py",
+      "sha256": "01bc921896e31c6a9f5428466f8940d5aa38100951a0dd8ccfe926b57473bb2a"
+    },
+    {
+      "path": "runtime/src/open_sprite_runtime/safety.py",
+      "source_project": "open_sprite_runtime",
+      "source_path": "src/open_sprite_runtime/safety.py",
+      "sha256": "8e734a31c34322d843d574b296dd8442802dccfe90359c003a3ec94199d36028"
+    },
+    {
+      "path": "runtime/src/open_sprite_runtime/session_heading.py",
+      "source_project": "open_sprite_runtime",
+      "source_path": "src/open_sprite_runtime/session_heading.py",
+      "sha256": "63bb18df965b96d057c0d6229a845e2bfcf2ecd30340c16ea44f9063edafcdc5"
+    },
+    {
+      "path": "runtime/src/open_sprite_runtime/shadow.py",
+      "source_project": "open_sprite_runtime",
+      "source_path": "src/open_sprite_runtime/shadow.py",
+      "sha256": "1ede9d8df06e1e65deb72df814488d0d8f64078591129a6997f5d1cc25317047"
+    },
+    {
+      "path": "runtime/src/open_sprite_runtime/simulation_drives.py",
+      "source_project": "open_sprite_runtime",
+      "source_path": "src/open_sprite_runtime/simulation_drives.py",
+      "sha256": "20b1f5b9e87fe5c9cff22487e4ef667bf8afa6e04d2c2fae72bb3263f52d0ce2"
+    },
+    {
+      "path": "runtime/src/open_sprite_runtime/single_joint_hold.py",
+      "source_project": "open_sprite_runtime",
+      "source_path": "src/open_sprite_runtime/single_joint_hold.py",
+      "sha256": "be582e12c896bcf948904f8e828b9a58103b9360764df37081c51f2dde069ffb"
+    },
+    {
+      "path": "runtime/src/open_sprite_runtime/socketcan.py",
+      "source_project": "open_sprite_runtime",
+      "source_path": "src/open_sprite_runtime/socketcan.py",
+      "sha256": "8b95bc3af005adcb16a8674a77cca84000e350d71dc79e90b07ba6bcc78beb83"
+    },
+    {
+      "path": "runtime/src/open_sprite_runtime/supermimic_replay.py",
+      "source_project": "open_sprite_runtime",
+      "source_path": "src/open_sprite_runtime/supermimic_replay.py",
+      "sha256": "65770603848b15c13fd8748e82d983b38b78ad74121fe9475725b6d0d4fd88fd"
+    },
+    {
+      "path": "runtime/src/open_sprite_runtime/supermimic_run002.py",
+      "source_project": "open_sprite_runtime",
+      "source_path": "src/open_sprite_runtime/supermimic_run002.py",
+      "sha256": "d0943992d2db633cc93eb80964765dea7437bf2e9efdb51e6601ca99d3b5ebff"
+    },
+    {
+      "path": "runtime/src/open_sprite_runtime/system_id_capture.py",
+      "source_project": "open_sprite_runtime",
+      "source_path": "src/open_sprite_runtime/system_id_capture.py",
+      "sha256": "5c6a281b5c0b8e92621546b01f296102eb0fd82898dd002f4541615a9033cbf6"
+    },
+    {
+      "path": "runtime/src/open_sprite_runtime/system_id_merge.py",
+      "source_project": "open_sprite_runtime",
+      "source_path": "src/open_sprite_runtime/system_id_merge.py",
+      "sha256": "1a6a3649058fd8bbdd2f6f728893c6fa76a88850aecbeac0e33f98b3f209788b"
+    },
+    {
+      "path": "runtime/src/open_sprite_runtime/target_projection.py",
+      "source_project": "open_sprite_runtime",
+      "source_path": "src/open_sprite_runtime/target_projection.py",
+      "sha256": "c4a377f67c3660b7f4d36d4c489179044187e064757685def43aa433c11a0202"
+    },
+    {
+      "path": "runtime/src/open_sprite_runtime/telemetry.py",
+      "source_project": "open_sprite_runtime",
+      "source_path": "src/open_sprite_runtime/telemetry.py",
+      "sha256": "797afdc49b44ef4e8ab9512a46fc0d8008677a19df938ee2874b4a9af87cf4ed"
+    },
+    {
+      "path": "runtime/src/open_sprite_runtime/timing.py",
+      "source_project": "open_sprite_runtime",
+      "source_path": "src/open_sprite_runtime/timing.py",
+      "sha256": "324cb52ecc236434e817edd25cc4e367b57b5cc32d58bcee676c401e7c13c612"
+    },
+    {
+      "path": "runtime/src/open_sprite_runtime/yahboom_imu.py",
+      "source_project": "open_sprite_runtime",
+      "source_path": "src/open_sprite_runtime/yahboom_imu.py",
+      "sha256": "a406a1d0406951933010b484f496c657771a2d4a952da825e70cf8cc7e557a07"
+    },
+    {
+      "path": "runtime/tests/__init__.py",
+      "source_project": "open_sprite_runtime",
+      "source_path": "tests/__init__.py",
+      "sha256": "5c53710dbc20fda51c5410b24623fb1c5705601518546611485e3439ef0b2b7d"
+    },
+    {
+      "path": "runtime/tests/test_action_trace_replay.py",
+      "source_project": "open_sprite_runtime",
+      "source_path": "tests/test_action_trace_replay.py",
+      "sha256": "470f1594a640f3fadb3d01d3ed55fb5afc105e4e4ef683b32da648edc08db12b"
+    },
+    {
+      "path": "runtime/tests/test_ankle.py",
+      "source_project": "open_sprite_runtime",
+      "source_path": "tests/test_ankle.py",
+      "sha256": "1976d7ee2d297de1775473c97e49d0498b3de1b13e45fe66aa16ae07689e1503"
+    },
+    {
+      "path": "runtime/tests/test_ankle_pair_commissioning.py",
+      "source_project": "open_sprite_runtime",
+      "source_path": "tests/test_ankle_pair_commissioning.py",
+      "sha256": "059fab58c91d06cf44a9e90a360a9a933fea40ce4bb016210f4a7e6751854661"
+    },
+    {
+      "path": "runtime/tests/test_bno055.py",
+      "source_project": "open_sprite_runtime",
+      "source_path": "tests/test_bno055.py",
+      "sha256": "db2f080e8c84ba809e1cd725cc1a1e6d14f39a17d89fed5b011dd1c300d3e18f"
+    },
+    {
+      "path": "runtime/tests/test_bno055_source.py",
+      "source_project": "open_sprite_runtime",
+      "source_path": "tests/test_bno055_source.py",
+      "sha256": "975cea63a90926b00201f483c69f36c3adef3f31a30ae2d558bb553aa7ee641d"
+    },
+    {
+      "path": "runtime/tests/test_command_schedule.py",
+      "source_project": "open_sprite_runtime",
+      "source_path": "tests/test_command_schedule.py",
+      "sha256": "903a0b79ed49e57fbb57d2ccbe672bf8b13e62a8694bbf87d6e93b38d414e1d2"
+    },
+    {
+      "path": "runtime/tests/test_command_slew.py",
+      "source_project": "open_sprite_runtime",
+      "source_path": "tests/test_command_slew.py",
+      "sha256": "b59bb1d666077ac525113707a4013354aae795e1a69fbeeb92ca7a9275aed6ee"
+    },
+    {
+      "path": "runtime/tests/test_contracts.py",
+      "source_project": "open_sprite_runtime",
+      "source_path": "tests/test_contracts.py",
+      "sha256": "4da73e07a8c3c1a747ded1e331107ea0b443d483977a7e08c99370e43cd8abb3"
+    },
+    {
+      "path": "runtime/tests/test_damiao.py",
+      "source_project": "open_sprite_runtime",
+      "source_path": "tests/test_damiao.py",
+      "sha256": "3b4da48aa8729d1ce34f500e12ee8824cdcb8965a64f542342685a03c465b909"
+    },
+    {
+      "path": "runtime/tests/test_damiao_registers.py",
+      "source_project": "open_sprite_runtime",
+      "source_path": "tests/test_damiao_registers.py",
+      "sha256": "f9a61dfff2d2e872e038e72bc511662e2781a0d7a7754a56d3b5af92d02bb1c2"
+    },
+    {
+      "path": "runtime/tests/test_damiao_set_zero.py",
+      "source_project": "open_sprite_runtime",
+      "source_path": "tests/test_damiao_set_zero.py",
+      "sha256": "99dfd2431a00a23627c3ffa7cbc85779a2fbd8903c768d9455e580efdfb96188"
+    },
+    {
+      "path": "runtime/tests/test_export_native_motor_config.py",
+      "source_project": "open_sprite_runtime",
+      "source_path": "tests/test_export_native_motor_config.py",
+      "sha256": "70e8370789697cbba28ad812c502fe844037c7456611e2dc6e3fdb28e6c3628a"
+    },
+    {
+      "path": "runtime/tests/test_full_body_probe.py",
+      "source_project": "open_sprite_runtime",
+      "source_path": "tests/test_full_body_probe.py",
+      "sha256": "bcefdbe61d1a6b1749963c7ccc5d79ff4ff0568959446e0c9bb9165cc3bad6d6"
+    },
+    {
+      "path": "runtime/tests/test_handoff.py",
+      "source_project": "open_sprite_runtime",
+      "source_path": "tests/test_handoff.py",
+      "sha256": "e1a9f1a07de8926fae92b3731532c85e595455643c16678d87483aae589c5363"
+    },
+    {
+      "path": "runtime/tests/test_hardware.py",
+      "source_project": "open_sprite_runtime",
+      "source_path": "tests/test_hardware.py",
+      "sha256": "ef131b7496e0016d9deb60f97471b3c3776bb3606de96469a5d45cd2cf8afcbb"
+    },
+    {
+      "path": "runtime/tests/test_hardware_arm_gaps.py",
+      "source_project": "open_sprite_runtime",
+      "source_path": "tests/test_hardware_arm_gaps.py",
+      "sha256": "67e06ef48256db48246c45956f2c2a36107159037766ded0499b1733bf83d025"
+    },
+    {
+      "path": "runtime/tests/test_heading.py",
+      "source_project": "open_sprite_runtime",
+      "source_path": "tests/test_heading.py",
+      "sha256": "39eabecd0c16264cf5dc64e8e27aadddad250ad740da44dc3cf1af3f65645e44"
+    },
+    {
+      "path": "runtime/tests/test_imu.py",
+      "source_project": "open_sprite_runtime",
+      "source_path": "tests/test_imu.py",
+      "sha256": "c764dc3fa912f7464625b8e22202efc9dacb1d9cc42d9c2efcf5d44ae08378fc"
+    },
+    {
+      "path": "runtime/tests/test_imu_commissioning.py",
+      "source_project": "open_sprite_runtime",
+      "source_path": "tests/test_imu_commissioning.py",
+      "sha256": "3ba0b618053708c67b75cdee3602e65dc3c7919cbfe804e1a3e0a13cb9a79e07"
+    },
+    {
+      "path": "runtime/tests/test_imu_fusion.py",
+      "source_project": "open_sprite_runtime",
+      "source_path": "tests/test_imu_fusion.py",
+      "sha256": "319c309d479d1b147abf3b682f5c18de170218cefb652d1b61a20dd7d30d06a8"
+    },
+    {
+      "path": "runtime/tests/test_imu_receive.py",
+      "source_project": "open_sprite_runtime",
+      "source_path": "tests/test_imu_receive.py",
+      "sha256": "fd0bbde7021e7a79f022220041539217174acdb81bd1e1e56b654744d05bdd6f"
+    },
+    {
+      "path": "runtime/tests/test_known_motor_nameplates.py",
+      "source_project": "open_sprite_runtime",
+      "source_path": "tests/test_known_motor_nameplates.py",
+      "sha256": "1ec13cf755421936e11078543bc6fcd00c6ec7f37b11d643f2378c8ed3f07167"
+    },
+    {
+      "path": "runtime/tests/test_limit_derivation.py",
+      "source_project": "open_sprite_runtime",
+      "source_path": "tests/test_limit_derivation.py",
+      "sha256": "0295b9daa14f79646fcc8ffb9645af366876899a462c91d80affa7ec571af04d"
+    },
+    {
+      "path": "runtime/tests/test_motor_group_hold.py",
+      "source_project": "open_sprite_runtime",
+      "source_path": "tests/test_motor_group_hold.py",
+      "sha256": "2a02fc87b44aa9496bfabd2f9316bac65165f55f971b9433b9c4dcf9d1b0601a"
+    },
+    {
+      "path": "runtime/tests/test_motor_mapping.py",
+      "source_project": "open_sprite_runtime",
+      "source_path": "tests/test_motor_mapping.py",
+      "sha256": "86ac2487b12ba8b021393fda11084903cbe0cc355332f653e13df91c788465c9"
+    },
+    {
+      "path": "runtime/tests/test_multirate_control.py",
+      "source_project": "open_sprite_runtime",
+      "source_path": "tests/test_multirate_control.py",
+      "sha256": "3912eb670878a13f9cc005ffdbd9a18e3c0e880d05bd9508abc56f7fcb19119b"
+    },
+    {
+      "path": "runtime/tests/test_native_bno_source.py",
+      "source_project": "open_sprite_runtime",
+      "source_path": "tests/test_native_bno_source.py",
+      "sha256": "afa66c02b0627b813ccdfa2266511291b42f919cf85ad2c7d0b5fcb20e9dae33"
+    },
+    {
+      "path": "runtime/tests/test_native_imu_packet.py",
+      "source_project": "open_sprite_runtime",
+      "source_path": "tests/test_native_imu_packet.py",
+      "sha256": "9fbcc995246bcb8307ae9441f9c9e8077e244d3c2d02e90236e4bca2067c8be6"
+    },
+    {
+      "path": "runtime/tests/test_native_ipc.py",
+      "source_project": "open_sprite_runtime",
+      "source_path": "tests/test_native_ipc.py",
+      "sha256": "e1c4ba031b61f10f6e5c15bc048c3d275ac30b0abaa9b8ba7937bd54da7b4b22"
+    },
+    {
+      "path": "runtime/tests/test_native_policy_client.py",
+      "source_project": "open_sprite_runtime",
+      "source_path": "tests/test_native_policy_client.py",
+      "sha256": "5256465954a17d6016657f03587b0035818fecbe22abdf5e6ad06580e779e92e"
+    },
+    {
+      "path": "runtime/tests/test_physical_startup.py",
+      "source_project": "open_sprite_runtime",
+      "source_path": "tests/test_physical_startup.py",
+      "sha256": "77d712dc2bd9065bda6b101c0b0aba7e930117ce2c09626d431db429d2eed153"
+    },
+    {
+      "path": "runtime/tests/test_policy_shadow.py",
+      "source_project": "open_sprite_runtime",
+      "source_path": "tests/test_policy_shadow.py",
+      "sha256": "f7075cd78f652d02076b5e78f898d301668335e440ce3f65e4b25215797629ee"
+    },
+    {
+      "path": "runtime/tests/test_safety.py",
+      "source_project": "open_sprite_runtime",
+      "source_path": "tests/test_safety.py",
+      "sha256": "5ca773b3d0eeda27c80e928ea4778f70ff01141a68838c00909226b82eebd189"
+    },
+    {
+      "path": "runtime/tests/test_session_heading.py",
+      "source_project": "open_sprite_runtime",
+      "source_path": "tests/test_session_heading.py",
+      "sha256": "547275c3e6b82c746e6035c67ddca4fe4e093515e55e183b06aa0b8d1fd10b82"
+    },
+    {
+      "path": "runtime/tests/test_shadow.py",
+      "source_project": "open_sprite_runtime",
+      "source_path": "tests/test_shadow.py",
+      "sha256": "bfed7ca080276850268b49cc8a1c2612d84ce8c0974306342315289a54c4130a"
+    },
+    {
+      "path": "runtime/tests/test_simulation_drives.py",
+      "source_project": "open_sprite_runtime",
+      "source_path": "tests/test_simulation_drives.py",
+      "sha256": "e476e2bd04ffb96f3440bec33632afe5658235c0e4b5fa2fe7286e1c5a01097f"
+    },
+    {
+      "path": "runtime/tests/test_single_joint_hold.py",
+      "source_project": "open_sprite_runtime",
+      "source_path": "tests/test_single_joint_hold.py",
+      "sha256": "6902af38c52e4b2453a39cebc374572b55593b904e0a7340d9c0e4955f6d666e"
+    },
+    {
+      "path": "runtime/tests/test_socketcan.py",
+      "source_project": "open_sprite_runtime",
+      "source_path": "tests/test_socketcan.py",
+      "sha256": "7ba20711e6a8b8fd7ea49812bd4cc526711656656398c3201330c28737943701"
+    },
+    {
+      "path": "runtime/tests/test_software_imu_packet.py",
+      "source_project": "open_sprite_runtime",
+      "source_path": "tests/test_software_imu_packet.py",
+      "sha256": "0b90cae8ebb644132e8d1f263d7400d48ea53cec197b229a682f101090e3d350"
+    },
+    {
+      "path": "runtime/tests/test_sprite0825_shoulder_motors.py",
+      "source_project": "open_sprite_runtime",
+      "source_path": "tests/test_sprite0825_shoulder_motors.py",
+      "sha256": "5fd25d4e0238aeef5aece3bd0fe3421a6d92e456380720c3fcf1e4bc7a34160f"
+    },
+    {
+      "path": "runtime/tests/test_strict_startup_recipe.py",
+      "source_project": "open_sprite_runtime",
+      "source_path": "tests/test_strict_startup_recipe.py",
+      "sha256": "02272d4250eee8b4852d0e47ded761a3bf2370a64b2e873610348536985ae804"
+    },
+    {
+      "path": "runtime/tests/test_supermimic_run002.py",
+      "source_project": "open_sprite_runtime",
+      "source_path": "tests/test_supermimic_run002.py",
+      "sha256": "9241e6a00e77f9170497315042e6e91ac92b2ea1711eff63c7df262b51be4bb2"
+    },
+    {
+      "path": "runtime/tests/test_system_id_capture.py",
+      "source_project": "open_sprite_runtime",
+      "source_path": "tests/test_system_id_capture.py",
+      "sha256": "93d3c952e23567c2d56039c82f8916da5e28b45e38ed165fb574b8e621e0833e"
+    },
+    {
+      "path": "runtime/tests/test_system_id_merge.py",
+      "source_project": "open_sprite_runtime",
+      "source_path": "tests/test_system_id_merge.py",
+      "sha256": "388c1f15c60d7a1106b6af957c0098646c7eecdb6fa2c04345dbdbf4ecf4f404"
+    },
+    {
+      "path": "runtime/tests/test_target_projection.py",
+      "source_project": "open_sprite_runtime",
+      "source_path": "tests/test_target_projection.py",
+      "sha256": "c52f911d5dc1e46bb31cba7e59efcc77812d42b2cc7de9315b7c9abbbec2bdfd"
+    },
+    {
+      "path": "runtime/tests/test_telemetry.py",
+      "source_project": "open_sprite_runtime",
+      "source_path": "tests/test_telemetry.py",
+      "sha256": "4f49e6cbb061ac3ada3c3e3e80b7a221785a77e5833d40adbfc6fd1d1f4cc637"
+    },
+    {
+      "path": "runtime/tests/test_timing.py",
+      "source_project": "open_sprite_runtime",
+      "source_path": "tests/test_timing.py",
+      "sha256": "ce8b9b7b56b4e550a346ed65e6ae8dc172c6ab5b9eaa2352337e7471b67ce3d8"
+    },
+    {
+      "path": "runtime/tests/test_yahboom_imu.py",
+      "source_project": "open_sprite_runtime",
+      "source_path": "tests/test_yahboom_imu.py",
+      "sha256": "d9ebe667fd3c3f7c8674a5d99d461a60faf26486d79cc085e0d9ec1e42118b0b"
+    },
+    {
+      "path": "runtime/tools/analyze_bno_kernel_trace.py",
+      "source_project": "open_sprite_runtime",
+      "source_path": "tools/analyze_bno_kernel_trace.py",
+      "sha256": "be2d4457aba3761b68e7c07a8e74632b21f12a1a7da862e758aa0a9af711b085"
+    },
+    {
+      "path": "runtime/tools/analyze_bno_lengths.py",
+      "source_project": "open_sprite_runtime",
+      "source_path": "tools/analyze_bno_lengths.py",
+      "sha256": "496bbeb0d41f5cccb68a6b963097dc068be7a9ee4c990b3cd28b636dea8a6595"
+    },
+    {
+      "path": "runtime/tools/analyze_bno_timing.py",
+      "source_project": "open_sprite_runtime",
+      "source_path": "tools/analyze_bno_timing.py",
+      "sha256": "b8aaccf45911870ab60fb87640dcfb4e8323795dde0415b036c2207f55756188"
+    },
+    {
+      "path": "runtime/tools/analyze_policy_joint_limit_clamps.py",
+      "source_project": "open_sprite_runtime",
+      "source_path": "tools/analyze_policy_joint_limit_clamps.py",
+      "sha256": "d4b95701762b8272e6a8be41d7181e54b134311ac5cb80274815e7c1337886bf"
+    },
+    {
+      "path": "runtime/tools/analyze_policy_observation_counterfactuals.py",
+      "source_project": "open_sprite_runtime",
+      "source_path": "tools/analyze_policy_observation_counterfactuals.py",
+      "sha256": "263067deb824adab707e6502f6659a1fb8c5b28c3ea28acea75ed5dd6b724ef0"
+    },
+    {
+      "path": "runtime/tools/analyze_software_imu.py",
+      "source_project": "open_sprite_runtime",
+      "source_path": "tools/analyze_software_imu.py",
+      "sha256": "8c732a92caf4c67bfe370f94307e95597d882e59cebdc107350f2173e7d9524b"
+    },
+    {
+      "path": "runtime/tools/analyze_yahboom_capture.py",
+      "source_project": "open_sprite_runtime",
+      "source_path": "tools/analyze_yahboom_capture.py",
+      "sha256": "5d62756316efa6c49fbd1e49347e99d2f64f855cf3da892db777deb7af414c84"
+    },
+    {
+      "path": "runtime/tools/apply_damiao_mit_range_readback.py",
+      "source_project": "open_sprite_runtime",
+      "source_path": "tools/apply_damiao_mit_range_readback.py",
+      "sha256": "152ec13cb82adf99a042774208cc042ae49f0df51c730b2e6a8d885b58d3b46a"
+    },
+    {
+      "path": "runtime/tools/apply_derived_motor_limits.py",
+      "source_project": "open_sprite_runtime",
+      "source_path": "tools/apply_derived_motor_limits.py",
+      "sha256": "794faea6d3bc5a9795d2b9aed762e9b80101be1b325d2361db4d3c7097d18edd"
+    },
+    {
+      "path": "runtime/tools/apply_known_motor_nameplates.py",
+      "source_project": "open_sprite_runtime",
+      "source_path": "tools/apply_known_motor_nameplates.py",
+      "sha256": "6ab90ff3187fffba4e6fdf73c451fbe2339aacfe1a7006d943573abcfb804134"
+    },
+    {
+      "path": "runtime/tools/audit_native_policy_trace_command_margins.py",
+      "source_project": "open_sprite_runtime",
+      "source_path": "tools/audit_native_policy_trace_command_margins.py",
+      "sha256": "17e6f78dc6e3245ea122fa7ba8749ebdf04987fb08f514e1278daa1cf1b3492a"
+    },
+    {
+      "path": "runtime/tools/benchmark_bno_policy_no_can.py",
+      "source_project": "open_sprite_runtime",
+      "source_path": "tools/benchmark_bno_policy_no_can.py",
+      "sha256": "a50942e5b7e26ff2e7787455f3468408315cd017c7415b46f0e96578f74402ef"
+    },
+    {
+      "path": "runtime/tools/benchmark_supermimic_jetson.py",
+      "source_project": "open_sprite_runtime",
+      "source_path": "tools/benchmark_supermimic_jetson.py",
+      "sha256": "1605ac3816636a3b1692734ed0f33aa503b6039b0fc95809d1d07fc49ffee8d8"
+    },
+    {
+      "path": "runtime/tools/build_bno_software_fusion.sh",
+      "source_project": "open_sprite_runtime",
+      "source_path": "tools/build_bno_software_fusion.sh",
+      "sha256": "7efd961fce20e5104980b4544c7859bd07a739c1a58238cc3d022fe6dcdefbda"
+    },
+    {
+      "path": "runtime/tools/build_icm_policy_shadow.sh",
+      "source_project": "open_sprite_runtime",
+      "source_path": "tools/build_icm_policy_shadow.sh",
+      "sha256": "ad586466094baea8d248495c984e403b7715cc71d42359a36d6b84b3044e00a2"
+    },
+    {
+      "path": "runtime/tools/build_native_policy_loop_test_on_253.sh",
+      "source_project": "open_sprite_runtime",
+      "source_path": "tools/build_native_policy_loop_test_on_253.sh",
+      "sha256": "b6be050270ed6a000296a1c921155979f3c2adcf07eb922aea5cac5acff6655b"
+    },
+    {
+      "path": "runtime/tools/build_native_policy_math_replays_on_253.sh",
+      "source_project": "open_sprite_runtime",
+      "source_path": "tools/build_native_policy_math_replays_on_253.sh",
+      "sha256": "e311cbe6ab2210d614d931b2a50ab9f447874f3a7edcd385419e361e06da42ab"
+    },
+    {
+      "path": "runtime/tools/build_native_policy_replay_on_253.sh",
+      "source_project": "open_sprite_runtime",
+      "source_path": "tools/build_native_policy_replay_on_253.sh",
+      "sha256": "5ca92b4a154fb78c6b948f87d53c4416f4d5751a9c78fa1680ff37157a505849"
+    },
+    {
+      "path": "runtime/tools/build_native_policy_shadow_on_253.sh",
+      "source_project": "open_sprite_runtime",
+      "source_path": "tools/build_native_policy_shadow_on_253.sh",
+      "sha256": "deca6bf3d534071f7de51a6c2d280ea958e222e413921dbaa9644de5dd85ccbc"
+    },
+    {
+      "path": "runtime/tools/build_native_powered_actor.sh",
+      "source_project": "open_sprite_runtime",
+      "source_path": "tools/build_native_powered_actor.sh",
+      "sha256": "133440b9cabc441940e052fd04da2d719b68ec72996f09f4a5a81546d90e5a8b"
+    },
+    {
+      "path": "runtime/tools/build_software_imu_policy_shadow.sh",
+      "source_project": "open_sprite_runtime",
+      "source_path": "tools/build_software_imu_policy_shadow.sh",
+      "sha256": "cd5547f6dba0c13ee2532910da4fb614c167f448bb94f7b5421a525eb3055df8"
+    },
+    {
+      "path": "runtime/tools/build_supermimic_replay.sh",
+      "source_project": "open_sprite_runtime",
+      "source_path": "tools/build_supermimic_replay.sh",
+      "sha256": "5eafa74f861d7cf6116c7fc7ae4c5ca65ed05c2cf19adfa5deafa27f9262bb96"
+    },
+    {
+      "path": "runtime/tools/build_xbox_shadow.sh",
+      "source_project": "open_sprite_runtime",
+      "source_path": "tools/build_xbox_shadow.sh",
+      "sha256": "37c6fc6e05d1a79eec43dd68fe40bfcce8d611857c4bd3265ee6b34fd926e123"
+    },
+    {
+      "path": "runtime/tools/capture_active_can_trace.py",
+      "source_project": "open_sprite_runtime",
+      "source_path": "tools/capture_active_can_trace.py",
+      "sha256": "86f71bda843631bee2b28c04eb9be1372733fb694984f829a5aa5677d2e4abd9"
+    },
+    {
+      "path": "runtime/tools/capture_bno_kernel_trace.py",
+      "source_project": "open_sprite_runtime",
+      "source_path": "tools/capture_bno_kernel_trace.py",
+      "sha256": "91f22f60d383b32efd29b649ddf03318a14d8ca5102a194d27651cd433b8c6c6"
+    },
+    {
+      "path": "runtime/tools/capture_imu_six_axis_check.py",
+      "source_project": "open_sprite_runtime",
+      "source_path": "tools/capture_imu_six_axis_check.py",
+      "sha256": "ce8c9e75d2f0a1db5d5839bb85f78aa97ffc2ef068388b06884127cd2d662afc"
+    },
+    {
+      "path": "runtime/tools/check_bno055_source.py",
+      "source_project": "open_sprite_runtime",
+      "source_path": "tools/check_bno055_source.py",
+      "sha256": "aad47b21601cff507fe2b0b141532917c31bfa049c3311639632e3a0480dbc3a"
+    },
+    {
+      "path": "runtime/tools/check_native_imu_no_can.py",
+      "source_project": "open_sprite_runtime",
+      "source_path": "tools/check_native_imu_no_can.py",
+      "sha256": "8e872c9417d92b1563b125a440ff474117f51589e552cd701e6c40115324d554"
+    },
+    {
+      "path": "runtime/tools/check_native_powered_completion.py",
+      "source_project": "open_sprite_runtime",
+      "source_path": "tools/check_native_powered_completion.py",
+      "sha256": "4bdbb2c5e5db381b932e9856455f167b778e8def49fd1ffa14def3c29c7109b0"
+    },
+    {
+      "path": "runtime/tools/check_xbox120_seal.py",
+      "source_project": "open_sprite_runtime",
+      "source_path": "tools/check_xbox120_seal.py",
+      "sha256": "5bf08a7b82f6721c312fa8c05ac3badf03686529464e6f0c1e148399d8ec0c9a"
+    },
+    {
+      "path": "runtime/tools/check_xbox_powered_seal.py",
+      "source_project": "open_sprite_runtime",
+      "source_path": "tools/check_xbox_powered_seal.py",
+      "sha256": "88befaf2a3bc045a388167437816e9a738bf65152c57fd9d0e16061adb49fa6a"
+    },
+    {
+      "path": "runtime/tools/derive_urdf_motor_limits.py",
+      "source_project": "open_sprite_runtime",
+      "source_path": "tools/derive_urdf_motor_limits.py",
+      "sha256": "17ae3129456f1bb4fef4f056ad072388e1f3a636540b492f6b9238d7a85d880c"
+    },
+    {
+      "path": "runtime/tools/diagnose_bno_timing_no_can.sh",
+      "source_project": "open_sprite_runtime",
+      "source_path": "tools/diagnose_bno_timing_no_can.sh",
+      "sha256": "903808bf32ab5578d806bd63d308d3f48e1fe1f8ddbe7c4373eb2b1492bcbc37"
+    },
+    {
+      "path": "runtime/tools/export_native_joint_safety_config.py",
+      "source_project": "open_sprite_runtime",
+      "source_path": "tools/export_native_joint_safety_config.py",
+      "sha256": "52ce11004036f34af9c525f752cf6ee639697178244163bb76189fd7a8252122"
+    },
+    {
+      "path": "runtime/tools/export_native_kinematics_config.py",
+      "source_project": "open_sprite_runtime",
+      "source_path": "tools/export_native_kinematics_config.py",
+      "sha256": "965fa8aef78c31988dc5cd574f173a02af744290146d1e9b788f63f035a18b64"
+    },
+    {
+      "path": "runtime/tools/export_native_motor_config.py",
+      "source_project": "open_sprite_runtime",
+      "source_path": "tools/export_native_motor_config.py",
+      "sha256": "9d61cc8e637a5ce2aa0f9ec87d2468ee12319a9f0eb67306d2988029db702dcb"
+    },
+    {
+      "path": "runtime/tools/guided_dual_imu_yaw.py",
+      "source_project": "open_sprite_runtime",
+      "source_path": "tools/guided_dual_imu_yaw.py",
+      "sha256": "1b726eeddc8f99e3d57b32726d2f1e201e566854420bd8ba6a3c04b66d3e1af7"
+    },
+    {
+      "path": "runtime/tools/hold_head_yaw_low_gain.py",
+      "source_project": "open_sprite_runtime",
+      "source_path": "tools/hold_head_yaw_low_gain.py",
+      "sha256": "21a94409640b7048794515d6c70d2da5b1fb9e9f1fe81001244a20846c2cf413"
+    },
+    {
+      "path": "runtime/tools/hold_left_arm_group_low_gain.py",
+      "source_project": "open_sprite_runtime",
+      "source_path": "tools/hold_left_arm_group_low_gain.py",
+      "sha256": "bc1d4e55cba4f9e14b5cf5b3e8c5832711bdeb6582f77f94e0ecf9320b4951d1"
+    },
+    {
+      "path": "runtime/tools/hold_proximal_leg_group_low_gain.py",
+      "source_project": "open_sprite_runtime",
+      "source_path": "tools/hold_proximal_leg_group_low_gain.py",
+      "sha256": "18242c9fa4b045a6455400fd51d00c9ea3a220c06270ba8cacd1cbb924ea166d"
+    },
+    {
+      "path": "runtime/tools/hold_right_arm_group_low_gain.py",
+      "source_project": "open_sprite_runtime",
+      "source_path": "tools/hold_right_arm_group_low_gain.py",
+      "sha256": "e910f1e9e3159651468383bacd5584bc06992884a7e28b60cb77e73b7c4ecec3"
+    },
+    {
+      "path": "runtime/tools/hold_right_wrist_group_low_gain.py",
+      "source_project": "open_sprite_runtime",
+      "source_path": "tools/hold_right_wrist_group_low_gain.py",
+      "sha256": "f09523c1be5aec076118868b34c908fd39a61a93b9a0fb1d3be1f2528e0fe3c0"
+    },
+    {
+      "path": "runtime/tools/hold_right_wrist_roll_low_gain.py",
+      "source_project": "open_sprite_runtime",
+      "source_path": "tools/hold_right_wrist_roll_low_gain.py",
+      "sha256": "ba745086993fcc70889d7562ddb089d59998c98bf90092be0a511523cea5f647"
+    },
+    {
+      "path": "runtime/tools/hold_waist_group_low_gain.py",
+      "source_project": "open_sprite_runtime",
+      "source_path": "tools/hold_waist_group_low_gain.py",
+      "sha256": "95e66cbafb28506f4bafbcfc5daa2a0d6bdf8db9aedf27354357e9317d3318c2"
+    },
+    {
+      "path": "runtime/tools/icm_native_walk40_adapter.py",
+      "source_project": "open_sprite_runtime",
+      "source_path": "tools/icm_native_walk40_adapter.py",
+      "sha256": "73472eeba158d2252106b00b121c9c944f0af8b38a9ebffa2945760ecd771b35"
+    },
+    {
+      "path": "runtime/tools/icm_spi_id_diagnostic.cpp",
+      "source_project": "open_sprite_runtime",
+      "source_path": "tools/icm_spi_id_diagnostic.cpp",
+      "sha256": "aa88c92c4e23be5d961305c80c5daec98140cf55a3d518c8cc4cdb5256652e3c"
+    },
+    {
+      "path": "runtime/tools/inspect_bno_kernel_trace.sh",
+      "source_project": "open_sprite_runtime",
+      "source_path": "tools/inspect_bno_kernel_trace.sh",
+      "sha256": "9bc234e100e80286d6a700a0963a0443e331db2ee25dafbe4e4e3f1dff53c08f"
+    },
+    {
+      "path": "runtime/tools/merge_system_id_capture.py",
+      "source_project": "open_sprite_runtime",
+      "source_path": "tools/merge_system_id_capture.py",
+      "sha256": "2f1e8057da4577b1b8db12b488512f28261dc8e513c1c5f09699f8830bf18d40"
+    },
+    {
+      "path": "runtime/tools/move_head_yaw_low_gain.py",
+      "source_project": "open_sprite_runtime",
+      "source_path": "tools/move_head_yaw_low_gain.py",
+      "sha256": "d1853f5e5dee5ae560ec8323853f2dbdef8d2aa43ecd1521b69610fe98775244"
+    },
+    {
+      "path": "runtime/tools/move_head_yaw_visible_10deg.py",
+      "source_project": "open_sprite_runtime",
+      "source_path": "tools/move_head_yaw_visible_10deg.py",
+      "sha256": "bd306da68368fcdf109dbe83e5eb47fdf1570b7f01184cfbd9036f8357e84d98"
+    },
+    {
+      "path": "runtime/tools/move_right_hip_yaw_5deg.py",
+      "source_project": "open_sprite_runtime",
+      "source_path": "tools/move_right_hip_yaw_5deg.py",
+      "sha256": "b2410c11880e3f9360893e603efdf56304dcf6f0fc346da1782b089fbe883f8d"
+    },
+    {
+      "path": "runtime/tools/move_right_wrist_roll_5deg.py",
+      "source_project": "open_sprite_runtime",
+      "source_path": "tools/move_right_wrist_roll_5deg.py",
+      "sha256": "66e071e3bd381994335c750c9df6b7e450aa963b8c29ceb202773a66b22bc34f"
+    },
+    {
+      "path": "runtime/tools/native_walk40_adapter.py",
+      "source_project": "open_sprite_runtime",
+      "source_path": "tools/native_walk40_adapter.py",
+      "sha256": "7668486857ff828464fdbecced28da9455508c8a6558e8cf38705c4676267633"
+    },
+    {
+      "path": "runtime/tools/patch_supermimic_waist.py",
+      "source_project": "open_sprite_runtime",
+      "source_path": "tools/patch_supermimic_waist.py",
+      "sha256": "feb67032ade2299b7e1f95634425b5d95011317a0bb02e30af0d03a856a71d6d"
+    },
+    {
+      "path": "runtime/tools/prepare_icm_walk_entry.py",
+      "source_project": "open_sprite_runtime",
+      "source_path": "tools/prepare_icm_walk_entry.py",
+      "sha256": "ca9751402b1dcec6a9dd771b8db337df89de8b97de81f735be9f109bf870272f"
+    },
+    {
+      "path": "runtime/tools/prepare_native_walk40_entry.py",
+      "source_project": "open_sprite_runtime",
+      "source_path": "tools/prepare_native_walk40_entry.py",
+      "sha256": "d0726df139e24305b81f80b40bb430f336feaebab7e874747dde0480bfcedfd8"
+    },
+    {
+      "path": "runtime/tools/prepare_upper_body_pd_candidate.py",
+      "source_project": "open_sprite_runtime",
+      "source_path": "tools/prepare_upper_body_pd_candidate.py",
+      "sha256": "50879183b4bfe9068acfbfb6d8cff89bc800903dde109b9a7fdb6e708ecf4c0c"
+    },
+    {
+      "path": "runtime/tools/prepare_upper_body_powered_entry.py",
+      "source_project": "open_sprite_runtime",
+      "source_path": "tools/prepare_upper_body_powered_entry.py",
+      "sha256": "ddfa36fd19965f070f0058cb961405c6bf1820055755115e9de0891b5da8b788"
+    },
+    {
+      "path": "runtime/tools/prepare_upper_body_shadow.py",
+      "source_project": "open_sprite_runtime",
+      "source_path": "tools/prepare_upper_body_shadow.py",
+      "sha256": "cbd137e562fdf02915488fd8b842f1119f0542c68b3523a937dbf6a1ed5a94a9"
+    },
+    {
+      "path": "runtime/tools/prepare_xbox120_candidate.py",
+      "source_project": "open_sprite_runtime",
+      "source_path": "tools/prepare_xbox120_candidate.py",
+      "sha256": "e92268eef50fea2fb7ee55ea9c7881d61a3e88c8a17445b47665052acb4b51b1"
+    },
+    {
+      "path": "runtime/tools/prepare_xbox_powered_candidate.py",
+      "source_project": "open_sprite_runtime",
+      "source_path": "tools/prepare_xbox_powered_candidate.py",
+      "sha256": "4e8a88a76c6af4552ca8b3294584e74bf26d93e1bafd5e9a522ba4905a60f22e"
+    },
+    {
+      "path": "runtime/tools/prepare_xbox_turn120_candidate.py",
+      "source_project": "open_sprite_runtime",
+      "source_path": "tools/prepare_xbox_turn120_candidate.py",
+      "sha256": "71ecebc7cfeecf7899e5a188788b48e53585e61e3af787ede80bed7fc7b4e86f"
+    },
+    {
+      "path": "runtime/tools/qualify_icm_powered_offline.sh",
+      "source_project": "open_sprite_runtime",
+      "source_path": "tools/qualify_icm_powered_offline.sh",
+      "sha256": "338fbbbc0b503b65ae2fa2dc69f6a3c7c916db649aad639ccced9898956f9e21"
+    },
+    {
+      "path": "runtime/tools/qualify_upper_body_native.py",
+      "source_project": "open_sprite_runtime",
+      "source_path": "tools/qualify_upper_body_native.py",
+      "sha256": "7ffffd03b9abecd035f70389453795b9b1acdb62e670e0564877f18d3c666bf8"
+    },
+    {
+      "path": "runtime/tools/qualify_xbox_disable_buttons.py",
+      "source_project": "open_sprite_runtime",
+      "source_path": "tools/qualify_xbox_disable_buttons.py",
+      "sha256": "f32bcf29126d70278899e78ad0b4ef04f238cdb432837f7b0b44756a9b4dc71f"
+    },
+    {
+      "path": "runtime/tools/qualify_xbox_input.py",
+      "source_project": "open_sprite_runtime",
+      "source_path": "tools/qualify_xbox_input.py",
+      "sha256": "219e40adcb7a254756bea37bfc03a5c6fc13fd9e07ffb526fd14c8e0bea8a181"
+    },
+    {
+      "path": "runtime/tools/qualify_xbox_shadow_on_253.sh",
+      "source_project": "open_sprite_runtime",
+      "source_path": "tools/qualify_xbox_shadow_on_253.sh",
+      "sha256": "9a930d009d07175062813d8b822122c545cfa96a361dcbe9cc5ffd5395d40495"
+    },
+    {
+      "path": "runtime/tools/read_damiao_commissioning_registers.py",
+      "source_project": "open_sprite_runtime",
+      "source_path": "tools/read_damiao_commissioning_registers.py",
+      "sha256": "2e61d1735dba69c04ebb12ac022b8f4cf1ba4714e9d4b981cdb18ae171849edc"
+    },
+    {
+      "path": "runtime/tools/read_damiao_mit_ranges.py",
+      "source_project": "open_sprite_runtime",
+      "source_path": "tools/read_damiao_mit_ranges.py",
+      "sha256": "f168484634eb9bdb745168279365848dfe327cd4eed9d3f20cb3a57fe174038a"
+    },
+    {
+      "path": "runtime/tools/render_supermimic_comparison.py",
+      "source_project": "open_sprite_runtime",
+      "source_path": "tools/render_supermimic_comparison.py",
+      "sha256": "6b9f80b52f05052bc4c76272721e4a75d17ca1e906d5cd54cdda1e9600b9b467"
+    },
+    {
+      "path": "runtime/tools/report_hardware_arm_gaps.py",
+      "source_project": "open_sprite_runtime",
+      "source_path": "tools/report_hardware_arm_gaps.py",
+      "sha256": "afaca61fe9a653e1b1bc6523cf3941015273a91f4fc743609e4eb33684373189"
+    },
+    {
+      "path": "runtime/tools/reproduce_strict_startup.py",
+      "source_project": "open_sprite_runtime",
+      "source_path": "tools/reproduce_strict_startup.py",
+      "sha256": "a217f619aa18a70b4a057dba47ac1f1779f492b42b8919d381abadcda4d9184b"
+    },
+    {
+      "path": "runtime/tools/run_ankle_pair_zero_torque_gate.py",
+      "source_project": "open_sprite_runtime",
+      "source_path": "tools/run_ankle_pair_zero_torque_gate.py",
+      "sha256": "d19f0cda66930c49cde2d85188e0ba77d0a113f59cc9f8bc01f608db59839938"
+    },
+    {
+      "path": "runtime/tools/run_ankle_pitch_direction_gate.py",
+      "source_project": "open_sprite_runtime",
+      "source_path": "tools/run_ankle_pitch_direction_gate.py",
+      "sha256": "401a0aaf39595442abb923494cca5de205bb3459d9f16ab2d03e0d74998be4ff"
+    },
+    {
+      "path": "runtime/tools/run_head_pair_joint_pd_gate.py",
+      "source_project": "open_sprite_runtime",
+      "source_path": "tools/run_head_pair_joint_pd_gate.py",
+      "sha256": "9758af78802a8f3dd9f6a492280931a7af5bc012f41f68b31797e4e56af0b151"
+    },
+    {
+      "path": "runtime/tools/run_native_policy_hardware_shadow.py",
+      "source_project": "open_sprite_runtime",
+      "source_path": "tools/run_native_policy_hardware_shadow.py",
+      "sha256": "1146b33c732a46fa6112cdf042c5b389b219b8b9c1a46e065e2ec4bbcc97d12f"
+    },
+    {
+      "path": "runtime/tools/run_supermimic_run002_offline.sh",
+      "source_project": "open_sprite_runtime",
+      "source_path": "tools/run_supermimic_run002_offline.sh",
+      "sha256": "f314a6a5a59d561eceac37648a06ea0632bf43a685d53124d3cd709d9f3411cc"
+    },
+    {
+      "path": "runtime/tools/seal_xbox_powered_candidate.py",
+      "source_project": "open_sprite_runtime",
+      "source_path": "tools/seal_xbox_powered_candidate.py",
+      "sha256": "bfd1f2a915f2cb014154b82e13e956d0be27716b948cf9a493955444f25c6289"
+    },
+    {
+      "path": "runtime/tools/simulate_supermimic_drives.py",
+      "source_project": "open_sprite_runtime",
+      "source_path": "tools/simulate_supermimic_drives.py",
+      "sha256": "b9576e468b60ecb92dc81622a224439c0bea970061587aee8162c0954ace7b68"
+    },
+    {
+      "path": "runtime/tools/test_icm_entry_offline.py",
+      "source_project": "open_sprite_runtime",
+      "source_path": "tools/test_icm_entry_offline.py",
+      "sha256": "9bd5eda94c529d5c06ba8e104c9053aaab4b1a734864d89a447d4f2e6efedb5e"
+    },
+    {
+      "path": "runtime/tools/test_native_command_schedule.py",
+      "source_project": "open_sprite_runtime",
+      "source_path": "tools/test_native_command_schedule.py",
+      "sha256": "fcb04aa48ab22cd67871909440c1e14dbad9dad5ebd6e2a8853228b6b4f76f51"
+    },
+    {
+      "path": "runtime/tools/test_native_completion.py",
+      "source_project": "open_sprite_runtime",
+      "source_path": "tools/test_native_completion.py",
+      "sha256": "f5852a4b05aee36fb381d0895bf2b1ecf334cbf22a94548b72bd73196460e406"
+    },
+    {
+      "path": "runtime/tools/test_native_entry_settings.py",
+      "source_project": "open_sprite_runtime",
+      "source_path": "tools/test_native_entry_settings.py",
+      "sha256": "58b598c5c657738b18c1f0b1c736ba6d5f6f5adc8e685fa045623ad3b03058e9"
+    },
+    {
+      "path": "runtime/tools/test_native_imu_replay.py",
+      "source_project": "open_sprite_runtime",
+      "source_path": "tools/test_native_imu_replay.py",
+      "sha256": "b2ffe05ab63255eadb97de00f778d753a26aa2e1da9e8e9b1aac37d3cbd74c47"
+    },
+    {
+      "path": "runtime/tools/test_native_policy_imu_ipc.py",
+      "source_project": "open_sprite_runtime",
+      "source_path": "tools/test_native_policy_imu_ipc.py",
+      "sha256": "eae811510dd9811f653aa41832ffeba13c532b932ebcd26462e4fb0af7cc6cf4"
+    },
+    {
+      "path": "runtime/tools/test_native_policy_realtime_loop.py",
+      "source_project": "open_sprite_runtime",
+      "source_path": "tools/test_native_policy_realtime_loop.py",
+      "sha256": "3eea849c4150199f081ab1ce5ab81f1645b57fddf08866d15090809dc9bb1dca"
+    },
+    {
+      "path": "runtime/tools/test_native_policy_realtime_suite_on_253.sh",
+      "source_project": "open_sprite_runtime",
+      "source_path": "tools/test_native_policy_realtime_suite_on_253.sh",
+      "sha256": "bfce0ec5f6697435888b08754cda903b326008d2861e2667ebcf2d53e382d78a"
+    },
+    {
+      "path": "runtime/tools/test_native_policy_state_ipc.py",
+      "source_project": "open_sprite_runtime",
+      "source_path": "tools/test_native_policy_state_ipc.py",
+      "sha256": "da391ffe446f9ff2d75667d522f86bce15e159b5ef33694b9ca06209e5f9a9ae"
+    },
+    {
+      "path": "runtime/tools/test_native_powered_completion.py",
+      "source_project": "open_sprite_runtime",
+      "source_path": "tools/test_native_powered_completion.py",
+      "sha256": "8e5cd4fbbba2d034f9a0f4336b056104fff1a9ff2cb347fcbcaea19c9c75a266"
+    },
+    {
+      "path": "runtime/tools/test_native_walk40_bundle.py",
+      "source_project": "open_sprite_runtime",
+      "source_path": "tools/test_native_walk40_bundle.py",
+      "sha256": "afd9a88c349c11b2dd5489595c81005b352421c858a8a0d57065225d0ca1cc8b"
+    },
+    {
+      "path": "runtime/tools/test_native_walk40_fake_on_253.sh",
+      "source_project": "open_sprite_runtime",
+      "source_path": "tools/test_native_walk40_fake_on_253.sh",
+      "sha256": "4d53460a2b24d95177009b0c1c90284f7cc7504aa64b8f618da3c71a8c22f884"
+    },
+    {
+      "path": "runtime/tools/test_supermimic_bundle_fail_closed.py",
+      "source_project": "open_sprite_runtime",
+      "source_path": "tools/test_supermimic_bundle_fail_closed.py",
+      "sha256": "fe5c75abfe9c77e6492fde9d78fb6b0978b8c2e02549e8caac600d5a85258634"
+    },
+    {
+      "path": "runtime/tools/test_supermimic_replay_fail_closed.py",
+      "source_project": "open_sprite_runtime",
+      "source_path": "tools/test_supermimic_replay_fail_closed.py",
+      "sha256": "259c3980caf35ef5286c72e804cd00cc983e82c50aedc54cc149b257c4378b44"
+    },
+    {
+      "path": "runtime/tools/test_upper_body_entry.py",
+      "source_project": "open_sprite_runtime",
+      "source_path": "tools/test_upper_body_entry.py",
+      "sha256": "d68acef3c5e350c1ae816e760008db5af4cd2be460c01ed5538c03ac3b357798"
+    },
+    {
+      "path": "runtime/tools/test_xbox_input.py",
+      "source_project": "open_sprite_runtime",
+      "source_path": "tools/test_xbox_input.py",
+      "sha256": "ec0dedbe1bf15acba000acac5c2e0e5256bc24b6d3af24a2669a5dfc1442e765"
+    },
+    {
+      "path": "runtime/tools/upper_body_native_walk40_adapter.py",
+      "source_project": "open_sprite_runtime",
+      "source_path": "tools/upper_body_native_walk40_adapter.py",
+      "sha256": "b73364b7b6501edbbbb01b41975981fdde288b607fe6e4682c0d9102cd4d87eb"
+    },
+    {
+      "path": "runtime/tools/verify_native_feedback_replay.py",
+      "source_project": "open_sprite_runtime",
+      "source_path": "tools/verify_native_feedback_replay.py",
+      "sha256": "d589a20f3a6c3c3cc83b77cbf11b2f74671846578c9481f978dddcf990416371"
+    },
+    {
+      "path": "runtime/tools/verify_native_policy_chain.py",
+      "source_project": "open_sprite_runtime",
+      "source_path": "tools/verify_native_policy_chain.py",
+      "sha256": "3b72ee9c3529ea3d9704265f944f9775f10f21ae0c06e237ec09d47e57dea850"
+    },
+    {
+      "path": "runtime/tools/verify_native_policy_chain_recordings_on_253.sh",
+      "source_project": "open_sprite_runtime",
+      "source_path": "tools/verify_native_policy_chain_recordings_on_253.sh",
+      "sha256": "8cdff6ba12b0e8a8cd2638004d3a7abbfd0a4d17bf4197c2f003256fe5495b19"
+    },
+    {
+      "path": "runtime/tools/verify_native_policy_replay.py",
+      "source_project": "open_sprite_runtime",
+      "source_path": "tools/verify_native_policy_replay.py",
+      "sha256": "d8247dd14a0a23e7feb462c513d580db574e2fbf16a89e1cb8c142245bca1a3a"
+    },
+    {
+      "path": "runtime/tools/verify_native_policy_trace.py",
+      "source_project": "open_sprite_runtime",
+      "source_path": "tools/verify_native_policy_trace.py",
+      "sha256": "3345101aec09c720536943bb31f1ad2f459ab052a724cd8542d7f9b787b56663"
+    },
+    {
+      "path": "runtime/tools/verify_native_protection_replay.py",
+      "source_project": "open_sprite_runtime",
+      "source_path": "tools/verify_native_protection_replay.py",
+      "sha256": "1f9de4636bf58623851148a4385cf0de0cdb1dda255748a3617410085a82c5ca"
+    },
+    {
+      "path": "runtime/tools/verify_supermimic_ipc.py",
+      "source_project": "open_sprite_runtime",
+      "source_path": "tools/verify_supermimic_ipc.py",
+      "sha256": "82a50cbfa0dadf51e8a5ed8f8ca92652a7fa82a45f4b8fe621f45b9326a912bb"
+    },
+    {
+      "path": "runtime/tools/verify_supermimic_replay.py",
+      "source_project": "open_sprite_runtime",
+      "source_path": "tools/verify_supermimic_replay.py",
+      "sha256": "3558e1daecdbb5bb5ced84ca5529f568ea19844cc70a3207dbaaf398f598fe6c"
+    },
+    {
+      "path": "runtime/tools/verify_xbox_mapping.py",
+      "source_project": "open_sprite_runtime",
+      "source_path": "tools/verify_xbox_mapping.py",
+      "sha256": "b257bb0c055427fac444e9ed46873e0c9f5392423de27b928ce2eeb6ecc2bdd5"
+    },
+    {
+      "path": "runtime/tools/view_bno055.py",
+      "source_project": "open_sprite_runtime",
+      "source_path": "tools/view_bno055.py",
+      "sha256": "d56e1f7c3ec810a36439273f46daf3a100777b070146b22e0bcfc3b7c7ec9f26"
+    },
+    {
+      "path": "runtime/tools/view_icm45686.py",
+      "source_project": "open_sprite_runtime",
+      "source_path": "tools/view_icm45686.py",
+      "sha256": "3ea1f82317d653d53bafccf07e41a8f13a0e3791bff6fafc236290ed0c052aac"
+    },
+    {
+      "path": "runtime/tools/view_software_imu.py",
+      "source_project": "open_sprite_runtime",
+      "source_path": "tools/view_software_imu.py",
+      "sha256": "2dbeccde3f231d99c1b42c1c07545d69c27c0508d25e27cd5aa019195eba7986"
+    },
+    {
+      "path": "docs/history/SUPERMIMIC_RUN002_20261106.md",
+      "source_project": "open_sprite_runtime",
+      "source_path": "docs/SUPERMIMIC_RUN002_20261106.md",
+      "sha256": "de86294380c603469fd0d5e5ea43a6cb2b46d0183a579078e7435b03c0696bb0"
+    },
+    {
+      "path": "docs/history/SUPERMIMIC_RUN002_JETSON_20261106.md",
+      "source_project": "open_sprite_runtime",
+      "source_path": "docs/SUPERMIMIC_RUN002_JETSON_20261106.md",
+      "sha256": "ad204dae4d5fa16ef5b21273c2726df09fd6f00f72b168137e164c8c972356bc"
+    },
+    {
+      "path": "docs/history/SUPERMIMIC_STRICT_STARTUP_20261106.md",
+      "source_project": "open_sprite_runtime",
+      "source_path": "docs/SUPERMIMIC_STRICT_STARTUP_20261106.md",
+      "sha256": "0716bb77f9bb3a6667abd9c16b37a64bbbf9499a072625c3f6316761b3ceaf2f"
+    },
+    {
+      "path": "reports/run002/final-evaluation-002/selection.json",
+      "source_project": "v5_joint_run002",
+      "source_path": "results/outputs/final-evaluation-002/selection.json",
+      "sha256": "f990a3a26724254487b156597bf3461eb079dc859b1684f0a64a88305ca896e1"
+    },
+    {
+      "path": "reports/run002/runtime-run002/scene.json",
+      "source_project": "v5_joint_run002",
+      "source_path": "results/outputs/runtime-run002/scene.json",
+      "sha256": "68c25c46b7074c9138533026c2a8192477b311f40bb8f4e26e06caf6aa87f509"
+    },
+    {
+      "path": "reports/run002/startup-envelope-003/FINAL_VALIDATION.json",
+      "source_project": "v5_joint_run002",
+      "source_path": "results/outputs/startup-envelope-003/FINAL_VALIDATION.json",
+      "sha256": "c68d16ed4e5a84ed6cb013e6dfaf8f3dee7b1bbe8025c719c6e5808b5961aa37"
+    },
+    {
+      "path": "reports/run002/startup-envelope-003/PROTECTION_BINDING.json",
+      "source_project": "v5_joint_run002",
+      "source_path": "results/outputs/startup-envelope-003/PROTECTION_BINDING.json",
+      "sha256": "12d630b30e35bce171b00f52e77f2bbf491ef5554670356b11b66b23552e28c1"
+    },
+    {
+      "path": "reports/run002/startup-envelope-003/full-tests.log",
+      "source_project": "v5_joint_run002",
+      "source_path": "results/outputs/startup-envelope-003/full-tests.log",
+      "sha256": "e670b72b1e0fcb2ee62ae647cdb626f5b0aa18c3cbaae6bcfd24b7f2895e73d1"
+    },
+    {
+      "path": "reports/jetson-cpu/LOCAL_VERIFICATION.json",
+      "source_project": "open_sprite_runtime",
+      "source_path": "reports/supermimic_v5_run002_jetson_20261106/LOCAL_VERIFICATION.json",
+      "sha256": "c2f4935b300e05ebd9eb94dd4d1aa41234f415fb82f2e56bafb7743a054bcb99"
+    },
+    {
+      "path": "reports/jetson-cpu/evidence/SUMMARY.json",
+      "source_project": "open_sprite_runtime",
+      "source_path": "reports/supermimic_v5_run002_jetson_20261106/evidence/SUMMARY.json",
+      "sha256": "46ff7f7e24aa0b3603d7d2bc26e6d6517b07cbda61f503bd0919309b2ce15a8a"
+    },
+    {
+      "path": "reports/preflight/effective_contract.json",
+      "source_project": "v5_joint_run002",
+      "source_path": "results/outputs/preflight-run002/effective_contract.json",
+      "sha256": "b6ccab5dd096937e27b63d956afec7fbc7bcbf50a8d4360feb41e46e489d5ca9"
+    },
+    {
+      "path": "reports/training/config.json",
+      "source_project": "v5_joint_run002",
+      "source_path": "results/outputs/joint-waist-v5-002/config.json",
+      "sha256": "039b788a4d12502e75160beca6f2d2d3a72033c2e55bfbc9acdba59e992648fe"
+    },
+    {
+      "path": "reports/training/metrics.jsonl",
+      "source_project": "v5_joint_run002",
+      "source_path": "results/outputs/joint-waist-v5-002/metrics.jsonl",
+      "sha256": "ab1b14b36fcde899893ca26f036ed682fc1eb8a32a6dc9f9e853f56ee8d9ea64"
+    },
+    {
+      "path": "reports/training/interface.json",
+      "source_project": "v5_joint_run002",
+      "source_path": "results/outputs/joint-waist-v5-002/interface.json",
+      "sha256": "e0c6564a668ac4b51f586f697f16930beeec08bc21967fa921c0115c1344e243"
+    },
+    {
+      "path": "reports/training/reference_qa.json",
+      "source_project": "v5_joint_run002",
+      "source_path": "results/outputs/joint-waist-v5-002/reference_qa.json",
+      "sha256": "e460bb88b12e8fe2bfa59604c060dbe037d351f8dc270417f9ef377d906f66f2"
+    },
+    {
+      "path": "configs/evaluation/commands.json",
+      "source_project": "v5_joint_run002",
+      "source_path": "results/outputs/final-evaluation-002/commands.json",
+      "sha256": "b40c78165082dec9092aa6cf9d84faf067eeac49b7b07bbd8a5824b310fd5a6f"
+    },
+    {
+      "path": "configs/evaluation/sequences.json",
+      "source_project": "v5_joint_run002",
+      "source_path": "results/outputs/final-evaluation-002/sequences.json",
+      "sha256": "528ce358bde8dd3c9b9ad805c28c72bdc39a7854aa008279b8d8e39a14c5b90d"
+    },
+    {
+      "path": "configs/evaluation/slew-static-commands.json",
+      "source_project": "v5_joint_run002",
+      "source_path": "results/outputs/startup-envelope-003/slew-static-commands.json",
+      "sha256": "b3f16cea73ad278ccb490e6f35f0ec24756a5172bb936b26edb73fc8662edc62"
+    },
+    {
+      "path": "configs/evaluation/slew-continuous-commands.json",
+      "source_project": "v5_joint_run002",
+      "source_path": "results/outputs/startup-envelope-003/slew-continuous-commands.json",
+      "sha256": "e96b8c49fc55d545d92591121700e1ec7c5d0673d42d1742f3e3bbcf7bcb5fbc"
+    },
+    {
+      "path": "docs/images/strict-startup-comparison.png",
+      "source_project": "v5_joint_run002",
+      "source_path": "results/outputs/startup-envelope-003/strict-startup-comparison.png",
+      "sha256": "1ade4abe3cb60746f99afc0d1bd4498c645ca3271fa1a178d745cb86ddf3ee34"
+    }
+  ],
+  "note": "Imported file hashes before repository packaging edits. Original experimental sources remain archived locally."
+}

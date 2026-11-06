@@ -1,0 +1,115 @@
+{
+  "created_utc": "2026-11-06T05:38:11.375682+00:00",
+  "architecture": "aarch64",
+  "checkpoint_sha256": "094b52267159d26f4d5bfb41edc5823a9becc32f706c87df05f8aa36b4016282",
+  "timing_reports": [
+    {
+      "path": "reports/run002-timing-2threads/report.json",
+      "passed": true,
+      "cpu_affinity": [
+        4,
+        5
+      ],
+      "seconds": 60,
+      "timing": {
+        "profile": "supermimic_v5_10f",
+        "mode": "paced_recorded_states_no_hardware",
+        "frames": 3000,
+        "policy_hz": 50,
+        "threads": 2,
+        "warmup_frames": 100,
+        "session_load_ms": 108.080602,
+        "loop_wall_ms": 59986.241618,
+        "ort_version": "1.23.2",
+        "inference_ms": {
+          "mean": 4.389965441,
+          "p50": 3.881062,
+          "p95": 6.76456,
+          "p99": 6.875646,
+          "max": 7.120535
+        },
+        "service_ms": {
+          "mean": 4.39851673233,
+          "p50": 3.889381,
+          "p95": 6.775887,
+          "p99": 6.888892,
+          "max": 7.132244
+        },
+        "wake_lateness_ms": {
+          "mean": 0.0650486403333,
+          "p50": 0.064301,
+          "p95": 0.069421,
+          "p99": 0.079479,
+          "max": 0.400549
+        },
+        "finish_lateness_ms": {
+          "mean": 4.46356537267,
+          "p50": 3.953379,
+          "p95": 6.840161,
+          "p99": 6.953471,
+          "max": 7.197824
+        },
+        "deadline_misses": 0,
+        "hardware_tx": 0,
+        "live_devices_opened": 0
+      },
+      "meets_20ms_under_test": true
+    },
+    {
+      "path": "reports/run002-timing-20261106T053208Z/report.json",
+      "passed": true,
+      "cpu_affinity": [
+        5
+      ],
+      "seconds": 60,
+      "timing": {
+        "profile": "supermimic_v5_10f",
+        "mode": "paced_recorded_states_no_hardware",
+        "frames": 3000,
+        "policy_hz": 50,
+        "threads": 1,
+        "warmup_frames": 100,
+        "session_load_ms": 108.725688,
+        "loop_wall_ms": 59990.098934,
+        "ort_version": "1.23.2",
+        "inference_ms": {
+          "mean": 8.28027891167,
+          "p50": 10.007421,
+          "p95": 10.072436,
+          "p99": 10.18736,
+          "max": 11.327042
+        },
+        "service_ms": {
+          "mean": 8.28949653133,
+          "p50": 10.017531,
+          "p95": 10.08328,
+          "p99": 10.198236,
+          "max": 11.340161
+        },
+        "wake_lateness_ms": {
+          "mean": 0.0688607753333,
+          "p50": 0.068508,
+          "p95": 0.07176,
+          "p99": 0.074813,
+          "max": 0.655409
+        },
+        "finish_lateness_ms": {
+          "mean": 8.35835730667,
+          "p50": 10.086013,
+          "p95": 10.153512,
+          "p99": 10.272964,
+          "max": 11.417153
+        },
+        "deadline_misses": 0,
+        "hardware_tx": 0,
+        "live_devices_opened": 0
+      },
+      "meets_20ms_under_test": true
+    }
+  ],
+  "hardware_tx": 0,
+  "physical_sensors_accessed": false,
+  "motor_enable_attempts": 0,
+  "hardware_qualified": false,
+  "scope": "Recorded-state CPU replay and timing only; no IPC/CAN/physical dynamics."
+}

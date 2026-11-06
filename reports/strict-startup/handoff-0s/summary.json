@@ -1,0 +1,445 @@
+{
+  "results": [
+    {
+      "case": "stand",
+      "command": [
+        0,
+        0,
+        0
+      ],
+      "mode": "runtime_strict",
+      "seed": 101,
+      "seconds": 8,
+      "handoff": true,
+      "settings": {
+        "mapped": true,
+        "envelope": true,
+        "multirate": true,
+        "delay_ms": 10,
+        "feedback_ms": 0,
+        "lag_ms": 0
+      },
+      "survived": false,
+      "first_failure_seconds": 0.02,
+      "first_failure_reason": "runtime_command_envelope_rejection",
+      "handoff_seconds": 0.0,
+      "command_start_seconds": 2.0,
+      "experiment": {
+        "handoff_seconds": 0.0,
+        "command_start_seconds": 2.0,
+        "trace_seconds": 8.0
+      },
+      "first_failure_motor": "left_hip_pitch_motor",
+      "last5s_velocity_m_s": null,
+      "protection_event": {
+        "time_seconds": 0.02,
+        "motor": "left_hip_pitch_motor",
+        "policy_command": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "requested_motor_torque_nm": -30.641856520919774,
+        "modeled_motor_torque_cap_nm": 28.0,
+        "motor_speed_rad_s": -0.012783966708309853,
+        "motor_position_rad": 6.727122567522995e-05,
+        "held_motor_target_rad": -0.2359343320131302,
+        "kp": 130.0,
+        "kd": 3.0,
+        "p_torque_nm": -30.680208421044703,
+        "d_torque_nm": 0.03835190012492956,
+        "ff_torque_nm": 0.0,
+        "cap_scope": "Conservative speed/nameplate and MIT feedforward-field proxy, not measured total motor torque"
+      },
+      "last5s_yaw_rad_s": null,
+      "peak_joint_torque_nm": [
+        28.0,
+        9.117788614304349,
+        8.08135054793149,
+        28.0,
+        4.033593870455283,
+        1.7055607917439257,
+        13.323400351922318,
+        0.5845052475428973,
+        28.0,
+        26.121648601531113,
+        2.428346202929915,
+        1.455470913821792,
+        2.5215324032955397,
+        8.322973202526894,
+        11.728833614127808,
+        11.774161121343138,
+        0.590819194942112,
+        1.1893489299654054,
+        0.10858593320128489,
+        0.6283665719278723,
+        2.3445998211940897,
+        0.8165653676685286,
+        20.62235093284643,
+        1.4396706399293193,
+        2.7516059553497527,
+        0.696054420715068,
+        0.4934260913551578,
+        1.6506336905269743,
+        0.08780770453773001,
+        0.12600747009462002,
+        0.03944562603438628
+      ],
+      "motor_diagnostics": {
+        "left_hip_pitch_motor": {
+          "peak_speed_rad_s": 0.020468297251335473,
+          "peak_torque_nm": 28.0,
+          "rms_torque_nm": 4.372949103454772,
+          "saturated_samples": 1,
+          "speed_exceedances": 0,
+          "target_soft_clips": 0
+        },
+        "right_hip_pitch_motor": {
+          "peak_speed_rad_s": 0.06011029508774247,
+          "peak_torque_nm": 13.323400351922318,
+          "rms_torque_nm": 2.0812252548992762,
+          "saturated_samples": 0,
+          "speed_exceedances": 0,
+          "target_soft_clips": 0
+        },
+        "waist_roll_motor": {
+          "peak_speed_rad_s": 0.08238432398812312,
+          "peak_torque_nm": 2.5215324032955397,
+          "rms_torque_nm": 0.39765595657715347,
+          "saturated_samples": 0,
+          "speed_exceedances": 0,
+          "target_soft_clips": 0
+        },
+        "left_hip_roll_motor": {
+          "peak_speed_rad_s": 0.08989636535227706,
+          "peak_torque_nm": 9.117788614304349,
+          "rms_torque_nm": 1.4251486512468392,
+          "saturated_samples": 0,
+          "speed_exceedances": 0,
+          "target_soft_clips": 0
+        },
+        "right_hip_roll_motor": {
+          "peak_speed_rad_s": 0.08716373478023294,
+          "peak_torque_nm": 0.5845052475428973,
+          "rms_torque_nm": 0.10722320957446886,
+          "saturated_samples": 0,
+          "speed_exceedances": 0,
+          "target_soft_clips": 0
+        },
+        "waist_yaw_motor": {
+          "peak_speed_rad_s": 0.019791205705472856,
+          "peak_torque_nm": 8.322973202526894,
+          "rms_torque_nm": 1.2999528609261666,
+          "saturated_samples": 0,
+          "speed_exceedances": 0,
+          "target_soft_clips": 0
+        },
+        "left_hip_yaw_motor": {
+          "peak_speed_rad_s": 0.003072498214950623,
+          "peak_torque_nm": 8.08135054793149,
+          "rms_torque_nm": 1.2620975639397454,
+          "saturated_samples": 0,
+          "speed_exceedances": 0,
+          "target_soft_clips": 0
+        },
+        "right_hip_yaw_motor": {
+          "peak_speed_rad_s": 0.007174485736696255,
+          "peak_torque_nm": 28.0,
+          "rms_torque_nm": 4.372879577812408,
+          "saturated_samples": 1,
+          "speed_exceedances": 0,
+          "target_soft_clips": 0
+        },
+        "left_shoulder_pitch_motor": {
+          "peak_speed_rad_s": 0.06960009608190519,
+          "peak_torque_nm": 11.728833614127808,
+          "rms_torque_nm": 1.833068245801788,
+          "saturated_samples": 0,
+          "speed_exceedances": 0,
+          "target_soft_clips": 0
+        },
+        "right_shoulder_pitch_motor": {
+          "peak_speed_rad_s": 0.05567814293683455,
+          "peak_torque_nm": 0.8165653676685286,
+          "rms_torque_nm": 0.14119139494965272,
+          "saturated_samples": 0,
+          "speed_exceedances": 0,
+          "target_soft_clips": 0
+        },
+        "left_knee_motor": {
+          "peak_speed_rad_s": 0.044926395664323875,
+          "peak_torque_nm": 28.0,
+          "rms_torque_nm": 4.373211455981699,
+          "saturated_samples": 1,
+          "speed_exceedances": 0,
+          "target_soft_clips": 0
+        },
+        "right_knee_motor": {
+          "peak_speed_rad_s": 0.15774095839148028,
+          "peak_torque_nm": 26.121648601531113,
+          "rms_torque_nm": 4.08171185939402,
+          "saturated_samples": 0,
+          "speed_exceedances": 0,
+          "target_soft_clips": 0
+        },
+        "left_shoulder_roll_motor": {
+          "peak_speed_rad_s": 0.010864199827048513,
+          "peak_torque_nm": 11.774161121343138,
+          "rms_torque_nm": 1.8388418772513702,
+          "saturated_samples": 0,
+          "speed_exceedances": 0,
+          "target_soft_clips": 0
+        },
+        "right_shoulder_roll_motor": {
+          "peak_speed_rad_s": 0.014999868214764888,
+          "peak_torque_nm": 20.62235093284643,
+          "rms_torque_nm": 3.2206879889862976,
+          "saturated_samples": 0,
+          "speed_exceedances": 0,
+          "target_soft_clips": 0
+        },
+        "head_yaw_motor": {
+          "peak_speed_rad_s": 0.0001660861912545993,
+          "peak_torque_nm": 0.03944562603438628,
+          "rms_torque_nm": 0.006160373093142705,
+          "saturated_samples": 0,
+          "speed_exceedances": 0,
+          "target_soft_clips": 0
+        },
+        "left_shoulder_yaw_motor": {
+          "peak_speed_rad_s": 0.004455718835977746,
+          "peak_torque_nm": 0.590819194942112,
+          "rms_torque_nm": 0.09227375161286445,
+          "saturated_samples": 0,
+          "speed_exceedances": 0,
+          "target_soft_clips": 0
+        },
+        "right_shoulder_yaw_motor": {
+          "peak_speed_rad_s": 0.006070663991530595,
+          "peak_torque_nm": 1.4396706399293193,
+          "rms_torque_nm": 0.22483996752449703,
+          "saturated_samples": 0,
+          "speed_exceedances": 0,
+          "target_soft_clips": 0
+        },
+        "left_elbow_motor": {
+          "peak_speed_rad_s": 0.1684810202414663,
+          "peak_torque_nm": 1.1893489299654054,
+          "rms_torque_nm": 0.18707173594461107,
+          "saturated_samples": 0,
+          "speed_exceedances": 0,
+          "target_soft_clips": 0
+        },
+        "right_elbow_motor": {
+          "peak_speed_rad_s": 0.1666803961950587,
+          "peak_torque_nm": 2.7516059553497527,
+          "rms_torque_nm": 0.43030684201657315,
+          "saturated_samples": 0,
+          "speed_exceedances": 0,
+          "target_soft_clips": 0
+        },
+        "left_wrist_yaw_motor": {
+          "peak_speed_rad_s": 0.0010591175272085794,
+          "peak_torque_nm": 0.10858593320128489,
+          "rms_torque_nm": 0.01696422483872372,
+          "saturated_samples": 0,
+          "speed_exceedances": 0,
+          "target_soft_clips": 0
+        },
+        "right_wrist_yaw_motor": {
+          "peak_speed_rad_s": 0.000606339313335663,
+          "peak_torque_nm": 0.696054420715068,
+          "rms_torque_nm": 0.10870568899260445,
+          "saturated_samples": 0,
+          "speed_exceedances": 0,
+          "target_soft_clips": 0
+        },
+        "left_wrist_pitch_motor": {
+          "peak_speed_rad_s": 0.03474428826422532,
+          "peak_torque_nm": 0.6283665719278723,
+          "rms_torque_nm": 0.09822786863751848,
+          "saturated_samples": 0,
+          "speed_exceedances": 0,
+          "target_soft_clips": 0
+        },
+        "right_wrist_pitch_motor": {
+          "peak_speed_rad_s": 0.03423087023653307,
+          "peak_torque_nm": 0.4934260913551578,
+          "rms_torque_nm": 0.07718017117226474,
+          "saturated_samples": 0,
+          "speed_exceedances": 0,
+          "target_soft_clips": 0
+        },
+        "left_wrist_roll_motor": {
+          "peak_speed_rad_s": 0.0004850497081753149,
+          "peak_torque_nm": 2.3445998211940897,
+          "rms_torque_nm": 0.36616497686704663,
+          "saturated_samples": 0,
+          "speed_exceedances": 0,
+          "target_soft_clips": 0
+        },
+        "right_wrist_roll_motor": {
+          "peak_speed_rad_s": 0.00031924580471729184,
+          "peak_torque_nm": 1.6506336905269743,
+          "rms_torque_nm": 0.2577856782595147,
+          "saturated_samples": 0,
+          "speed_exceedances": 0,
+          "target_soft_clips": 0
+        },
+        "left_ankle_motor_a": {
+          "peak_speed_rad_s": 3.391813541382126,
+          "peak_torque_nm": 1.6860550027586825,
+          "rms_torque_nm": 0.902368763820465,
+          "saturated_samples": 0,
+          "speed_exceedances": 0,
+          "target_soft_clips": 0
+        },
+        "left_ankle_motor_b": {
+          "peak_speed_rad_s": 2.669799373167822,
+          "peak_torque_nm": 1.4073815377068983,
+          "rms_torque_nm": 0.8123939884100115,
+          "saturated_samples": 0,
+          "speed_exceedances": 0,
+          "target_soft_clips": 0
+        },
+        "right_ankle_motor_a": {
+          "peak_speed_rad_s": 2.673081646907178,
+          "peak_torque_nm": 1.438662948133289,
+          "rms_torque_nm": 0.7645309541960021,
+          "saturated_samples": 0,
+          "speed_exceedances": 0,
+          "target_soft_clips": 0
+        },
+        "right_ankle_motor_b": {
+          "peak_speed_rad_s": 1.1856507662167237,
+          "peak_torque_nm": 0.6230521423026599,
+          "rms_torque_nm": 0.34709005742427457,
+          "saturated_samples": 0,
+          "speed_exceedances": 0,
+          "target_soft_clips": 0
+        },
+        "head_motor_a": {
+          "peak_speed_rad_s": 0.02231512976154455,
+          "peak_torque_nm": 0.05878405293724723,
+          "rms_torque_nm": 0.009188784542680635,
+          "saturated_samples": 0,
+          "speed_exceedances": 0,
+          "target_soft_clips": 0
+        },
+        "head_motor_b": {
+          "peak_speed_rad_s": 0.02003010736334066,
+          "peak_torque_nm": 0.146181335533299,
+          "rms_torque_nm": 0.02283302521306843,
+          "saturated_samples": 0,
+          "speed_exceedances": 0,
+          "target_soft_clips": 0
+        }
+      },
+      "motor_diagnostics_scope": "pre_trip_including_trigger_tick",
+      "post_trip_controller_output_applied": false,
+      "contact": {
+        "sample_interval_seconds": 0.002,
+        "synchronized_instantaneous": true,
+        "samples": 10,
+        "foot_unloaded_fraction": [
+          0.7,
+          0.7
+        ],
+        "loaded_contact_slip_fraction_over_0_05_m_s": [
+          0.6666666666666666,
+          0.0
+        ],
+        "normal_force_weighted_contact_speed_m_s": [
+          0.052322025036507375,
+          0.03500594397240781
+        ]
+      },
+      "model_sha256": "f3529c927a44f970908d48e5694e63302d0fc838121aba2fa87c0a0863968bba",
+      "scene_sha256": "d657bd4fae1f906916aa4d0eab853031c7f87e768221745a3e11678c79507011",
+      "hardware_sha256": "9ddf06034f24bbca49cb06f80236caa4cea7aee0040516d11209f848da1f2c10",
+      "mujoco_version": "3.11.0",
+      "wall_seconds": 2.2425435967743397,
+      "motor_envelope_assumptions": [
+        {
+          "motor": "waist_roll_motor",
+          "rated_speed_rad_s": 4.1887902047863905,
+          "envelope_no_load_rad_s": 4.974188368183839,
+          "project_max_speed_rad_s": 4.974188368183839,
+          "source": "nameplate rated speed; voltage-scaled free speed proxy; project speed from transformed URDF limits"
+        },
+        {
+          "motor": "head_yaw_motor",
+          "rated_speed_rad_s": 15.707963267948966,
+          "envelope_no_load_rad_s": 75.44185692062192,
+          "project_max_speed_rad_s": 50.0,
+          "source": "nameplate rated speed; voltage-scaled free speed proxy; project speed from transformed URDF limits"
+        },
+        {
+          "motor": "left_wrist_pitch_motor",
+          "rated_speed_rad_s": 15.707963267948966,
+          "envelope_no_load_rad_s": 75.44185692062192,
+          "project_max_speed_rad_s": 50.0,
+          "source": "nameplate rated speed; voltage-scaled free speed proxy; project speed from transformed URDF limits"
+        },
+        {
+          "motor": "right_wrist_pitch_motor",
+          "rated_speed_rad_s": 15.707963267948966,
+          "envelope_no_load_rad_s": 75.44185692062192,
+          "project_max_speed_rad_s": 50.0,
+          "source": "nameplate rated speed; voltage-scaled free speed proxy; project speed from transformed URDF limits"
+        },
+        {
+          "motor": "left_wrist_roll_motor",
+          "rated_speed_rad_s": 15.707963267948966,
+          "envelope_no_load_rad_s": 75.44185692062192,
+          "project_max_speed_rad_s": 50.0,
+          "source": "nameplate rated speed; voltage-scaled free speed proxy; project speed from transformed URDF limits"
+        },
+        {
+          "motor": "right_wrist_roll_motor",
+          "rated_speed_rad_s": 15.707963267948966,
+          "envelope_no_load_rad_s": 75.44185692062192,
+          "project_max_speed_rad_s": 50.0,
+          "source": "nameplate rated speed; voltage-scaled free speed proxy; project speed from transformed URDF limits"
+        },
+        {
+          "motor": "head_motor_a",
+          "rated_speed_rad_s": 15.707963267948966,
+          "envelope_no_load_rad_s": 75.44185692062192,
+          "project_max_speed_rad_s": 50.0,
+          "source": "nameplate rated speed; voltage-scaled free speed proxy; project speed from transformed URDF limits"
+        },
+        {
+          "motor": "head_motor_b",
+          "rated_speed_rad_s": 15.707963267948966,
+          "envelope_no_load_rad_s": 75.44185692062192,
+          "project_max_speed_rad_s": 50.0,
+          "source": "nameplate rated speed; voltage-scaled free speed proxy; project speed from transformed URDF limits"
+        }
+      ],
+      "gain_profile_sha256": null,
+      "gain_override_scope": "checkpoint contract controls",
+      "training_run": "joint-waist-v5-002",
+      "asset_revision": "sprite0825_v5_4340_shoulders_waist20261105",
+      "control_profile_sha256": "184ec989fd24b4bc6ea5034e6fdae796b5b9ce83ef2c884dfe4fc61d8d6987dc",
+      "physics_dt": 0.0005,
+      "policy_hz": 50,
+      "motor_internal_hz": 1000,
+      "ankle_hz": 500,
+      "other_motors_hz": 50,
+      "base_twist_frame": "mjOBJ_XBODY link frame, not principal inertia axes",
+      "hardware_tx": 0,
+      "hardware_qualified": false,
+      "limitations": [
+        "Measured constant linear differential, not nonlinear linkage geometry",
+        "Motor torque-speed polyline is a conservative nameplate model, not a measured dynamometer curve",
+        "Feedback delays and torque response lag are sensitivity assumptions; thermal/current limits not identified",
+        "IMU uses physics-derived attitude/gyro, not a full raw-sensor software-estimator model"
+      ]
+    }
+  ],
+  "survived": 0,
+  "trials": 1,
+  "hardware_tx": 0,
+  "hardware_qualified": false
+}

@@ -1,0 +1,57 @@
+{
+  "all_passed": true,
+  "results": [
+    {
+      "name": "assets",
+      "returncode": 0,
+      "seconds": 0.06398126110434532
+    },
+    {
+      "name": "references-local",
+      "returncode": 0,
+      "seconds": 0.06392368115484715
+    },
+    {
+      "name": "training-tests",
+      "returncode": 0,
+      "seconds": 9.734508115798235
+    },
+    {
+      "name": "runtime-tests",
+      "returncode": 0,
+      "seconds": 1.8677730169147253
+    },
+    {
+      "name": "gpu-preflight",
+      "returncode": 0,
+      "seconds": 8.981102960184216
+    },
+    {
+      "name": "gradient-routing",
+      "returncode": 0,
+      "seconds": 3.6206888277083635
+    },
+    {
+      "name": "joint-smoke",
+      "returncode": 0,
+      "seconds": 19.504316376522183
+    },
+    {
+      "name": "onnx-export",
+      "returncode": 0,
+      "seconds": 8.07028871960938
+    },
+    {
+      "name": "strict-dry-run",
+      "returncode": 0,
+      "seconds": 0.21402388252317905
+    }
+  ],
+  "initial_packaging_issues": [
+    "Inherited tests expected4 ticks at5ms; run002 is10 ticks at2ms for same20ms cadence. Fixed tests, not controller.",
+    "Missing legacy contract fixture moved explicitly into runtime/tests/fixtures; no historical weights required."
+  ],
+  "hardware_tx": 0,
+  "motor_enable_attempts": 0,
+  "reference_data_published": false
+}
