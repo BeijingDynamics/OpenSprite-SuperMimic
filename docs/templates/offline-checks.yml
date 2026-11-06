@@ -14,6 +14,9 @@ jobs:
       - run: python -m pip install -r requirements-cpu.txt -e 'runtime[can,imu,dev]'
       - run: python -m pytest runtime/tests -q
       - run: python -m compileall -q opensprite_tracker retarget scripts runtime/src
+      - run: cmake -S runtime/native -B runtime/build/zero-gain -DCMAKE_BUILD_TYPE=Release
+      - run: cmake --build runtime/build/zero-gain --target sprite_zero_gain_can_probe
+      - run: ctest --test-dir runtime/build/zero-gain -R zero_gain_codec --output-on-failure
       - run: python -c 'from retarget.umr_pipeline import check_node_runtime; check_node_runtime()'
       - run: python scripts/fetch_robot_assets.py
       - name: Check reference data stays out of Git

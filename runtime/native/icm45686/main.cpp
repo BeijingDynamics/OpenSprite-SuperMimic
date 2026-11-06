@@ -106,6 +106,19 @@ int main(int argc,char** argv) {
     std::cout<<"WHO_AM_I="<<unsigned(id)<<" expected=233 NO_CAN\n";
     if(id!=0xE9)throw std::runtime_error("ICM45686 identity mismatch");
     if(probe)return 0;
+    // Qualified Orin SPI0 policy: keep the controller awake for acquisition and
+    // after exit. A one-time boot/udev setup makes this work as an ordinary user.
+    if(std::string(argv[2])!="/dev/spidev0.0" && std::string(argv[2])!="/dev/spidev0.1")
+      throw std::runtime_error("performance policy is qualified only for Orin SPI0");
+    const char* pm_path="/sys/bus/platform/devices/3210000.spi/power/control";
+    std::string pm_mode;
+    {std::ifstream pm(pm_path);pm>>pm_mode;}
+    if(pm_mode!="on") {
+      {std::ofstream pm(pm_path);if(pm)pm<<"on\n";}
+      {std::ifstream pm(pm_path);pm>>pm_mode;}
+    }
+    if(pm_mode!="on")throw std::runtime_error("SPI0 runtime PM must be on; run runtime/tools/install_icm_spi_performance.sh once with sudo");
+    std::cout<<"SPI_RUNTIME_PM=on (not restored to auto on exit)\n";
     Fd edge(gpio(argv[3],unsigned(std::stoul(argv[4]))));
     IcmServer server(std::getenv("ICM_IPC_SOCKET"));
     icm::configure(d,rate);configured=true;

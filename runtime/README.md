@@ -2,6 +2,8 @@
 
 Snapshot of `BeijingDynamics/open_sprite_runtime`, branch `codex/supermimic-v5`,
 commit `5f8225ce6258cb38db174ee18c55162fa34d96a6`.
+This project additionally maintains the bounded C++ zero-gain probe and persistent
+SPI0 performance policy verified on 2026-11-06; see the parent SPI power-management guide.
 The snapshot includes native 10-frame/993-input replay, receive-only IPC, motor maps,
 strict closed-loop simulation, tests and their dependencies. No model is hardware qualified.
 

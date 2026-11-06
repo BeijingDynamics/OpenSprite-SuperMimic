@@ -14,6 +14,9 @@ target_compile_options(sprite_can_shadow PRIVATE -Wall -Wextra -Wpedantic -Werro
 target_link_libraries(sprite_can_shadow PRIVATE pthread)
 
 enable_testing()
+add_executable(sprite_zero_gain_can_probe src/zero_gain_can_probe.cpp)
+target_compile_options(sprite_zero_gain_can_probe PRIVATE -Wall -Wextra -Wpedantic -Werror)
+add_test(NAME zero_gain_codec COMMAND sprite_zero_gain_can_probe --self-test)
 add_executable(test_gamepad src/gamepad_test.cpp)
 target_compile_options(test_gamepad PRIVATE -Wall -Wextra -Wpedantic -Werror -UNDEBUG)
 add_test(NAME gamepad COMMAND test_gamepad)

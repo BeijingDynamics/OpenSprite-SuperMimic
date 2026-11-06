@@ -76,6 +76,9 @@ python runtime/tools/verify_supermimic_replay.py \
 
 ## Jetson 已做什么、还没做什么
 
+ICM45686 的 SPI0 **必须固定 `power/control=on`**，关闭运行时省电，开机设置且退出不恢复 `auto`。
+安装、检查和实测依据见 [SPI 电源管理约定](SPI_POWER_MANAGEMENT.md)。这项配置不使能电机。
+
 原 Orin Nano Super、25 W、schedutil，CPU ORT 1.23.2；未改功耗/频率策略。
 上面的 `requirements-cpu.txt` 固定的是 x86 验证环境 ORT 1.31.1；Jetson 应使用已验证的
 aarch64 1.23.2 与对应头文件，不按 x86 依赖文件覆盖现有机器人环境。
@@ -83,7 +86,37 @@ aarch64 1.23.2 与对应头文件，不按 x86 依赖文件覆盖现有机器人
 60 秒/3000 个 20 ms 周期没有截止期遗漏。单线程也通过。
 详见 [已保存的 Jetson 报告](history/SUPERMIMIC_RUN002_JETSON_20261106.md)。
 
-这些是录制状态的 CPU 测试；没有真实 IMU/CAN、物理反馈、零增益电机帧或使能。
-新增残余阻尼执行器路径尚未在真实反馈与实时总调度中验证。
-接下来是接收状态与无发送 shadow、前馈/映射/调度验证；电机运动准入仍为 false。
+上述时延数字是录制状态的 CPU 测试结果，不包含真实 IMU/CAN。
+同日随后已用本仓库 C++ 探针完成 31 电机、四总线同时 500 Hz、45 秒零增益通信，
+并发 C++ ICM45686 800 Hz 采集；原生代码只允许零增益、零前馈，任何非 disabled 反馈即退出。
+SPI 固定 `on` 前后对比见上面的电源管理文档。电机没有使能。
+
+这完成的是电机通信与传感器采集两条并发链，**没有运行真实传感器到新 SuperMimic 模型的
+完整策略 shadow**，不把它写成动作控制验收。现有只读 SuperMimic IPC actor 默认解析
+SPIMU002，真实 ICM 输出 SPIMU003，后续必须显式适配与校验，不能改包头冒充另一种传感器。
+新增残余阻尼执行器路径也尚未在真实反馈与实时总调度中验证；电机运动准入仍为 false。
 runtime 中保留的历史硬件调试工具不等于本模型已获准执行那些动作。
+
+## 原生零增益工具
+
+```bash
+cmake -S runtime/native -B runtime/build/zero-gain -DCMAKE_BUILD_TYPE=Release
+cmake --build runtime/build/zero-gain --target sprite_zero_gain_can_probe
+ctest --test-dir runtime/build/zero-gain -R zero_gain_codec --output-on-failure
+python runtime/tools/export_zero_gain_inventory.py \
+  --hardware /path/to/qualified/hardware.json --output /path/to/new-inventory.tsv
+```
+
+Python 只导出静态清单，不打开 CAN/IMU。实际电机收发与 ICM 采集均为 C++。
+真实总线运行前，需要吊架支撑、驱动供电且未使能、MIT 模式和正确的 CAN-FD 参数；
+不能在有人依赖电机保持力矩支撑时发零增益帧。已授权并满足条件后，命令为：
+
+```bash
+runtime/build/zero-gain/sprite_zero_gain_can_probe /path/to/new-inventory.tsv \
+  45 500 /path/to/new-result-prefix ZERO_GAIN_DISABLED_MOTORS_ONLY
+```
+
+工具不配置接口、不发送使能/禁用/切模式帧；编码器在每次写入前检查原始 Kp/Kd=0、
+速度与前馈的零编码。使用纳秒 ppoll 定时，迟到时跳过过期槽，不无界重放积压。
+反馈必须有软件与原始硬件时间戳，超时、非 FD+BRS、未知端点或非 disabled 状态立即退出。
+验收覆盖率为原 95% 门槛，报告同时给出实测频率和跳过槽数。

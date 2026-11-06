@@ -1,0 +1,3 @@
+# Keep the qualified Orin SPI0 controller awake; no motor/CAN configuration.
+ACTION=="add", SUBSYSTEM=="platform", KERNEL=="3210000.spi", TEST=="power/control", ATTR{power/control}="on"
+ACTION=="bind", SUBSYSTEM=="platform", KERNEL=="3210000.spi", TEST=="power/control", ATTR{power/control}="on"

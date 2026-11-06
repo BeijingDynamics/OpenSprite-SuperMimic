@@ -14,7 +14,8 @@
 | 动作跟踪评估 | 15/15 次，每次约 7.98 秒 | 五段原生参考、三个种子 |
 | Jetson CPU | 14 组 / 21000 帧回放通过；双线程服务 P99 6.889 ms | 50 Hz，3000 周期，0 截止期遗漏；不含真实传感器/CAN |
 | 严格电机闭环候选 | **88/88 次，每次 50 秒**；无原始力矩饱和、速度超限或前馈字段越界 | 1.5 s 交接、残余阻尼、命令斜率限制、明确的保守命令集 |
-| 真机零增益 / 带电行走 | **未进行 / 未准入** | 电机发送和使能均为 0 |
+| 真机零增益 | **31 电机通过 C++ 四总线 500 Hz、45 秒并发检查** | 全部 disabled；并发 C++ ICM 800 Hz 采集，SPI 固定 on 后仅 1 个超周期样本 |
+| 带电行走 | **未准入** | 电机使能为 0；尚未完成新模型的真实传感器全链 shadow |
 
 **两种仿真的结论不能混用。** 训练环境中测试过前进 0.6 m/s；严格电机闭环目前只验证到
 前进请求 0.25 m/s 及明确的转弯、倒退、横移场景。请求速度不等于实际速度；后者仍有偏差和漂移。
@@ -27,6 +28,7 @@
 - [安装、训练和评估](docs/REPRODUCE.md)：固定版本、500 Hz PD、预检、短训练、完整训练与导出。
 - [如何获得重定向动作](docs/REFERENCE_MOTIONS.md)：源动作、UMR、接触优化及 QA；数据仅在本地使用。
 - [CPU 回放与严格闭环](docs/RUNTIME.md)：10 帧 / 993 维接口、native 构建、仿真复现和 Jetson 时延。
+- [Jetson SPI0 电源管理](docs/SPI_POWER_MANAGEMENT.md)：ICM 采集必需的固定 `on` 设置、开机安装和退出行为。
 - [结果与经验](docs/RESULTS_AND_LESSONS.md)：已有证据、失败消融、速度偏差和后续工作。
 - [数据与第三方声明](DATA_AND_LICENSES.md)：代码许可证与外部数据条款分别记录。
 - [Release](https://github.com/BeijingDynamics/OpenSprite-SuperMimic/releases)：训练检查点、ONNX、场景和验证成果，附 SHA256。
@@ -65,7 +67,8 @@ docs/                          复现步骤、经验及带日期的历史记录
 
 本仓库与 [open_sprite](https://github.com/BeijingDynamics/open_sprite) 的模型仓库、
 [open_sprite_runtime](https://github.com/BeijingDynamics/open_sprite_runtime) 的真机 runtime 各有职责。
-runtime 快照固定于 `5f8225c`，方便独立复现；安装它不会替换机器人上的当前部署。
+runtime 以 `5f8225c` 为基线，另外维护已验证的 C++ 零增益探针与 SPI 常开策略；
+源码位于本仓库 `runtime/`，安装 Python 包不会替换机器人上的当前部署。
 
 ## 来源
 

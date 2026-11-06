@@ -1,0 +1,8 @@
+{
+  "spi_control_path": "/sys/bus/platform/devices/3210000.spi/power/control",
+  "spi_mode_after_capture": "on",
+  "service_enabled": "enabled",
+  "service_active": "active",
+  "reboot_tested": false,
+  "motor_enable_attempts": 0
+}

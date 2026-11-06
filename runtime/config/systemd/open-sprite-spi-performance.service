@@ -1,0 +1,13 @@
+[Unit]
+Description=Keep Open Sprite ICM SPI0 controller awake
+After=systemd-udev-trigger.service
+Before=multi-user.target
+ConditionPathExists=/sys/bus/platform/devices/3210000.spi/power/control
+
+[Service]
+Type=oneshot
+ExecStart=/bin/sh -c 'echo on > /sys/bus/platform/devices/3210000.spi/power/control'
+RemainAfterExit=yes
+
+[Install]
+WantedBy=multi-user.target
