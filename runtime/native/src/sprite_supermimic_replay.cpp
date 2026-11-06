@@ -1,4 +1,4 @@
-// Offline or receive-only simulation IPC; no CAN/device/powered entry.
+// Offline or receive-only state IPC; no CAN/device/powered entry.
 #if defined(SPRITE_LOOP_TEST) || defined(SPRITE_SHADOW_LOOP) || defined(SPRITE_POWERED_LOOP)
 #error SuperMimic replay cannot be built as a live or powered loop
 #endif
@@ -56,17 +56,18 @@ int main(int argc,char** argv) {
     if(argc<4)throw std::runtime_error("Usage: sprite_supermimic_replay MODEL FIXTURE OUTPUT [--benchmark] [--threads N] [--warmup N]");
     bool paced=false;int threads=1,warmup=50;
 #ifdef SPRITE_SUPERMIMIC_IPC_READONLY
-    std::string state_socket,imu_socket,feedback_config;
+    std::string state_socket,imu_socket,feedback_config,imu_kind="software";
 #endif
     for(int i=4;i<argc;++i) {
       const std::string option=argv[i];
       if(option=="--benchmark")paced=true;
 #ifdef SPRITE_SUPERMIMIC_IPC_READONLY
-      else if((option=="--state-socket" || option=="--imu-socket" || option=="--feedback-config") && i+1<argc) {
+      else if((option=="--state-socket" || option=="--imu-socket" || option=="--feedback-config" || option=="--imu-kind") && i+1<argc) {
         const std::string value=argv[++i];
         if(option=="--state-socket")state_socket=value;
         else if(option=="--imu-socket")imu_socket=value;
-        else feedback_config=value;
+        else if(option=="--feedback-config")feedback_config=value;
+        else imu_kind=value;
       }
 #endif
       else if((option=="--threads" || option=="--warmup") && i+1<argc) {
@@ -79,6 +80,7 @@ int main(int argc,char** argv) {
 #ifdef SPRITE_SUPERMIMIC_IPC_READONLY
     if(state_socket.empty() || imu_socket.empty() || feedback_config.empty() || paced)
       throw std::runtime_error("read-only IPC requires state/IMU/config and producer pacing");
+    if(imu_kind!="software" && imu_kind!="icm")throw std::runtime_error("IMU kind must be software or icm");
 #endif
     const std::uint32_t endian=1;
     if(*reinterpret_cast<const char*>(&endian)!=1)throw std::runtime_error("little endian required");
@@ -142,7 +144,7 @@ int main(int argc,char** argv) {
     if(feedback_file.peek()!=std::char_traits<char>::eof())throw std::runtime_error("trailing feedback configuration");
     for(double v:feedback.motor_zero)if(!std::isfinite(v))throw std::runtime_error("nonfinite feedback zero");
     for(double v:feedback.motor_to_joint)if(!std::isfinite(v))throw std::runtime_error("nonfinite feedback matrix");
-    sprite_policy::NativeImuClient imu(imu_socket,true);
+    sprite_policy::NativeImuClient imu(imu_socket,true,imu_kind=="icm");
     sprite_policy::ImuSnapshot sample;const auto wait_start=Clock::now();
     while(!imu.snapshot(sample)) {
       if(Clock::now()-wait_start>std::chrono::seconds(1))throw std::runtime_error("IMU startup timeout");
@@ -207,7 +209,7 @@ int main(int argc,char** argv) {
     std::ostringstream report;report<<std::setprecision(12);
     report<<"{\"profile\":\"supermimic_v5_10f\",\"mode\":\""
 #ifdef SPRITE_SUPERMIMIC_IPC_READONLY
-          <<"receive_only_simulation_state_ipc"
+          <<"receive_only_state_ipc"
 #else
           <<(paced?"paced_recorded_states_no_hardware":"offline_replay_no_hardware")
 #endif
@@ -222,6 +224,7 @@ int main(int argc,char** argv) {
     report<<",\"state_age_ms\":";stats(report,state_age);
     report<<",\"imu_age_ms\":";stats(report,imu_age);
     report<<",\"state_socket_transmitted_bytes\":0";
+    report<<",\"imu_kind\":\""<<imu_kind<<"\"";
 #endif
     report<<",\"deadline_misses\":"<<deadline_misses<<",\"hardware_tx\":0,\"live_devices_opened\":0}";
     std::ofstream json(std::string(argv[3])+".timing.json");json<<report.str()<<'\n';json.close();

@@ -1,0 +1,241 @@
+{
+  "schema": "sprite_run002_native_live_readonly_shadow_20261106",
+  "all_passed": true,
+  "policy_sha256": "f3529c927a44f970908d48e5694e63302d0fc838121aba2fa87c0a0863968bba",
+  "training_pd_hz": 500,
+  "policy_hz": 50,
+  "history_frames": 10,
+  "observation_dim": 993,
+  "runtime": "C++ CAN, C++ ICM45686 and C++ actor; Python offline/supervision only",
+  "runs": [
+    {
+      "frames": 500,
+      "policy_hz": 50,
+      "threads": 2,
+      "imu_kind": "icm",
+      "command": [
+        0,
+        0,
+        0
+      ],
+      "handoff_seconds": 1.5,
+      "service_ms": {
+        "mean": 3.31148085,
+        "p50": 2.855878,
+        "p95": 5.99638,
+        "p99": 6.560672,
+        "max": 6.771752
+      },
+      "oldest_motor_feedback_to_inference_finish_ms": {
+        "mean": 5.038459028,
+        "p50": 4.71333,
+        "p95": 7.650975,
+        "p99": 8.38049,
+        "max": 8.788413
+      },
+      "motor_state_age_ms": {
+        "mean": 1.722108982,
+        "p50": 1.596637,
+        "p95": 2.086298,
+        "p99": 2.102906,
+        "max": 2.140061
+      },
+      "imu_age_before_inference_ms": {
+        "mean": 3.29494079,
+        "p50": 3.263998,
+        "p95": 5.632648,
+        "p99": 6.063585,
+        "max": 6.405622
+      },
+      "deadline_misses": 0,
+      "actor_reverse_bytes": 0,
+      "actor_write_half_closed": true,
+      "can_tx": 154805,
+      "can_recorded_rx": 154798,
+      "per_motor_rx_hz_min": 499.293,
+      "per_motor_rx_hz_max": 499.493,
+      "can_discarded_timestamps": 0,
+      "can_skipped_slots_by_bus": [
+        {
+          "interface": "kcan1",
+          "skipped_slots": 53
+        },
+        {
+          "interface": "kcan2",
+          "skipped_slots": 53
+        },
+        {
+          "interface": "kcan3",
+          "skipped_slots": 53
+        },
+        {
+          "interface": "kcan4",
+          "skipped_slots": 36
+        }
+      ],
+      "imu_full_capture": {
+        "no_can": true,
+        "rate_hz": 800,
+        "samples": 27710,
+        "missed_sequence_events": 12,
+        "coalesced_events": 12,
+        "late_samples_discarded": 6,
+        "max_spi_ns": 1027933,
+        "max_edge_to_read_end_ns": 1172741,
+        "max_sample_gap_ns": 8831524,
+        "completed": true,
+        "hardware_qualified": false
+      },
+      "imu_actor_supervisor_window": {
+        "processed_events": 8260,
+        "rejected_events": 2,
+        "spi_p99_ms": 0.18145378999999995
+      },
+      "offline_cpp_byte_exact": true,
+      "independent_python_max_abs_error": {
+        "obs": 0.0,
+        "raw": 0.0,
+        "action": 0.0,
+        "target": 0.0
+      },
+      "passed": true
+    },
+    {
+      "frames": 3000,
+      "policy_hz": 50,
+      "threads": 2,
+      "imu_kind": "icm",
+      "command": [
+        0,
+        0,
+        0
+      ],
+      "handoff_seconds": 1.5,
+      "service_ms": {
+        "mean": 3.398653798,
+        "p50": 2.962134,
+        "p95": 4.965628,
+        "p99": 6.492802,
+        "max": 8.606608
+      },
+      "oldest_motor_feedback_to_inference_finish_ms": {
+        "mean": 5.19769493367,
+        "p50": 4.878808,
+        "p95": 6.77951,
+        "p99": 8.3689,
+        "max": 11.922774
+      },
+      "motor_state_age_ms": {
+        "mean": 1.793027291,
+        "p50": 1.809691,
+        "p95": 2.072585,
+        "p99": 2.30642,
+        "max": 4.514435
+      },
+      "imu_age_before_inference_ms": {
+        "mean": 3.31627717033,
+        "p50": 3.263494,
+        "p95": 5.709532,
+        "p99": 6.105452,
+        "max": 7.93956
+      },
+      "deadline_misses": 0,
+      "actor_reverse_bytes": 0,
+      "actor_write_half_closed": true,
+      "can_tx": 928901,
+      "can_recorded_rx": 928892,
+      "per_motor_rx_hz_min": 499.382,
+      "per_motor_rx_hz_max": 499.449,
+      "can_discarded_timestamps": 0,
+      "can_skipped_slots_by_bus": [
+        {
+          "interface": "kcan1",
+          "skipped_slots": 289
+        },
+        {
+          "interface": "kcan2",
+          "skipped_slots": 289
+        },
+        {
+          "interface": "kcan3",
+          "skipped_slots": 289
+        },
+        {
+          "interface": "kcan4",
+          "skipped_slots": 233
+        }
+      ],
+      "imu_full_capture": {
+        "no_can": true,
+        "rate_hz": 800,
+        "samples": 67275,
+        "missed_sequence_events": 45,
+        "coalesced_events": 45,
+        "late_samples_discarded": 19,
+        "max_spi_ns": 1112120,
+        "max_edge_to_read_end_ns": 1228031,
+        "max_sample_gap_ns": 13886668,
+        "completed": true,
+        "hardware_qualified": false
+      },
+      "imu_actor_supervisor_window": {
+        "processed_events": 47916,
+        "rejected_events": 17,
+        "spi_p99_ms": 0.187274
+      },
+      "offline_cpp_byte_exact": true,
+      "independent_python_max_abs_error": {
+        "obs": 0.0,
+        "raw": 0.0,
+        "action": 0.0,
+        "target": 0.0
+      },
+      "passed": true
+    }
+  ],
+  "native_tests_passed": 6,
+  "python_unittest": {
+    "run": 308,
+    "passed": 307,
+    "skipped": 1,
+    "skip_reason": "Optional MuJoCo unavailable on Jetson; inertia-axis test passed on rental host earlier"
+  },
+  "malformed_replay_cases_passed": 14,
+  "software_ipc_faults": {
+    "none": {
+      "passed": true,
+      "fault_exit_seconds": null
+    },
+    "state_stale": {
+      "passed": true,
+      "fault_exit_seconds": 0.031057453001267277
+    },
+    "state_order": {
+      "passed": true,
+      "fault_exit_seconds": 0.02966562400069961
+    },
+    "state_disconnect": {
+      "passed": true,
+      "fault_exit_seconds": 0.02872546000071452
+    },
+    "imu_freeze": {
+      "passed": true,
+      "fault_exit_seconds": 0.06701012099983927
+    }
+  },
+  "local_evidence": {
+    "files_sha256_verified": 413,
+    "archive_sha256": "aa098612af3809d90a86167b8933d6658846db781b04b59f224245c3a711df56",
+    "raw_hardware_traces_published": false
+  },
+  "physical_sensors_accessed": true,
+  "motor_enable_attempts": 0,
+  "nonzero_gain_or_feedforward_tx": 0,
+  "hardware_qualified": false,
+  "powered_walking_ready": false,
+  "limitations": [
+    "Zero velocity command only; mechanically supported disabled robot.",
+    "No target IPC writeback, motor PD, residual damping actuation or powered closed-loop admission.",
+    "IMU rejected/coalesced events remain in source reports; freshness limits unchanged."
+  ]
+}

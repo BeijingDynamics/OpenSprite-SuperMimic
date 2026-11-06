@@ -11,6 +11,7 @@ def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--hardware', type=Path, required=True)
     parser.add_argument('--output', type=Path, required=True)
+    parser.add_argument('--state-feedback', action='store_true', help='Include exact raw feedback decoding ranges for native state IPC')
     args = parser.parse_args()
     endpoints = endpoints_from_hardware_config(json.loads(args.hardware.read_text()))
     if args.output.exists():
@@ -18,7 +19,8 @@ def main():
     for endpoint in endpoints:
         if endpoint.can_id not in range(1, 9) or endpoint.master_id != endpoint.can_id + 16:
             raise ValueError('this bounded Sprite probe requires qualified command/master IDs')
-    content = ''.join(' '.join(map(str, (e.interface, e.motor_name, e.can_id, e.master_id))) + '\n'
+    content = ''.join(' '.join(map(str, (e.interface, e.motor_name, e.can_id, e.master_id,
+                          *(e.ranges.position_rad + e.ranges.velocity_rad_s if args.state_feedback else ())))) + '\n'
                       for e in endpoints)
     args.output.parent.mkdir(parents=True, exist_ok=True)
     args.output.write_text(content, encoding='utf-8', newline='\n')

@@ -13,6 +13,9 @@ int main(){
     double norm=0;for(auto v:q)norm+=v*v;for(auto& v:q)v/=std::sqrt(norm);
     auto p=encode_icm(raw,bias,q,10,1000000000,1000200000);
     auto s=sprite_policy::validate_imu_packet(p.data(),p.size(),1001000000,9,false,true);
+    bool wrong_profile=false;
+    try{sprite_policy::validate_imu_packet(p.data(),p.size(),1001000000,9,true,false);}catch(const std::runtime_error&){wrong_profile=true;}
+    require(wrong_profile); // ICM SPIMU003 cannot silently enter the BNO/software path.
     const double w=s.values[6],x=s.values[7],y=s.values[8],z=s.values[9];
     const std::array<double,3> policy_g{1-2*(x*x+y*y),2*(y*z+x*w),2*(x*z-y*w)};
     const std::array<double,3> expected{-2*(q[1]*q[3]-q[0]*q[2]),-2*(q[2]*q[3]+q[0]*q[1]),-(1-2*(q[1]*q[1]+q[2]*q[2]))};
@@ -53,5 +56,5 @@ int main(){
     require(received);
   }
   require(::access(path.c_str(),F_OK)!=0);require(::rmdir(dir)==0);
-  std::cout<<"ICM packet: 200 orientations and 1200 rejection cases passed\n";
+  std::cout<<"ICM packet: 200 orientations, profile mismatch and corruption cases passed\n";
 }

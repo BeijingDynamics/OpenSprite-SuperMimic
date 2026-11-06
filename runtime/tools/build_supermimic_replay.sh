@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Build file-only actors and math tests. Reuses the installed ORT; no device setup.
+# Build replay/receive-only actors and zero-gain diagnostics; no device setup.
 set -euo pipefail
 cd "$(dirname "${BASH_SOURCE[0]}")/.."
 python_bin="${SPRITE_REPLAY_PYTHON:-.venv/bin/python}"
@@ -13,6 +13,6 @@ cmake -S native -B "$build_dir" \
   -DSPRITE_ORT_INCLUDE="$headers" -DSPRITE_ORT_LIBRARY="$libpath" \
   -DCMAKE_BUILD_RPATH="$(cd "$build_dir" && pwd)"
 cmake --build "$build_dir" --parallel 2 \
-  --target test_policy_core test_supermimic_core sprite_policy_replay sprite_supermimic_replay sprite_supermimic_ipc_readonly
-ctest --test-dir "$build_dir" --output-on-failure -R '^(policy_core|supermimic_core)$'
-echo 'Built offline replay/test targets only; no CAN/IMU or powered binaries installed.'
+  --target test_policy_core test_supermimic_core test_readonly_state_server sprite_zero_gain_can_probe sprite_policy_replay sprite_supermimic_replay sprite_supermimic_ipc_readonly
+ctest --test-dir "$build_dir" --output-on-failure -R '^(policy_core|supermimic_core|readonly_state_server|zero_gain_codec)$'
+echo 'Built replay/read-only actors, tests and zero-gain diagnostic. No devices accessed or binaries installed.'
