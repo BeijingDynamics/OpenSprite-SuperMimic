@@ -77,6 +77,8 @@ python runtime/tools/verify_supermimic_replay.py \
 ## Jetson 已做什么、还没做什么
 
 原 Orin Nano Super、25 W、schedutil，CPU ORT 1.23.2；未改功耗/频率策略。
+上面的 `requirements-cpu.txt` 固定的是 x86 验证环境 ORT 1.31.1；Jetson 应使用已验证的
+aarch64 1.23.2 与对应头文件，不按 x86 依赖文件覆盖现有机器人环境。
 双线程 CPU4/5 的观测+推理+交接 P99 **6.889 ms**，最大 **7.132 ms**，
 60 秒/3000 个 20 ms 周期没有截止期遗漏。单线程也通过。
 详见 [已保存的 Jetson 报告](history/SUPERMIMIC_RUN002_JETSON_20261106.md)。

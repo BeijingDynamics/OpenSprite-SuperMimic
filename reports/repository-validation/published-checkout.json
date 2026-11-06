@@ -1,0 +1,12 @@
+{
+  "source_commit": "9ea4d260920ce592b59ce5105a2ff542619fa2fa",
+  "method": "Exact git archive extracted in a new empty directory; public mesh assets restored by checksum. No original reference bank installed.",
+  "robot_manifest_files_verified": 38,
+  "node_fbx_parser": "passed",
+  "training_tests_passed": 112,
+  "runtime_tests_passed": 308,
+  "runtime_subtests_passed": 33,
+  "hardware_tx": 0,
+  "motor_enable_attempts": 0,
+  "note": "Earlier independent staging also passed GPU effective-parameter preflight, gradient routing, 3 joint-training updates and ONNX export (3.259629e-9 max abs error)."
+}

@@ -6,6 +6,9 @@ Windows 本机用于归档和文档；没有验证 Windows GPU 训练。不要�
 发布前已从本仓库的独立目录验证：训练侧 112 项测试、runtime 308 项测试及 33 个子测试通过，
 实际 GPU 参数预检、梯度路由、三步联合训练和 ONNX 导出均通过。
 记录在 `reports/repository-validation/`，短训练导出的最大误差约 `3.3e-9`。
+已发布提交的干净源码目录还通过了 112+308 项测试、33 子测试及 UMR Node 解析器完整性检查，
+不依赖私有参考库。CI 配置保存在 `docs/templates/offline-checks.yml`；当前 GitHub OAuth
+授权缺少 workflow scope，尚未将模板激活为 Actions。上述测试已在租用服务器实际执行。
 
 ## 1. 安装与机器人资产
 
