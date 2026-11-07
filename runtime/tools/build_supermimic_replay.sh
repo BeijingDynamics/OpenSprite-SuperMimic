@@ -13,6 +13,6 @@ cmake -S native -B "$build_dir" \
   -DSPRITE_ORT_INCLUDE="$headers" -DSPRITE_ORT_LIBRARY="$libpath" \
   -DCMAKE_BUILD_RPATH="$(cd "$build_dir" && pwd)"
 cmake --build "$build_dir" --parallel 2 \
-  --target test_policy_core test_supermimic_core test_readonly_state_server sprite_zero_gain_can_probe sprite_policy_replay sprite_supermimic_replay sprite_supermimic_ipc_readonly
-ctest --test-dir "$build_dir" --output-on-failure -R '^(policy_core|supermimic_core|readonly_state_server|zero_gain_codec)$'
+  --target test_policy_core test_supermimic_core test_readonly_state_server sprite_zero_gain_can_probe sprite_supermimic_pose_gate sprite_policy_replay sprite_supermimic_replay sprite_supermimic_ipc_readonly
+ctest --test-dir "$build_dir" --output-on-failure -R '^(policy_core|supermimic_core|readonly_state_server|zero_gain_codec|supermimic_pose_gate)$'
 echo 'Built replay/read-only actors, tests and zero-gain diagnostic. No devices accessed or binaries installed.'

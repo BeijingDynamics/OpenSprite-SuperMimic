@@ -1,0 +1,45 @@
+{
+  "schema": "sprite_run002_slot_schedule_sensitivity_v1",
+  "scope": "closed_loop_simulation_only",
+  "hardware_qualified": false,
+  "motor_enable_supported": false,
+  "passed_pressure_admission": false,
+  "policy_sha256": "f3529c927a44f970908d48e5694e63302d0fc838121aba2fa87c0a0863968bba",
+  "contract_sha256": "86e6bb69d73d0a3c3d5495c146e163ccb777c9a4f012672f6098328316173ccc",
+  "hardware_sha256": "9ddf06034f24bbca49cb06f80236caa4cea7aee0040516d11209f848da1f2c10",
+  "scene_sha256": "d657bd4fae1f906916aa4d0eab853031c7f87e768221745a3e11678c79507011",
+  "training_pd_hz": 500,
+  "policy_hz": 50,
+  "handoff_seconds": 1.5,
+  "embedded_kd_max": 3.0,
+  "command_delay_ms": 12.0,
+  "imu_delay_ms": 8.0,
+  "inference_budget_ms": 8.607,
+  "torque_lag_sensitivity_ms": [
+    0,
+    5
+  ],
+  "extra_sample_age_sensitivity_ms": [
+    1,
+    2
+  ],
+  "internal_pd_phase_sensitivity": [
+    0,
+    1
+  ],
+  "wire_quantization": true,
+  "feedback_quantization": true,
+  "final_published_gains_unchanged": true,
+  "repeat_transmission_hz": 500,
+  "target_and_residual_update_hz": 50,
+  "linear_command_acceleration_m_s2": 0.25,
+  "yaw_command_acceleration_rad_s2": 0.3,
+  "limitations": [
+    "A surviving trial is not necessarily command tracking; low lateral commands can remain standing.",
+    "1/2ms extra sample age, 5ms torque lag and modeled1kHz internal PD are sensitivity assumptions, not identified actuator dynamics.",
+    "Recorded software/realtime to monotonic conversion is estimated; input timing trace is not a measured torque response.",
+    "Linear calibrated differential only; nonlinear linkage and powered actuator timing not identified.",
+    "The supported fixture is six-axis and stronger than a rope. All tested preposition-to-release candidates tripped before unassisted evaluation.",
+    "No candidate controller, gain ramp or motor enable was activated on hardware."
+  ]
+}
