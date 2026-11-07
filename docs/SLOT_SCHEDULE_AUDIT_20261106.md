@@ -6,7 +6,7 @@ run002 的 12 小时主训练在 15398 次更新结束，权重、ONNX、资产�
 
 可核对的[数值报告](../reports/slot-schedule-audit/summary.json)保留通过与失败，
 参数记录在[实验配置](../runtime/config/supermimic_run002_slot_audit.experiment.json)。
-已有的 [88/88 严格启动仿真](SUPERMIMIC_STRICT_STARTUP_20261106.md)属于此前的时序模型；
+已有的 [88/88 严格启动仿真](history/SUPERMIMIC_STRICT_STARTUP_20261106.md)属于此前的时序模型；
 不能用它代替本轮逐电机时隙、量化和真实初态的验证。
 
 ## 时序中发现的问题
