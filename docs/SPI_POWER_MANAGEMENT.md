@@ -117,8 +117,12 @@ systemctl status open-sprite-spi-performance.service --no-pager
 ```
 
 预期分别是 `on`、`enabled`、oneshot 服务成功且保持 `active (exited)`。
-安装当天已实测当前状态、服务 enabled/active 及采集退出后仍为 `on`；本次没有重启机器人。
-下次重启后应再次检查 `on`，不把服务已启用当作已经做过重启测试。
+2026-11-09 在 253 开机约两分钟时复验，`power/control=on`，服务为 `enabled`、`active`，
+ICM45686 的 `WHO_AM_I` 为 `0xE9`。四路 `kcan1`–`kcan4` 开机后均为 DOWN，
+复测 CAN 前需在本机运行 `sudo bash /home/tony/setup_sprite0825_kcanfd_on_253.sh` 恢复接口配置。
+接口恢复后，20 秒零增益链路完成了 1000 帧，推理结束前未错过 20 ms 截止期。
+推理服务 P99 为 6.52 ms，最大 16.12 ms。最旧电机反馈到推理结束最长 17.92 ms，
+该帧的反馈年龄约 1.80 ms。采集退出后 `power/control` 仍为 `on`。
 
 ## C++ 启动行为与退出行为
 
