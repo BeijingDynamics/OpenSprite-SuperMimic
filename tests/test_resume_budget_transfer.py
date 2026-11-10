@@ -35,7 +35,7 @@ def campaign(tmp_path, monkeypatch):
     record = {"schema": 1, "mode": "authorized_extension", "source_checkpoint": str(source),
               "old_output": str(old), "new_output": str(new), "source_iteration": 10000,
               "old_runtime_seconds": ck["wall_seconds"], "new_hard_budget_seconds": 14400,
-              "new_soft_budget_seconds": 14220, "user_authorization": "完成后再加四个小时继续训练",
+              "new_soft_budget_seconds": 14220, "user_authorization": "Continue training for another four hours after completion",
               "source_completion": str(completion), "source_supervisor": str(supervisor),
               "source_completion_reason": "wall_budget", "parent_budget_seconds": 14220.}
     record_path = tmp_path / "authorization.json"

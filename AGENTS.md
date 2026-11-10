@@ -1,5 +1,9 @@
 # Project conventions
 
+The primary README, first-party code comments/docstrings, terminal output,
+operator prompts, and generated labels must be English. Preserve original
+third-party notices and immutable historical evidence. Retain AGPL-3.0.
+
 Preserve full joint SuperMimic: motion/velocity encoders, shared decoder and world model,
 separate critics, 50/50 environments, 10 history and 10 future reference frames, latent alignment.
 Do not replace it with PPO or a velocity-only shortcut.

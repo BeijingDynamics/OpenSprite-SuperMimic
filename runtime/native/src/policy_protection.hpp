@@ -101,4 +101,77 @@ public:
         return result;
     }
 };
+
+enum class StartupJoint : std::uint8_t {
+    arm, stance, left_ankle, right_ankle, hold
+};
+
+// Smoothly hand over the measured pose to the projected policy target. The
+// settling check is diagnostic and does not gate the command or gain ramp.
+class TrackedStartup {
+    static constexpr double settle_tracking_error_rad_=0.10;
+    static constexpr double settle_speed_rad_s_=0.30;
+    static constexpr unsigned settle_frames_=50;
+    StartupRamp ramp_;
+    std::array<StartupJoint,31> roles_;
+    bool follow_all_ = false;
+  bool direct_=false, direct_started_=false;
+    ProtectionVector initial_{};
+    unsigned stable_frames_=0;
+    bool ankle_joint(std::size_t j) const {
+        return roles_[j]==StartupJoint::left_ankle || roles_[j]==StartupJoint::right_ankle;
+    }
+    bool stance_joint(std::size_t j) const {
+        return follow_all_ || roles_[j]==StartupJoint::stance || ankle_joint(j);
+    }
+public:
+    double tracking_error_rad=0., goal_error_rad=0.;
+    explicit TrackedStartup(std::array<StartupJoint,31> roles, double hold_seconds=1., bool follow_all=false,
+                            bool direct=false)
+        : ramp_(50,hold_seconds,4.), roles_(roles), follow_all_(follow_all), direct_(direct) {
+        if (direct_ && !follow_all_) throw std::runtime_error("direct start requires full-body control");
+        std::array<unsigned,5> counts{};
+        for (const auto joint : roles_) {
+            const auto role=static_cast<std::size_t>(joint);
+            if (role>=counts.size()) throw std::runtime_error("invalid startup joint role");
+            ++counts[role];
+        }
+        if (counts!=std::array<unsigned,5>{8,10,2,2,9})
+            throw std::runtime_error("unexpected SuperMimic startup joint groups");
+    }
+    bool captured() const { return direct_?direct_started_:ramp_.captured(); }
+    bool complete() const { return direct_?direct_started_:ramp_.complete(); }
+    double alpha() const { return direct_?(direct_started_?1.:0.):ramp_.last_alpha; }
+    unsigned stable_frames() const { return stable_frames_; }
+    bool settled() const { return stable_frames_==settle_frames_; }
+
+    ImpedanceTarget apply(const ImpedanceTarget& goal, const ProtectionVector& measured,
+                          const ProtectionVector& velocity) {
+        require_finite(velocity);
+        if (!captured()) initial_=measured;
+        auto target=goal;
+        target.velocity={};
+        target.feedforward={};
+        for (std::size_t j=0; j<measured.size(); ++j)
+            if (!follow_all_ && roles_[j]==StartupJoint::hold) target.position[j]=initial_[j];
+        auto result=direct_?target:ramp_.apply(target,measured);
+        if (direct_) direct_started_=true;
+        // Preserve the captured angles exactly for the independently held joints.
+        for (std::size_t j=0; j<measured.size(); ++j)
+            if (!follow_all_ && roles_[j]==StartupJoint::hold) result.position[j]=initial_[j];
+        tracking_error_rad=0.;
+        goal_error_rad=0.;
+        bool quiet=true;
+        for (std::size_t j=0; j<measured.size(); ++j) {
+            quiet=quiet && std::abs(velocity[j])<=settle_speed_rad_s_;
+            if (stance_joint(j)) {
+                goal_error_rad=std::max(goal_error_rad,std::abs(goal.position[j]-measured[j]));
+                tracking_error_rad=std::max(tracking_error_rad,std::abs(result.position[j]-measured[j]));
+            }
+        }
+        stable_frames_=complete() && quiet && goal_error_rad<=settle_tracking_error_rad_ ?
+            std::min(stable_frames_+1,settle_frames_) : 0;
+        return result;
+    }
+};
 }

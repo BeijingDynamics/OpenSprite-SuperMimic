@@ -45,19 +45,19 @@ if (live/'summary.json').exists():
 (folder/'envelope_summary.json').write_text(json.dumps(result,indent=2))
 with (folder/'envelope_summary.csv').open('w',newline='') as f:
     writer=csv.DictWriter(f,fieldnames=list(rows[0]));writer.writeheader();writer.writerows(rows)
-text=['# 当前v5策略速度命令测试','',f'{len(rows)}组命令，种子{result["seeds"]}，每组30秒。全部从URDF零关节姿态起步，不重置失败。',
-      '存活与跟速精度分别统计；下表实测为最后5秒的存活试验平均。范围内/外指训练随机命令范围，参考命令可能越界。','',
-      '|类别|命令vx/vy/yaw|30秒未倒|实测vx/vy/yaw|随机命令范围|',
+text=['# Current v5 policy velocity-command tests','',f'{len(rows)} command sets, seeds {result["seeds"]}, 30 seconds each. All start from the URDF zero-joint pose; failures are not reset.',
+      'Survival and tracking accuracy are reported separately. Measurements below average the final 5 seconds of surviving trials. In/out denotes the random training-command range; reference-derived commands may exceed it.','',
+      '|Category|Command vx/vy/yaw|Survived 30 s|Measured vx/vy/yaw|Random training range|',
       '|---|---|---|---|---|']
 fmt=lambda value:'—' if value is None else f'{value:+.3f}'
 for r in rows:
     text.append(f'|{r["category"]}|{r["vx"]:+.2f}/{r["vy"]:+.2f}/{r["yaw"]:+.2f}|{r["survived"]}/{r["trials"]}|'+
-                '/'.join(fmt(r[k]) for k in ['measured_vx','measured_vy','measured_yaw'])+f'|{"内" if r["inside_random_training_range"] else "外"}|')
-text+=['','## 同一个模型连续切换命令','',
-       '每个面板为同一机器人连续运行，每5秒切换命令，中途不重置、不换权重。录像白色CMD为目标，绿色MEAS为实际速度。',
-       '低抬脚不直接判失败；本测试确认命令响应与30秒存活，不能据此认定接触质量或硬件资格。']
+                '/'.join(fmt(r[k]) for k in ['measured_vx','measured_vy','measured_yaw'])+f'|{"In" if r["inside_random_training_range"] else "Out"}|')
+text+=['','## Continuous command switching with one model','',
+       'Each panel follows one robot continuously, switching commands every 5 seconds without resetting or changing weights. White CMD is the target; green MEAS is measured velocity.',
+       'Low foot clearance alone is not classified as failure. These tests assess command response and 30-second survival, not contact quality or hardware qualification.']
 for sequence in result.get('live_command_sequences',[]):
-    text.append(f'- {sequence["case_name"]}：32秒未倒={sequence["survived"]}；具体每段实测见JSON。')
+    text.append(f'- {sequence["case_name"]}: survived 32 seconds={sequence["survived"]}; see JSON for per-segment measurements.')
 (folder/'SPEED_ENVELOPE_REPORT.md').write_text('\n'.join(text)+'\n')
 print(json.dumps(dict(seeds=result['seeds'],cases=len(rows),survived=sum(r['survived'] for r in rows),trials=sum(r['trials'] for r in rows),
     forward=[r for r in rows if r['category']=='forward']),indent=2),flush=True)

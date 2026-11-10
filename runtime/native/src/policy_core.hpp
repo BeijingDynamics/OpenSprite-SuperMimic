@@ -16,6 +16,10 @@ template<int HistoryFrames> struct PolicyCore {
   std::array<float,history_size> history{};
   unsigned steps=0,completed=0;
   bool ready=false;
+  // Keep the affine profile, but never carry warmup/handshake history into control.
+  void reset_episode() {
+    previous={}; initial={}; history={}; completed=0; ready=false;
+  }
   std::array<float,input_size> observe(const std::array<double,71>& input) {
     for(double v:input) if(!std::isfinite(v)) throw std::runtime_error("nonfinite input");
     const std::array<int,5> widths{31,31,31,3,3};
@@ -43,7 +47,8 @@ template<int HistoryFrames> struct PolicyCore {
     }
     return result;
   }
-  Joints latch(const std::array<float,31>& raw,const std::array<double,71>& input) {
+  Joints latch(const std::array<float,31>& raw,const std::array<double,71>& input,
+               bool policy_output_history=false) {
     if(!ready) for(int j=0;j<31;++j) {
       if(!std::isfinite(scale[j]) || std::abs(scale[j])<=1e-12)
         throw std::runtime_error("invalid action scale");
@@ -58,8 +63,11 @@ template<int HistoryFrames> struct PolicyCore {
     Joints target{};
     for(int j=0;j<31;++j) {
       if(!std::isfinite(raw[j])) throw std::runtime_error("nonfinite actor output");
-      previous[j]=(1-alpha)*initial[j]+alpha*raw[j];
-      target[j]=offset[j]+scale[j]*previous[j];
+      const double blended=(1-alpha)*initial[j]+alpha*raw[j];
+      target[j]=offset[j]+scale[j]*blended;
+      // SuperMimic training stores actor output, independently of actuator
+      // saturation or deployment handoff. Keep legacy behavior by default.
+      previous[j]=policy_output_history?raw[j]:blended;
       if(!std::isfinite(target[j])) throw std::runtime_error("nonfinite target");
     }
     ready=true;

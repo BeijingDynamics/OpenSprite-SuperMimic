@@ -107,12 +107,12 @@ def failure_annotation(live, continuing, first_failure_seconds, *, held=False):
         return "LIVE", None
     if continuing:
         first = f"{first_failure_seconds:.2f}s" if first_failure_seconds is not None else "unavailable"
-        return "POST-FAILURE CONTINUING", f"首次失败 {first} · 失败后持续仿真不重置 / POST-FAILURE CONTINUING"
-    return "FAILED", ("真实终止 · 视频停帧回看 · 未继续仿真" if held else "真实终止 · 记录在此截断")
+        return "POST-FAILURE CONTINUING", f"First failure {first} · Simulation continues without reset / POST-FAILURE CONTINUING"
+    return "FAILED", ("Terminated · Frozen-frame review · Simulation stopped" if held else "Terminated · Recording ends here")
 
 
 def policy_label(metadata):
-    return "单动作策略" if metadata.get("training_clip_count") == 1 else "策略"
+    return "Single-motion policy" if metadata.get("training_clip_count") == 1 else "Policy"
 
 
 def build_models(path, width, height):
@@ -229,9 +229,9 @@ class Hud:
             "/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf",
         ] if Path(p).is_file()), None)
         self.fonts = {}
-        names = {"dance2_subject1": "舞蹈"}
+        names = {"dance2_subject1": "Dance"}
         clip = metadata.get("clip_name", f"clip {metadata.get('clip', '?')}")
-        self.title = args.title or f"{names.get(clip, '动作追踪')}  /  {clip}"
+        self.title = args.title or f"{names.get(clip, 'Motion tracking')}  /  {clip}"
         self.source_seconds = metadata.get("expected_transitions", 0) / fps
         self.request_seconds = metadata.get("requested_transitions", len(arrays["root_pos"]) - 1) / fps
         self.actual_seconds = recorded_end / fps
@@ -297,7 +297,7 @@ class Hud:
         values = [f"{drift:.3f} m", f"{np.sqrt(np.mean(joint**2)):.3f} rad" if joint is not None else blank,
                   f"{100*np.max(torque):.1f}%" if torque is not None else blank,
                   f"{np.max(speed):.2f}×" if speed is not None else blank]
-        labels = ["PELVIS · 世界位置漂移", "JOINT · 关节 RMSE", "TORQUE · 实际 / 上限", "SPEED · 速度 / 上限"]
+        labels = ["PELVIS · World drift", "JOINT · RMSE", "TORQUE · Actual / limit", "SPEED · Actual / limit"]
         col = (self.w - 116*s) / 4
         for i, (label, value) in enumerate(zip(labels, values)):
             cx = 58*s + i*col
@@ -308,21 +308,21 @@ class Hud:
             draw.text((cx, self.h-137*s), value, font=self.font(32), fill=colour)
             if i > 0:
                 draw.line((cx-20*s, self.h-157*s, cx-20*s, self.h-86*s), fill=(120,150,185,55), width=1)
-        note = "初始状态：尚无转移测量" if t == 0 else "力矩与速度：刚结束的 20 ms 控制周期内实测峰值"
+        note = "Initial state: no transition measured yet" if t == 0 else "Torque and speed: measured peaks over the preceding 20 ms control cycle"
         if not live and self.continuing:
-            note = "真实持续仿真 · 标准评分含首次失败转移，其后仅作诊断（20 ms实测峰值）"
+            note = "Continuous simulation · Score includes first failure; later transitions are diagnostic (20 ms measured peaks)"
         draw.text((58*s, self.h-79*s), note, font=self.font(15), fill=muted)
-        scope = ("完整源请求" if self.m.get("requested_transitions") == self.m.get("expected_transitions")
-                 else f"请求前缀 {self.request_seconds:.2f}s")
-        duration = f"{scope} · 实录 {self.actual_seconds:.2f}s · 源 {self.source_seconds:.2f}s"
+        scope = ("Full source request" if self.m.get("requested_transitions") == self.m.get("expected_transitions")
+                 else f"Requested prefix {self.request_seconds:.2f}s")
+        duration = f"{scope} · Recorded {self.actual_seconds:.2f}s · Source {self.source_seconds:.2f}s"
         draw.text((self.w-58*s, self.h-78*s), duration, font=self.font(16), fill=muted, anchor="ra")
         legend_y = self.h - 228*s
         draw.rounded_rectangle((36*s, legend_y-8*s, self.w-36*s, legend_y+30*s), radius=10*s, fill=(12,21,34,160))
         for x, colour in [(58, white), (73, (213, 58, 72, 255)), (310, cyan)]:
             draw.ellipse((x*s, legend_y+6*s, (x+11)*s, legend_y+17*s), fill=colour)
-        draw.text((96*s, legend_y-3*s), "白 / 红：实际机器人", font=self.font(17), fill=muted)
-        draw.text((335*s, legend_y-3*s), "蓝色透明：UMR 参考", font=self.font(17), fill=muted)
-        draw.text((570*s, legend_y-3*s), "世界坐标直接叠加 · 无位置对齐", font=self.font(17), fill=muted)
+        draw.text((96*s, legend_y-3*s), "White/red: robot", font=self.font(17), fill=muted)
+        draw.text((335*s, legend_y-3*s), "Blue: UMR reference", font=self.font(17), fill=muted)
+        draw.text((570*s, legend_y-3*s), "World-frame overlay · No position alignment", font=self.font(17), fill=muted)
         draw.text((self.w-58*s, legend_y-3*s), f"{seconds:06.2f}s  /  {self.source_seconds:.2f}s", font=self.font(17), fill=white, anchor="ra")
         bar_y = self.h - 195*s
         draw.rounded_rectangle((36*s, bar_y, self.w-36*s, bar_y+4*s), radius=2*s, fill=(65,84,107,180))

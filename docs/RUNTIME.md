@@ -4,6 +4,11 @@
 原生接口为 10 帧历史、993 维输入、31 维输出，保持旧 8 帧接口独立。
 这里所有推荐命令均为文件回放或仿真，没有硬件发送后端。
 
+The November 10 [previous-action contract](ACTION_HISTORY_CONTRACT_20261110.md)
+distinguishes action history from measured joint feedback, with paper references,
+training source hashes and frame-by-frame simulation checks. The full-body
+candidate retains the raw previous ONNX action independently of target protection.
+
 ## 取得模型与仿真输入
 
 从 [Release](https://github.com/BeijingDynamics/OpenSprite-SuperMimic/releases)下载

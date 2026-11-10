@@ -19,7 +19,7 @@ def evaluate(name, rows):
     elif name == 'release':
         active = next((i for i, r in enumerate(rows) if r['LT_permission'] and abs(r['vx']) > .04), None)
         if active is None:
-            return {'passed': False, 'reason': '未记录到松开前的前进指令；请按Enter后先保持LT和前推1秒，再松开LT'}
+            return {'passed': False, 'reason': 'No forward command recorded before release. After Enter, hold LT and forward input for one second, then release LT.'}
         revoked = next((i for i in range(active+1, len(rows)) if not rows[i]['LT_permission']), None)
         stopped = next((r for r in rows[revoked:] if zero(r)), None) if revoked is not None else None
         seconds = (stopped['stamp_ns']-rows[revoked]['stamp_ns'])/1e9 if stopped else None
@@ -72,18 +72,18 @@ def main():
     thread = threading.Thread(target=reader, daemon=True)
     thread.start()
     stages = [
-        ('startup', 4, '松开LT，两个摇杆回中，不操作。'),
-        ('forward', 8, '摇杆回中，捏放一次LT；再按住LT，并把前后摇杆向前推到底，保持。'),
-        ('release', 5, '按Enter后，先保持LT和前推1秒，再只松开LT，摇杆继续向前。不要提前松开。'),
-        ('rearm_disconnect', 8, '摇杆回中，松开LT；再按住LT，并向前推摇杆，保持。此项不要关机。'),
-        ('disconnect', 20, '按Enter后真正关闭手柄电源，确认手柄指示灯完全熄灭。仅松开LT不算断连。此阶段不要重新开机。'),
-        ('reconnect', 20, '重新开启手柄，等待连接；LT松开、摇杆回中，不要重新解锁。'),
-        ('rearm_reconnected', 8, '摇杆回中，捏放一次LT；再按住LT，向前推摇杆。'),
+        ('startup', 4, 'Release LT, centre both sticks, and leave the controller untouched.'),
+        ('forward', 8, 'Centre the sticks and press/release LT once. Then hold LT and full forward stick input.'),
+        ('release', 5, 'After Enter, hold LT and forward input for one second; then release only LT while keeping the stick forward. Do not release early.'),
+        ('rearm_disconnect', 8, 'Centre the sticks and release LT. Then hold LT and forward input. Do not power off in this stage.'),
+        ('disconnect', 20, 'After Enter, power off the gamepad and verify its indicator is completely off. Releasing LT is not a disconnect. Do not restart it during this stage.'),
+        ('reconnect', 20, 'Power on the gamepad and wait for connection. Release LT, centre the sticks, and do not rearm.'),
+        ('rearm_reconnected', 8, 'Centre the sticks and press/release LT once. Then hold LT and forward input.'),
     ]
-    print('只读手柄，不发送CAN、不使能电机。报告目录：', out, flush=True)
+    print('Gamepad read-only test; no CAN transmission or motor enable. Report directory:', out, flush=True)
     try:
         for name, seconds, instruction in stages:
-            input('\n下一项 '+name+'：'+instruction+'\n先按键盘Enter开始计时，再按上述要求操作。 ')
+            input('\nNext stage '+name+': '+instruction+'\nPress Enter to start the timer, then follow the instructions above. ')
             with lock:
                 start = len(rows)
             for remaining in range(seconds, 0, -1):

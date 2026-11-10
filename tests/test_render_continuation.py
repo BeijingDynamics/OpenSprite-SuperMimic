@@ -93,10 +93,10 @@ def test_partial_continued_source_is_not_labelled_complete():
 def test_failure_annotation_discloses_first_time_and_continuation_without_freeze():
     status, message = failure_annotation(False, True, 193.82, held=True)
     assert status == "POST-FAILURE CONTINUING"
-    assert "首次失败 193.82s" in message and "失败后持续仿真不重置" in message
-    assert "停帧" not in message and "截断" not in message
+    assert "First failure 193.82s" in message and "Simulation continues without reset" in message
+    assert "Frozen-frame" not in message and "Recording ends" not in message
     assert failure_annotation(True, True, 193.82) == ("LIVE", None)
-    assert "停帧回看" in failure_annotation(False, False, 193.82, held=True)[1]
-    assert "记录在此截断" in failure_annotation(False, False, 193.82)[1]
-    assert policy_label({"training_clip_count": 1}) == "单动作策略"
-    assert policy_label({}) == "策略" and "共享" not in policy_label({})
+    assert "Frozen-frame review" in failure_annotation(False, False, 193.82, held=True)[1]
+    assert "Recording ends here" in failure_annotation(False, False, 193.82)[1]
+    assert policy_label({"training_clip_count": 1}) == "Single-motion policy"
+    assert policy_label({}) == "Policy" and "Shared" not in policy_label({})

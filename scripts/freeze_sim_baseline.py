@@ -121,7 +121,7 @@ def main():
                    'bytes': p.stat().st_size, 'sha256': sha(p)} for p in existing]
     manifest = {
         'label': LABEL,
-        'human_label': 'Open Sprite v5 SuperMimic 仿真基线 v0.1',
+        'human_label': 'Open Sprite v5 SuperMimic simulation baseline v0.1',
         'created_at': datetime.now(timezone.utc).isoformat(),
         'status': 'simulation_baseline_frozen_hardware_not_admitted',
         'hardware_qualified': False,
@@ -145,31 +145,31 @@ def main():
         'external_preserved_evidence': references,
     }
     write(dest / 'LABEL.json', manifest)
-    readme = '''# Open Sprite v5 SuperMimic 仿真基线 v0.1
+    readme = '''# Open Sprite v5 SuperMimic simulation baseline v0.1
 
-标签：`sprite-v5-supermimic-sim-v0.1-20261105`。冻结 run001 第26951次更新；只建立本地成果标签，未向 GitHub 发布。
+Label: `sprite-v5-supermimic-sim-v0.1-20261105`. Frozen run001 update 26951; this is a local artifact label, not a GitHub publication.
 
-当前状态：前进、后退、侧移、转弯及连续命令切换已在现有仿真条件下测试。49组命令×3个种子，各30秒，147/147未倒；独立后退/切换演示4/4跑满32秒。存活结果不等同于速度精度、接触质量或真机资格。仍有跟速不足、偏航漂移和左右转弯不对称。
+Forward, reverse, lateral, turning and continuous command switching were tested in the recorded simulation conditions. All 147 trials (49 commands, three seeds, 30 seconds each) survived; four independent reverse/switching demonstrations completed 32 seconds. Survival does not establish velocity accuracy, contact quality or hardware qualification. Tracking deficits, yaw drift and left/right turning asymmetry remain.
 
-## 真机判断
+## Hardware assessment at this baseline
 
-可以作为下一步 runtime 适配与 Sim2Real 验证的冻结起点；当前不能直接替换 runtime 模型上机行走。
+This is a frozen starting point for runtime adaptation and Sim2Real validation. It cannot directly replace the runtime model for hardware walking.
 
-1. 本模型50Hz、10帧、993维；所核对 runtime 的 C++ 执行器固定8帧、795维。Python历史构建器+ONNX回放误差2.38e-6，仅证明这条离线路径对齐，未验证 C++ 执行器。应新增10帧配置，不可截断或补零冒充模型兼容。
-2. 训练使用串联踝关节抽象，真实并联踝的电机力矩/速度包络尚未验证。50Hz策略频率一致，也不等于500Hz踝控制、50Hz其余电机、传感延迟等闭环行为一致。当前训练关闭了力矩滞后。
-3. runtime 真机准入检查实际拒绝当前 contract，详见 evidence/runtime-readiness.json。已有G74策略的真机记录不自动适用于本策略；原Xbox真机入口仍禁止倒退。
+1. This model uses 50 Hz, 10 history frames and 993 inputs; the inspected native runtime was fixed to eight frames and 795 inputs. Python-history/ONNX replay error of 2.38e-6 validates only that offline path. Add a native 10-frame profile; do not truncate or pad inputs to imply compatibility.
+2. Training uses serial ankle joints. Real parallel-ankle torque/speed envelopes were not validated. Matching the 50 Hz policy rate does not establish equivalent 500 Hz ankle transport, 50 Hz other-motor transport or sensor latency. Torque lag was disabled in this training run.
+3. The runtime hardware-admission check rejected this contract; see evidence/runtime-readiness.json. G74 hardware evidence does not qualify this policy. The original Xbox hardware entry still disallows reverse commands.
 
-合理下一步：增加独立10帧原生执行配置→C++回放及目标Jetson时延测量→带真实执行器/传感时序的闭环仿真→核对实机标定后做保护状态下站立与短距离低速试验。当前标签没有批准带电测试。
+Next steps: add a separate native 10-frame profile, validate C++ replay and target-Jetson latency, simulate real actuator/sensor timing, then verify calibration before protected standing and short low-speed trials. This label grants no powered-test authorization.
 
-## 保留内容
+## Retained artifacts
 
-`model_026951.pt`是训练检查点；`deploy/`保留原始ONNX与contract，hardware_qualified仍为false；`training/`有本轮原始配置、169KB训练源码快照、自制40秒v5参考动作。`source/`是本次评估/导出源码，区别于训练源码快照；原训练奖励的两个A.6问题在后续代码中修正，但未改写此权重。
+`model_026951.pt` is the training checkpoint. `deploy/` retains the original ONNX and contract with hardware_qualified=false. `training/` contains the original configuration, 169 KB training-source snapshot and locally prepared 40-second v5 reference. `source/` contains evaluation/export code, separately from the training snapshot. Later code fixes two A.6 reward issues without rewriting these weights.
 
-`videos/`保留连续控制及后退演示；`evidence/`保留测量摘要与低速步态复核。低抬脚不再被直接判为纯滑步失败。历史报告中的强定性以复核文件为准。
+`videos/` retains continuous-control and reverse demonstrations. `evidence/` contains measurement summaries and the low-speed gait review. Low foot clearance is not automatically classified as sliding failure; consult the review before relying on earlier qualitative claims.
 
-通用原始动作库、依赖缓存不另行打包。完整rollout与既有重要成果归档已在本地，路径和SHA256列入LABEL.json。复现实验还需原workspace的机器人资产及依赖，本文件夹不是可直接部署的真机安装包。
+Generic raw motion libraries and dependency caches are excluded. Full rollouts and earlier important archives remain local; LABEL.json lists their paths and SHA256 hashes. Reproduction also requires the original robot assets and dependencies. This directory is not a ready-to-deploy hardware package.
 
-`SHA256SUMS.json`覆盖本文件夹冻结内容，`VERIFIED.json`记录本地逐项校验结果。未来改进应另建标签，避免覆盖本版本。
+`SHA256SUMS.json` covers the frozen contents; `VERIFIED.json` records local verification. Create a new label for improvements rather than overwriting this version.
 '''
     (dest / 'README.md').write_text(readme, encoding='utf-8')
     copy(Path(__file__), 'source/freeze_sim_baseline.py')

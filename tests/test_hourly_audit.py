@@ -35,7 +35,7 @@ prompt=sys.stdin.read()
 (root/'prompt.txt').write_text(prompt)
 time.sleep(float(os.environ.get('FAKE_DELAY','0')))
 if os.environ.get('FAKE_FAIL') == '1':sys.exit(7)
-pathlib.Path(sys.argv[sys.argv.index('--output-last-message')+1]).write_text('逐动作趋势审计完成。')
+pathlib.Path(sys.argv[sys.argv.index('--output-last-message')+1]).write_text('Per-motion trend audit completed.')
 """)
     fake.chmod(0o755)
     env = dict(os.environ, FAKE_ROOT=str(tmp_path))
@@ -63,7 +63,7 @@ def test_single_audit_success_or_failure_preserves_training_and_budget(campaign,
     assert 'sandbox_mode="danger-full-access"' in calls[0]
     assert not any(x in calls[0] for x in ("--model", "-m", "--ignore-rules", "--dangerously-bypass-hook-trust"))
     latest = (run / "hourly/latest.md").read_text()
-    assert latest == ("Previous successful report" if failed else "逐动作趋势审计完成。")
+    assert latest == ("Previous successful report" if failed else "Per-motion trend audit completed.")
     snapshot = json.loads(next((run / "hourly").glob("*.snapshot.json")).read_text())
     assert snapshot["campaign_seconds"] == 3100
     assert snapshot["formal_elapsed_seconds"] == pytest.approx(2068.428500912983)

@@ -215,9 +215,9 @@ class Launcher:
             except (ValueError, KeyError, TypeError, OSError) as error:
                 context["delivery_marker_error"] = str(error)
             task = local_path(self.root, self.args.task).read_text()
-            prompt = task + "\n\n本次只读启动快照；必须重新核实动态状态：\n```json\n"
+            prompt = task + "\n\nRead-only startup snapshot; recheck the current dynamic state:\n```json\n"
             prompt += json.dumps(context, ensure_ascii=False, indent=2) + "\n```\n"
-            prompt += f"\nUTC审计标识：{stamp}。上一报告：{self.folder / 'latest.md'}。本次最终分析将由CLI保存；必须实际分析逐clip趋势、WM有效样本和GPU/NaN，并对照上次报告。健康时不改训练源码/配置、不重复smoke。总GPU训练上限{context['hard_total_training_budget_seconds']}秒，active_seconds已含prior，不能再次相加。任务结束后预算内的独立训练继续，不要停止健康trainer。\n"
+            prompt += f"\nUTC audit ID: {stamp}. Previous report: {self.folder / 'latest.md'}. The CLI will save this final analysis. Analyze per-clip trends, valid world-model samples, GPU health and NaNs; compare with the previous report. Do not edit healthy training code/configuration or repeat smoke tests. Total GPU training limit: {context['hard_total_training_budget_seconds']} seconds; active_seconds already includes prior time, so do not add it again. Independent training within budget continues after this audit; do not stop a healthy trainer.\n"
             prompt_path = self.folder / f"{stamp}.prompt.md"
             atomic_write(prompt_path, prompt)
             atomic_write(self.folder / f"{stamp}.snapshot.json", json.dumps(context, ensure_ascii=False, indent=2) + "\n")

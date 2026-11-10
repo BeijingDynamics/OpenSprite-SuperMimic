@@ -11,7 +11,7 @@ import time
 C=Path('/home/tony/open_sprite_runtime/candidates/xbox_native_120_20261019')
 device='/dev/input/js0'
 def read_buttons(label):
-    input(f'{label}: 松开所有按键，按回车后，只按下并松开{label}。采集6秒。')
+    input(f'{label}: Release all buttons. Press Enter, then press and release only {label}. Recording for 6 seconds.')
     fd=os.open(device,os.O_RDONLY|os.O_NONBLOCK)
     events=[];pressed=set();end=time.monotonic()+6
     try:
@@ -30,13 +30,13 @@ def read_buttons(label):
     return button,events
 
 if __name__=='__main__':
-    print('只读取手柄，无CAN、无使能、无policy。',flush=True)
+    print('Gamepad read-only test; no CAN, motor enable or policy execution.',flush=True)
     lb,le=read_buttons('LB');rb,re=read_buttons('RB')
     if lb==rb:raise RuntimeError('LB and RB must differ')
-    input('下一步松开LB/RB，回车后再同时按住两键至少3秒。')
+    input('Release LB/RB. Press Enter, then hold both buttons together for at least 3 seconds.')
     env=os.environ.copy();env.update(SPRITE_GAMEPAD_LB=str(lb),SPRITE_GAMEPAD_RB=str(rb))
     subprocess.run([str(C/'gamepad_disable_probe'),device],env=env,check=True)
     result={'passed':True,'device':device,'lb':lb,'rb':rb,'lb_events':le,'rb_events':re,'native_combo_passed':True,'hardware_tx':0}
     (C/'buttons_verified.json').write_text(json.dumps(result,indent=2)+'\n')
     subprocess.run([sys.executable,str(C/'check_powered_seal.py'),'--seal'],check=True)
-    print('按键确认完成；尚未使能任何电机。')
+    print('Button validation complete; no motors have been enabled.')

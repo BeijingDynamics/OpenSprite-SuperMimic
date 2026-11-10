@@ -9,6 +9,7 @@
 #include <fstream>
 #include <iomanip>
 #include <iostream>
+#include <limits>
 #include <map>
 #include <sstream>
 #include <stdexcept>
@@ -19,6 +20,7 @@
 #include <fcntl.h>
 #include <linux/can.h>
 #include <linux/can/raw.h>
+#include <linux/net_tstamp.h>
 #include <net/if.h>
 #include <poll.h>
 #include <pthread.h>
@@ -26,9 +28,13 @@
 #include <sys/un.h>
 #include <sys/ioctl.h>
 #include <sys/mman.h>
+#include <sys/prctl.h>
 #include <sys/socket.h>
 #include <time.h>
 #include <unistd.h>
+#include "sling_window.hpp"
+#include "action_tx_trace.hpp"
+#include <linux/sockios.h>
 
 namespace {
 
@@ -39,6 +45,12 @@ constexpr std::uint16_t kStateKind = 1;
 constexpr std::uint16_t kTargetKind = 2;
 constexpr std::size_t kJointCount = 31;
 constexpr std::int64_t kTargetTimeoutNs = 100'000'000LL;
+constexpr std::int64_t kSuperMimicDeadlineNs = 20'000'000LL;
+constexpr int kSuperMimicRealtimePriority = 50;
+// Give the feedback batch a bounded arrival window. The true oldest sample
+// still determines the same end-to-end deadline.
+constexpr std::size_t kSuperMimicFirstPublishSlot = 13;
+constexpr std::size_t kSuperMimicLastPublishSlot = 17;
 volatile std::sig_atomic_t g_shutdown_requested = 0;
 
 void request_shutdown(int) {
@@ -105,6 +117,13 @@ struct Motor {
   int poll_phase = 0;
   double last_position = 0.0;
   double last_velocity = 0.0;
+  std::int64_t feedback_ns = 0;
+  std::int64_t cycle_poll_ns = 0;
+  // Additional coherent-group replies must not speed up the existing filters.
+  bool cadence_monitors = false;
+  std::int64_t monitor_poll_ns = 0;
+  std::size_t monitor_samples = 0;
+  std::size_t nominal_sends = 0;
   int maximum_mos_temperature = 0;
   int maximum_rotor_temperature = 0;
   double filtered_mos_temperature = 0.0;
@@ -179,11 +198,25 @@ struct Options {
   bool policy_actuation = false;
   bool saturate_policy_torque = false;
   bool bounded_shadow_preview = false;
+  bool tracked_startup = false;
+  bool direct_policy_start = false;
+  bool coherent_action_send = false;
+  bool supermimic_commissioning = false;
+  double walk_speed = 0.0;
+  int sling_ready_fd = -1, operator_status_fd = -1;
 };
 
 struct Socket {
   std::string interface;
   int fd = -1;
+  sprite_policy::ActionTxTrace tx_trace;
+};
+
+struct PolicyCycleTiming {
+  std::uint64_t sequence = 0;
+  std::int64_t feedback_ns = 0, publish_ns = 0, actor_target_ns = 0,
+      receive_ns = 0, accept_ns = 0;
+  std::size_t oldest_motor = 0;
 };
 
 struct IpcSocket {
@@ -193,11 +226,17 @@ struct IpcSocket {
   std::uint64_t state_sequence = 0;
   std::uint64_t last_target_sequence = 0;
   std::int64_t last_target_ns = 0;
+  std::int64_t source_feedback_ns = 0;
+  std::uint64_t last_target_source_sequence = 0;
+  double maximum_feedback_to_target_ms = 0.0;
   std::size_t target_count = 0;
   double maximum_target_age_ms = 0.0;
   TargetPacket latest_target{};
   bool has_target = false;
   std::size_t motor_preview_count = 0;
+  std::vector<PolicyCycleTiming> timing;
+  const char* deadline_stage = "";
+  std::string missing_feedback_motor;
 };
 
 std::int64_t monotonic_ns() {
@@ -530,6 +569,20 @@ Options parse_options(int argc, char** argv) {
     }
     else if (argument == "--measured-pose-hold") result.measured_pose_hold = true;
     else if (argument == "--policy-actuation") result.policy_actuation = true;
+    else if (argument == "--supermimic-commissioning") result.supermimic_commissioning = true;
+    else if (argument == "--tracked-startup") result.tracked_startup = true;
+    else if (argument == "--direct-policy-start") result.direct_policy_start = true;
+    else if (argument == "--coherent-action-send") result.coherent_action_send = true;
+    else if (argument == "--walk-020" || argument == "--walk-025" || argument == "--walk-030") {
+      if (result.walk_speed > 0.0) throw std::runtime_error("only one walking profile can be selected");
+      result.walk_speed = argument == "--walk-020" ? .20 : argument == "--walk-025" ? .25 : .30;
+    }
+    else if (argument == "--sling-ready-fd" || argument == "--operator-status-fd") {
+      const auto fd = unsigned_number(value());
+      if (fd < 3 || fd > static_cast<unsigned>(std::numeric_limits<int>::max()))
+        throw std::runtime_error("invalid sling pipe descriptor");
+      (argument == "--sling-ready-fd" ? result.sling_ready_fd : result.operator_status_fd) = static_cast<int>(fd);
+    }
     else if (argument == "--saturate-policy-torque-to-commissioning-cap") {
       result.saturate_policy_torque = true;
     }
@@ -545,7 +598,47 @@ Options parse_options(int argc, char** argv) {
   if (result.measured_pose_hold && result.policy_actuation) {
     throw std::runtime_error("measured-pose hold and policy actuation are mutually exclusive");
   }
-  const std::string required_ack = result.measured_pose_hold
+  if (result.tracked_startup && !result.supermimic_commissioning) {
+    throw std::runtime_error("tracked startup requires strict SuperMimic commissioning");
+  }
+  if (result.direct_policy_start && !result.tracked_startup)
+    throw std::runtime_error("direct policy start requires protected tracked transport");
+  if (result.coherent_action_send && !result.direct_policy_start)
+    throw std::runtime_error("coherent send requires direct protected control");
+  if (result.supermimic_commissioning && result.realtime_priority != kSuperMimicRealtimePriority) {
+    throw std::runtime_error("SuperMimic commissioning requires SCHED_FIFO priority 50");
+  }
+  const bool sling = result.sling_ready_fd >= 0 || result.operator_status_fd >= 0;
+  const bool walking = result.walk_speed > 0.0;
+  const auto sling_duration = walking ? sprite_policy::kWalkDurationSeconds
+                                             : sprite_policy::kSlingDurationSeconds;
+  if (walking && !sling) throw std::runtime_error("walking requires the sling and operator channels");
+  if (sling && (result.sling_ready_fd < 0 || result.operator_status_fd < 0 ||
+      result.sling_ready_fd == result.operator_status_fd || !result.tracked_startup ||
+      !result.supermimic_commissioning || result.duration_s != sling_duration)) {
+    throw std::runtime_error("sling window requires both pipes and the bounded tracked SuperMimic schedule");
+  }
+  const bool supermimic_extended = result.supermimic_commissioning &&
+      result.policy_actuation && (result.duration_s == 6.0 || result.duration_s == 10.0);
+  if (result.supermimic_commissioning &&
+      (result.measured_pose_hold || result.saturate_policy_torque || result.bounded_shadow_preview ||
+       !result.extended_policy_actuation_acknowledgement.empty() || result.ipc_socket.empty() ||
+       result.joint_safety_config.empty() ||
+       (!sling && !supermimic_extended && result.duration_s > (result.policy_actuation ? 2.0 : 10.0)) ||
+       result.duration_s < 0.02 || std::abs(result.duration_s * 50 - std::round(result.duration_s * 50)) > 1.0e-9)) {
+    throw std::runtime_error("SuperMimic commissioning requires strict IPC and a bounded duration");
+  }
+  const std::string required_ack = walking
+      ? std::string(result.policy_actuation ? "ENABLE_SUPERMIMIC_WALK_" : "PREVIEW_SUPERMIMIC_WALK_") +
+          (result.walk_speed == .20 ? "020_10S" : result.walk_speed == .25 ? "025_10S" : "030_10S")
+      : sling
+      ? (result.policy_actuation ? "ENABLE_SUPERMIMIC_ZERO_SPD_SLING_WINDOW" : "ZERO_GAIN_SUPERMIMIC_SLING_WINDOW")
+      : supermimic_extended
+      ? (result.duration_s == 6.0 ? "ENABLE_SUSPENDED_SUPERMIMIC_LOW_GAIN_6S"
+                                  : "ENABLE_SUSPENDED_SUPERMIMIC_LOW_GAIN_10S")
+      : result.supermimic_commissioning
+      ? (result.policy_actuation ? "ENABLE_SUSPENDED_SUPERMIMIC_LOW_GAIN" : "ZERO_GAIN_SUPERMIMIC_WRITEBACK")
+      : result.measured_pose_hold
       ? "ENABLE_NATIVE_FULL_BODY_MEASURED_POSE_HOLD"
       : result.policy_actuation ? "ENABLE_NATIVE_PROTECTED_POLICY_ACTUATION"
                                 : "ZERO_GAIN_NATIVE_SHADOW";
@@ -585,18 +678,18 @@ Options parse_options(int argc, char** argv) {
     const bool acknowledged_60_seconds =
         result.extended_policy_actuation_acknowledgement ==
         "ENABLE_60_SECOND_GROUNDED_LOWER_BODY_SIM_PD_TEST";
-    if (result.duration_s > 10.0 &&
+    if (!sling && result.duration_s > 10.0 &&
         !acknowledged_20_seconds && !acknowledged_40_seconds &&
         !acknowledged_60_seconds) {
       throw std::runtime_error(
           "protected policy actuation over 10 seconds requires the exact extended-test acknowledgement");
     }
-    if (result.duration_s > 20.0 &&
+    if (!sling && result.duration_s > 20.0 &&
         !acknowledged_40_seconds && !acknowledged_60_seconds) {
       throw std::runtime_error(
           "protected policy actuation over 20 seconds requires the exact 40-second acknowledgement");
     }
-    if (result.duration_s > 40.0 && !acknowledged_60_seconds) {
+    if (!walking && result.duration_s > 40.0 && !acknowledged_60_seconds) {
       throw std::runtime_error(
           "protected policy actuation over 40 seconds requires the exact 60-second lower-body sim-PD acknowledgement");
     }
@@ -662,13 +755,24 @@ std::array<std::uint8_t, 8> zero_gain_payload(const Motor& motor) {
   return data;
 }
 
-Socket open_socket(const std::string& interface) {
+Socket open_socket(const std::string& interface, bool timestamp_feedback = false, bool trace_tx = false) {
   const int fd = socket(PF_CAN, SOCK_RAW | SOCK_NONBLOCK, CAN_RAW);
   if (fd < 0) throw std::runtime_error("failed to open CAN socket");
   int enable_fd = 1;
   if (setsockopt(fd, SOL_CAN_RAW, CAN_RAW_FD_FRAMES, &enable_fd, sizeof(enable_fd)) != 0) {
     close(fd);
     throw std::runtime_error("failed to enable CAN-FD");
+  }
+  if (timestamp_feedback) {
+    int flags = SOF_TIMESTAMPING_RX_HARDWARE | SOF_TIMESTAMPING_RX_SOFTWARE |
+                SOF_TIMESTAMPING_SOFTWARE | SOF_TIMESTAMPING_RAW_HARDWARE;
+    if(trace_tx) flags |= SOF_TIMESTAMPING_TX_HARDWARE | SOF_TIMESTAMPING_TX_SOFTWARE |
+                         SOF_TIMESTAMPING_OPT_ID | SOF_TIMESTAMPING_OPT_TSONLY |
+                         SOF_TIMESTAMPING_OPT_TX_SWHW;
+    if (setsockopt(fd, SOL_SOCKET, SO_TIMESTAMPING, &flags, sizeof(flags)) != 0) {
+      close(fd);
+      throw std::runtime_error("failed to enable kernel CAN feedback timestamps");
+    }
   }
   ifreq request{};
   std::strncpy(request.ifr_name, interface.c_str(), IFNAMSIZ - 1);
@@ -683,7 +787,20 @@ Socket open_socket(const std::string& interface) {
     close(fd);
     throw std::runtime_error("failed to bind CAN interface: " + interface);
   }
-  return Socket{interface, fd};
+  if (trace_tx) {
+    hwtstamp_config config{};
+    request.ifr_data = reinterpret_cast<char*>(&config);
+    if (ioctl(fd, SIOCGHWTSTAMP, &request) || config.tx_type != HWTSTAMP_TX_ON ||
+        config.rx_filter != HWTSTAMP_FILTER_ALL) {
+      close(fd);
+      throw std::runtime_error("coherent action sending requires active TX/RX hardware timestamps: " + interface);
+    }
+  }
+  Socket result;
+  result.interface = interface;
+  result.fd = fd;
+  if (trace_tx) result.tx_trace.prepare();
+  return result;
 }
 
 IpcSocket open_ipc_server(const std::string& path) {
@@ -728,8 +845,45 @@ void close_ipc(IpcSocket& ipc) {
   ipc.server_fd = -1;
 }
 
+void require_supermimic_deadline(std::int64_t source_ns, std::int64_t finish_ns) {
+  if (source_ns <= 0 || finish_ns < source_ns || finish_ns - source_ns > kSuperMimicDeadlineNs) {
+    throw std::runtime_error("SuperMimic oldest-feedback 20 ms deadline exceeded");
+  }
+}
+
+void check_policy_cycle_deadline(IpcSocket& ipc, std::int64_t source_ns,
+                                 std::int64_t finish_ns, const char* stage) {
+  try {
+    require_supermimic_deadline(source_ns, finish_ns);
+  } catch (...) {
+    ipc.deadline_stage = stage;
+    throw;
+  }
+}
+
+void pack_supermimic_polls(std::vector<Motor>& motors) {
+  std::map<std::string, int> next_phase;
+  for (const auto& motor : motors) {
+    if (motor.poll_rate_hz == 500) next_phase[motor.interface] = -1;
+  }
+  for (auto& motor : motors) {
+    auto& next = next_phase[motor.interface];
+    if (next >= 0) motor.poll_phase = ++next;
+    if (motor.poll_rate_hz == 50 && motor.poll_phase >= static_cast<int>(kSuperMimicFirstPublishSlot))
+      throw std::runtime_error("SuperMimic poll does not fit the feedback window");
+  }
+}
+
+const Motor* first_missing_policy_feedback(const std::vector<Motor>& motors, std::int64_t cycle_start) {
+  const auto missing = std::find_if(motors.begin(), motors.end(), [cycle_start](const Motor& motor) {
+    const auto cutoff = motor.poll_rate_hz == 50 ? motor.cycle_poll_ns : cycle_start;
+    return cutoff < cycle_start || motor.feedback_ns < cutoff;
+  });
+  return missing == motors.end() ? nullptr : &*missing;
+}
+
 void send_state_packet(IpcSocket& ipc, const std::vector<Motor>& motors,
-                       std::uint64_t motor_hash, std::int64_t now_ns) {
+                       std::uint64_t motor_hash, std::int64_t now_ns, bool strict = false) {
   StatePacket packet{};
   std::memcpy(packet.magic, "SPRT", 4);
   packet.version = kIpcVersion;
@@ -737,22 +891,33 @@ void send_state_packet(IpcSocket& ipc, const std::vector<Motor>& motors,
   packet.sequence = ++ipc.state_sequence;
   packet.monotonic_ns = now_ns;
   packet.motor_order_hash = motor_hash;
+  std::size_t oldest_motor = 0;
   for (std::size_t index = 0; index < motors.size(); ++index) {
+    if (strict && motors[index].feedback_ns < packet.monotonic_ns) {
+      packet.monotonic_ns = motors[index].feedback_ns;
+      oldest_motor = index;
+    }
     packet.position_rad[index] = motors[index].last_position;
     packet.velocity_rad_s[index] = motors[index].last_velocity;
+  }
+  if (strict) {
+    ipc.timing.push_back({packet.sequence, packet.monotonic_ns, 0, 0, 0, 0, oldest_motor});
+    check_policy_cycle_deadline(ipc, packet.monotonic_ns, now_ns, "can_feedback_age_at_publish");
+    ipc.source_feedback_ns = packet.monotonic_ns;
   }
   const ssize_t sent = send(ipc.client_fd, &packet, sizeof(packet), MSG_DONTWAIT | MSG_NOSIGNAL);
   if (sent != static_cast<ssize_t>(sizeof(packet))) {
     throw std::runtime_error("failed to publish native state IPC packet");
   }
+  if (strict) ipc.timing.back().publish_ns = now_ns;
 }
 
 void drain_target_packets(IpcSocket& ipc, std::uint64_t policy_joint_hash,
                           const std::vector<JointSafety>& joint_safety,
-                          std::int64_t now_ns) {
+                          std::int64_t now_ns, bool strict = false) {
   while (true) {
     TargetPacket packet{};
-    const ssize_t received = recv(ipc.client_fd, &packet, sizeof(packet), MSG_DONTWAIT);
+    const ssize_t received = recv(ipc.client_fd, &packet, sizeof(packet), MSG_DONTWAIT | MSG_TRUNC);
     if (received < 0 && (errno == EAGAIN || errno == EWOULDBLOCK)) return;
     if (received < 0) {
       const int receive_errno = errno;
@@ -762,13 +927,24 @@ void drain_target_packets(IpcSocket& ipc, std::uint64_t policy_joint_hash,
     if (received == 0) throw std::runtime_error("policy IPC client disconnected");
     if (received != static_cast<ssize_t>(sizeof(packet)) ||
         std::memcmp(packet.magic, "SPRT", 4) != 0 || packet.version != kIpcVersion ||
-        packet.kind != kTargetKind || packet.joint_order_hash != policy_joint_hash) {
+        packet.kind != kTargetKind || packet.joint_order_hash != policy_joint_hash ||
+        packet.monotonic_ns <= 0) {
       throw std::runtime_error("policy IPC target ABI/order invariant failed");
     }
     if (packet.sequence <= ipc.last_target_sequence ||
         packet.source_state_sequence > ipc.state_sequence ||
         ipc.state_sequence - packet.source_state_sequence > 5) {
       throw std::runtime_error("policy IPC target sequence invariant failed");
+    }
+    if (strict) {
+      now_ns = monotonic_ns();
+      if (!packet.source_state_sequence || packet.source_state_sequence != ipc.state_sequence ||
+          packet.source_state_sequence <= ipc.last_target_source_sequence || packet.monotonic_ns > now_ns) {
+        throw std::runtime_error("SuperMimic target does not match the pending motor state");
+      }
+      ipc.timing.back().actor_target_ns = packet.monotonic_ns;
+      ipc.timing.back().receive_ns = now_ns;
+      check_policy_cycle_deadline(ipc, ipc.source_feedback_ns, packet.monotonic_ns, "actor_target_timestamp");
     }
     const std::int64_t age_ns = now_ns - packet.monotonic_ns;
     if (age_ns < -5'000'000LL || age_ns > kTargetTimeoutNs) {
@@ -780,6 +956,10 @@ void drain_target_packets(IpcSocket& ipc, std::uint64_t policy_joint_hash,
       if (!std::all_of(values.begin(), values.end(), [](double value) { return std::isfinite(value); }) ||
           packet.kp[index] < 0.0 || packet.kd[index] < 0.0 || packet.kd[index] > 5.0) {
         throw std::runtime_error("policy IPC target numeric/gain invariant failed");
+      }
+      // The frozen SuperMimic control profile uses zero joint feedforward.
+      if (strict && packet.feedforward_torque_nm[index] != 0.0) {
+        throw std::runtime_error("SuperMimic joint feedforward must be zero");
       }
       if (!joint_safety.empty()) {
         constexpr double tolerance = 1.0e-9;
@@ -797,6 +977,14 @@ void drain_target_packets(IpcSocket& ipc, std::uint64_t policy_joint_hash,
       }
     }
     ipc.last_target_sequence = packet.sequence;
+    if (strict) {
+      const auto accepted_ns = monotonic_ns();
+      check_policy_cycle_deadline(ipc, ipc.source_feedback_ns, accepted_ns, "target_ipc_accept");
+      ipc.timing.back().accept_ns = accepted_ns;
+      ipc.maximum_feedback_to_target_ms = std::max(
+          ipc.maximum_feedback_to_target_ms, (accepted_ns - ipc.source_feedback_ns) / 1.0e6);
+      ipc.last_target_source_sequence = packet.source_state_sequence;
+    }
     ipc.last_target_ns = packet.monotonic_ns;
     ipc.latest_target = packet;
     ipc.has_target = true;
@@ -806,9 +994,40 @@ void drain_target_packets(IpcSocket& ipc, std::uint64_t policy_joint_hash,
   }
 }
 
+void use_peak_pd_command_caps(std::vector<Motor>& motors) {
+  for (auto& motor : motors) {
+    motor.commissioning_torque_cap = 0.90 * motor.mechanical_peak_torque;
+    if (motor.name.find("ankle_motor") != std::string::npos) {
+      motor.commissioning_torque_cap = std::min({motor.commissioning_torque_cap,
+                                               -motor.torque_min, motor.torque_max});
+    }
+  }
+}
+
+void limit_pd_ankle_pair(Motor& a, Motor& b) {
+  double scale = 1.0;
+  for (auto* motor : {&a, &b}) {
+    const double request = motor->preview_feedforward_torque;
+    if (!std::isfinite(request)) throw std::runtime_error("nonfinite ankle PD torque");
+    motor->preview_maximum_abs_unsaturated_torque = std::max(
+        motor->preview_maximum_abs_unsaturated_torque, std::abs(request));
+    const double code_step = (motor->torque_max - motor->torque_min) / 4095.0;
+    const double usable = motor->commissioning_torque_cap - code_step;
+    if (usable <= 0.) throw std::runtime_error("ankle cap has no quantization margin");
+    if (std::abs(request) > usable) scale = std::min(scale, usable / std::abs(request));
+  }
+  if (scale < 1.) {
+    a.preview_feedforward_torque *= scale;
+    b.preview_feedforward_torque *= scale;
+    ++a.policy_torque_saturation_count;
+    ++b.policy_torque_saturation_count;
+  }
+}
+
 void preview_final_motor_commands(std::vector<Motor>& motors, IpcSocket& ipc,
                                   const NativeKinematics& kinematics,
-                                  bool saturate_to_commissioning_cap = false) {
+                                  bool saturate_to_commissioning_cap = false,
+                                  bool pd_position_saturation = false) {
   if (!ipc.has_target) return;
   std::array<double, kJointCount> joint_position{};
   std::array<double, kJointCount> joint_velocity{};
@@ -842,10 +1061,17 @@ void preview_final_motor_commands(std::vector<Motor>& motors, IpcSocket& ipc,
         raw, -kinematics.joint_effort_limit[joint], kinematics.joint_effort_limit[joint]);
   }
   const bool update_other_motors = ipc.motor_preview_count % 10 == 0;
+  std::array<Motor*, 4> ankle_motors{};
   for (std::size_t motor_index = 0; motor_index < kJointCount; ++motor_index) {
     auto& motor = motors[motor_index];
     const bool ankle = motor.name.find("ankle_motor") != std::string::npos;
     if (ankle) {
+      if (pd_position_saturation) {
+        if (motor.name == "left_ankle_motor_a") ankle_motors[0] = &motor;
+        if (motor.name == "left_ankle_motor_b") ankle_motors[1] = &motor;
+        if (motor.name == "right_ankle_motor_a") ankle_motors[2] = &motor;
+        if (motor.name == "right_ankle_motor_b") ankle_motors[3] = &motor;
+      }
       motor.preview_position = motor.last_position;
       motor.preview_velocity = 0.0;
       motor.preview_kp = 0.0;
@@ -887,6 +1113,14 @@ void preview_final_motor_commands(std::vector<Motor>& motors, IpcSocket& ipc,
       }
       motor.preview_initialized = true;
     }
+  }
+  if (pd_position_saturation) {
+    if (std::any_of(ankle_motors.begin(), ankle_motors.end(), [](const Motor* m) { return !m; }))
+      throw std::runtime_error("missing parallel ankle motor for PD torque saturation");
+    limit_pd_ankle_pair(*ankle_motors[0], *ankle_motors[1]);
+    limit_pd_ankle_pair(*ankle_motors[2], *ankle_motors[3]);
+  }
+  for (auto& motor : motors) {
     if (!motor.preview_initialized) continue;
     const double estimated_torque = motor.preview_kp *
             (motor.preview_position - motor.last_position) +
@@ -936,9 +1170,11 @@ void preview_final_motor_commands(std::vector<Motor>& motors, IpcSocket& ipc,
         motor.preview_kd < 0.0 || motor.preview_kd > 5.0 + tolerance ||
         std::abs(motor.preview_feedforward_torque) >
             std::min(std::abs(motor.torque_min), motor.torque_max) + tolerance ||
-        std::abs(protected_estimated_torque) >
-            std::min(std::abs(motor.torque_min), motor.torque_max) + tolerance ||
-        std::abs(protected_estimated_torque) > motor.mechanical_peak_torque + tolerance) {
+        !std::isfinite(protected_estimated_torque) ||
+        (!pd_position_saturation &&
+         (std::abs(protected_estimated_torque) >
+              std::min(std::abs(motor.torque_min), motor.torque_max) + tolerance ||
+          std::abs(protected_estimated_torque) > motor.mechanical_peak_torque + tolerance))) {
       throw std::runtime_error("final motor command preview invariant failed for " + motor.name);
     }
     motor.preview_maximum_abs_position =
@@ -964,12 +1200,15 @@ void send_poll(Socket& socket, Motor& motor) {
   frame.len = 8;
   frame.flags = CANFD_BRS;
   std::copy(data.begin(), data.end(), frame.data);
+  const auto begin = socket.tx_trace.enabled ? monotonic_ns() : 0;
+  const auto realtime = socket.tx_trace.enabled ? sprite_policy::realtime_now_ns() : 0;
   const ssize_t sent = write(socket.fd, &frame, CANFD_MTU);
   if (sent != CANFD_MTU) {
     throw std::runtime_error(
         "CAN-FD zero-gain write failed for " + motor.name + ": " + std::strerror(errno));
   }
   ++motor.tx_count;
+  socket.tx_trace.sent(motor.can_id, begin, socket.tx_trace.enabled ? monotonic_ns() : 0, realtime);
 }
 
 std::array<std::uint8_t, 8> hold_payload(
@@ -1001,7 +1240,8 @@ std::array<std::uint8_t, 8> hold_payload(
       static_cast<std::uint8_t>(torque)};
 }
 
-std::array<std::uint8_t, 8> protected_policy_payload(Motor& motor, bool bounded = false) {
+std::array<std::uint8_t, 8> protected_policy_payload(Motor& motor, bool bounded = false,
+                                                      bool pd_position_saturation = false) {
   constexpr double tolerance = 1.0e-9;
   const double position = motor.preview_position;
   const double velocity = motor.preview_velocity;
@@ -1021,23 +1261,45 @@ std::array<std::uint8_t, 8> protected_policy_payload(Motor& motor, bool bounded 
       kp < 0.0 || kp > 500.0 || kd < 0.0 || kd > 5.0) {
     throw std::runtime_error("protected policy command envelope failed for " + motor.name);
   }
-  const auto p = encode_uint(position, motor.position_min, motor.position_max, 16);
+  auto p = encode_uint(position, motor.position_min, motor.position_max, 16);
   const auto v = encode_uint(velocity, motor.velocity_min, motor.velocity_max, 12);
   auto kp_raw = encode_uint(kp, 0.0, 500.0, 12);
   auto kd_raw = encode_uint(kd, 0.0, 5.0, 12);
   auto torque = encode_uint(feedforward, motor.torque_min, motor.torque_max, 12);
-  const double encoded_position = decode_uint(p, motor.position_min, motor.position_max, 16);
   const double encoded_velocity = decode_uint(v, motor.velocity_min, motor.velocity_max, 12);
   const auto estimate = [&]() {
-    return decode_uint(kp_raw, 0.0, 500.0, 12) * (encoded_position - motor.last_position) +
+    return decode_uint(kp_raw, 0.0, 500.0, 12) *
+        (decode_uint(p, motor.position_min, motor.position_max, 16) - motor.last_position) +
         decode_uint(kd_raw, 0.0, 5.0, 12) * (encoded_velocity - motor.last_velocity) +
         decode_uint(torque, motor.torque_min, motor.torque_max, 12);
   };
   double estimated = estimate();
+  if (pd_position_saturation) {
+    double lower = std::max({motor.soft_position_min, motor.hard_position_min, motor.position_min});
+    double upper = std::min({motor.soft_position_max, motor.hard_position_max, motor.position_max});
+    const double encoded_kp = decode_uint(kp_raw, 0.0, 500.0, 12);
+    if (encoded_kp > 0.0) {
+      const double offset_torque =
+          decode_uint(kd_raw, 0.0, 5.0, 12) * (encoded_velocity - motor.last_velocity) +
+          decode_uint(torque, motor.torque_min, motor.torque_max, 12);
+      const double cap = motor.commissioning_torque_cap;
+      lower = std::max(lower, motor.last_position + (-cap - offset_torque) / encoded_kp);
+      upper = std::min(upper, motor.last_position + (cap - offset_torque) / encoded_kp);
+    }
+    const double codes_per_rad = 65535.0 / (motor.position_max - motor.position_min);
+    const double first = std::ceil((lower - motor.position_min) * codes_per_rad);
+    const double last = std::floor((upper - motor.position_min) * codes_per_rad);
+    if (!(0.0 <= first && first <= last && last <= 65535.0)) {
+      throw std::runtime_error("no safe quantized PD position for " + motor.name);
+    }
+    if (std::abs(estimated) > motor.commissioning_torque_cap) ++motor.policy_torque_saturation_count;
+    p = std::clamp(p, static_cast<std::uint32_t>(first), static_cast<std::uint32_t>(last));
+    estimated = estimate();
+  }
   // Re-evaluate the actual wire values against the latest feedback. Reducing
   // impedance and feedforward together preserves cancellation; never shift the
   // target out of its validated envelope or relax the final torque guard.
-  if (bounded && std::isfinite(estimated) &&
+  if (!pd_position_saturation && bounded && std::isfinite(estimated) &&
       std::abs(estimated) > motor.commissioning_torque_cap + tolerance) {
     double scale = 1.0;
     for (int attempt = 0; attempt < 32 &&
@@ -1079,10 +1341,13 @@ void send_payload(Socket& socket, Motor& motor,
   frame.len = 8;
   frame.flags = CANFD_BRS;
   std::copy(data.begin(), data.end(), frame.data);
+  const auto begin = socket.tx_trace.enabled ? monotonic_ns() : 0;
+  const auto realtime = socket.tx_trace.enabled ? sprite_policy::realtime_now_ns() : 0;
   if (write(socket.fd, &frame, CANFD_MTU) != CANFD_MTU) {
     throw std::runtime_error("CAN-FD hold write failed for " + motor.name);
   }
   ++motor.tx_count;
+  socket.tx_trace.sent(motor.can_id, begin, socket.tx_trace.enabled ? monotonic_ns() : 0, realtime);
 }
 
 void send_special(Socket& socket, Motor& motor, std::uint8_t opcode) {
@@ -1226,15 +1491,52 @@ void update_temperature_filter(Motor& motor, double mos_c, double rotor_c) {
       motor.maximum_filtered_rotor_temperature, motor.filtered_rotor_temperature);
 }
 
+ssize_t read_timestamped_feedback(int fd, canfd_frame& frame, std::int64_t& feedback_ns) {
+  alignas(cmsghdr) std::array<unsigned char, CMSG_SPACE(3 * sizeof(timespec))> control{};
+  iovec buffer{&frame, sizeof(frame)};
+  msghdr message{};
+  message.msg_iov = &buffer;
+  message.msg_iovlen = 1;
+  message.msg_control = control.data();
+  message.msg_controllen = control.size();
+  const auto size = recvmsg(fd, &message, MSG_DONTWAIT);
+  if (size != CANFD_MTU) return size;
+  if (message.msg_flags & (MSG_TRUNC | MSG_CTRUNC)) {
+    throw std::runtime_error("truncated kernel CAN feedback timestamp");
+  }
+  for (auto* header = CMSG_FIRSTHDR(&message); header; header = CMSG_NXTHDR(&message, header)) {
+    if (header->cmsg_level != SOL_SOCKET || header->cmsg_type != SO_TIMESTAMPING ||
+        header->cmsg_len < CMSG_LEN(3 * sizeof(timespec))) continue;
+    std::array<timespec, 3> stamp{};
+    std::memcpy(stamp.data(), CMSG_DATA(header), sizeof(stamp));
+    if ((!stamp[2].tv_sec && !stamp[2].tv_nsec) || !stamp[0].tv_sec) break;
+    // Software RX is in CLOCK_REALTIME. Sample monotonic first so conversion
+    // includes userspace dequeue delay and errs toward an older source stamp.
+    const auto now_ns = monotonic_ns();
+    timespec realtime{};
+    if (clock_gettime(CLOCK_REALTIME, &realtime) != 0) break;
+    const auto age = (realtime.tv_sec - stamp[0].tv_sec) * 1'000'000'000LL +
+                     realtime.tv_nsec - stamp[0].tv_nsec;
+    if (age < 0 || age > 30'000'000LL || now_ns <= age) break;
+    feedback_ns = now_ns - age;
+    return size;
+  }
+  throw std::runtime_error("missing, stale or future kernel CAN feedback timestamp");
+}
+
 void drain_policy_feedback(
     std::vector<Socket>& sockets, std::vector<Motor>& motors,
     const std::map<std::pair<std::string, int>, std::size_t>& feedback_map,
-    int expected_status, bool enforce_dynamic_guards) {
+    int expected_status, bool enforce_dynamic_guards, bool timestamp_feedback = false) {
   for (auto& can_socket : sockets) {
     while (true) {
       canfd_frame frame{};
-      const ssize_t received = read(can_socket.fd, &frame, CANFD_MTU);
+      std::int64_t feedback_ns = 0;
+      const ssize_t received = timestamp_feedback
+          ? read_timestamped_feedback(can_socket.fd, frame, feedback_ns)
+          : read(can_socket.fd, &frame, CANFD_MTU);
       if (received < 0 && (errno == EAGAIN || errno == EWOULDBLOCK)) break;
+      if (received < 0 && expected_status < 0 && !enforce_dynamic_guards) break;
       if (received != CANFD_MTU || frame.len != 8 || (frame.flags & CANFD_BRS) == 0) {
         // A bus fault can leave stale or malformed frames queued while shutting
         // down. Keep polling for a valid disabled reply from every endpoint.
@@ -1245,6 +1547,9 @@ void drain_policy_feedback(
       const auto found = feedback_map.find({can_socket.interface, frame_id});
       if (found == feedback_map.end()) continue;
       auto& motor = motors[found->second];
+      if (timestamp_feedback && feedback_ns <= motor.feedback_ns) {
+        throw std::runtime_error("CAN feedback timestamp regressed for " + motor.name);
+      }
       const int controller_id = frame.data[0] & 0x0F;
       const int status_code = (frame.data[0] >> 4) & 0x0F;
       const bool status_valid = expected_status >= 0
@@ -1275,18 +1580,23 @@ void drain_policy_feedback(
       const double feedback_torque =
           decode_uint(raw_torque, motor.torque_min, motor.torque_max, 12);
       motor.last_status_code = status_code;
+      if (timestamp_feedback) motor.feedback_ns = feedback_ns;
       motor.maximum_abs_speed =
           std::max(motor.maximum_abs_speed, std::abs(motor.last_velocity));
       motor.maximum_abs_feedback_torque = std::max(
           motor.maximum_abs_feedback_torque, std::abs(feedback_torque));
-      if (enforce_dynamic_guards && status_code == 1) {
+      const bool monitor_sample = !motor.cadence_monitors ||
+          (motor.monitor_poll_ns > 0 && feedback_ns >= motor.monitor_poll_ns);
+      if (monitor_sample) motor.monitor_poll_ns = 0;
+      if (motor.cadence_monitors && monitor_sample) ++motor.monitor_samples;
+      if (enforce_dynamic_guards && status_code == 1 && monitor_sample) {
         update_torque_rms_monitor(motor, feedback_torque);
       }
       motor.maximum_mos_temperature =
           std::max(motor.maximum_mos_temperature, static_cast<int>(frame.data[6]));
       motor.maximum_rotor_temperature =
           std::max(motor.maximum_rotor_temperature, static_cast<int>(frame.data[7]));
-      update_temperature_filter(
+      if (monitor_sample) update_temperature_filter(
           motor, static_cast<double>(frame.data[6]), static_cast<double>(frame.data[7]));
       if (frame.data[6] >= motor.mos_temperature_limit ||
           frame.data[7] >= motor.rotor_temperature_limit) {
@@ -1555,8 +1865,24 @@ int run_native_protected_policy(
     const NativeKinematics& kinematics, const std::vector<JointSafety>& joint_safety,
     IpcSocket& ipc, std::uint64_t motor_hash, bool memory_locked) {
   std::string failure;
+  const bool strict = options.supermimic_commissioning;
+  const bool powered = options.policy_actuation;
+  const bool bound_command = options.saturate_policy_torque;
+  const bool pd_position_saturation = options.tracked_startup;
+  const bool sling = options.sling_ready_fd >= 0;
+  const bool walking = options.walk_speed > 0.0;
+  bool sling_window_opened = false;
+  bool sling_blend_started = false;
+  std::int64_t sling_notice_ns = 0;
+  std::int64_t sling_notice_to_blend_ns = 0;
+  std::uint64_t sling_checked_target_sequence = 0;
+  sprite_policy::SlingReadiness sling_readiness{};
+  sprite_policy::SlingReadiness walk_readiness{};
+  std::size_t enable_attempts = 0;
   std::size_t deadline_misses = 0;
   double maximum_lateness_ms = 0.0;
+  const std::size_t transport_slots =
+      static_cast<std::size_t>(std::llround(options.duration_s * kTransportRateHz));
   std::vector<std::size_t> active_tx(kJointCount, 0);
   std::vector<std::size_t> active_rx(kJointCount, 0);
   auto due = [](const Motor& motor, std::size_t slot) {
@@ -1576,8 +1902,70 @@ int run_native_protected_policy(
       return motor.seen;
     });
   };
+  auto enforce_pending_deadline = [&]() {
+    if (strict && ipc.state_sequence > ipc.last_target_source_sequence) {
+      check_policy_cycle_deadline(ipc, ipc.source_feedback_ns, monotonic_ns(), "target_ipc_pending");
+    }
+  };
+  std::size_t last_published_cycle = std::numeric_limits<std::size_t>::max();
+  std::uint64_t active_action_sequence = 1;
+  std::size_t coherent_groups = 0;
+  sprite_policy::ActionTxContext active_action;
+  const auto drain_tx = [&]() {
+    for (auto& socket : sockets) socket.tx_trace.drain(socket.fd);
+  };
+  const auto publish = [&](std::size_t slot, std::int64_t epoch, bool preparing) {
+    const auto phase = slot % 40;
+    if (!strict) {
+      if (phase == 39 && all_seen()) send_state_packet(ipc, motors, motor_hash, monotonic_ns());
+      return;
+    }
+    if (phase < kSuperMimicFirstPublishSlot || phase > kSuperMimicLastPublishSlot ||
+        slot / 40 == last_published_cycle) return;
+    const auto cycle_start = epoch + static_cast<std::int64_t>(slot - phase) * kTransportPeriodNs;
+    if (const auto* missing = first_missing_policy_feedback(motors, cycle_start)) {
+      if (!preparing && phase == kSuperMimicLastPublishSlot) {
+        ipc.deadline_stage = "can_feedback_missing";
+        ipc.missing_feedback_motor = missing->name;
+        throw std::runtime_error("SuperMimic CAN feedback batch incomplete before publish");
+      }
+      return;
+    }
+    send_state_packet(ipc, motors, motor_hash, monotonic_ns(), true);
+    last_published_cycle = slot / 40;
+  };
+  const auto emit_status = [&](const char* message) {
+    const auto size = std::strlen(message);
+    if (write(options.operator_status_fd, message, size) != static_cast<ssize_t>(size))
+      throw std::runtime_error("sling operator status channel unavailable");
+  };
+  const auto read_readiness = [&](sprite_policy::SlingReadiness& readiness, std::uint64_t sequence) {
+    if (read(options.sling_ready_fd, &readiness, sizeof(readiness)) !=
+            static_cast<ssize_t>(sizeof(readiness)) ||
+        readiness.sequence != sequence || ipc.last_target_source_sequence < sequence) {
+      throw std::runtime_error("standing checkpoint missing current readiness");
+    }
+  };
 
   try {
+    if (sling) {
+      std::signal(SIGPIPE, SIG_IGN);
+      const int input_flags = fcntl(options.sling_ready_fd, F_GETFL);
+      const int output_flags = fcntl(options.operator_status_fd, F_GETFL);
+      if (input_flags < 0 || output_flags < 0 || !(input_flags & O_NONBLOCK) ||
+          !(output_flags & O_NONBLOCK) || (input_flags & O_ACCMODE) != O_RDONLY ||
+          (output_flags & O_ACCMODE) != O_WRONLY) {
+        throw std::runtime_error("invalid nonblocking sling channels");
+      }
+      emit_status("WAITING_FOR_ENABLE\n");
+    }
+    if (strict) {
+      if (prctl(PR_SET_TIMERSLACK, 1UL, 0UL, 0UL, 0UL) != 0)
+        throw std::runtime_error("cannot set strict CAN timer slack");
+      pack_supermimic_polls(motors);
+      ipc.timing.reserve(1 + transport_slots / 40);
+    }
+    if (pd_position_saturation) use_peak_pd_command_caps(motors);
     // Keep every drive disabled while obtaining complete state, live IMU policy
     // output, and the first zero-gain measured-pose startup target.
     constexpr std::size_t preparation_slots = 4000;
@@ -1589,13 +1977,15 @@ int run_native_protected_policy(
       }
       sleep_until(preparation_start + static_cast<std::int64_t>(slot) * kTransportPeriodNs);
       for (auto& motor : motors) {
-        if (due(motor, slot)) send_poll(sockets[socket_index.at(motor.interface)], motor);
+        if (!due(motor, slot)) continue;
+        if (strict && motor.poll_rate_hz == 50) motor.cycle_poll_ns = monotonic_ns();
+        send_poll(sockets[socket_index.at(motor.interface)], motor);
       }
-      drain_policy_feedback(sockets, motors, feedback_map, 0, false);
-      drain_target_packets(ipc, options.policy_joint_hash, joint_safety, monotonic_ns());
-      if (slot % 40 == 39 && all_seen()) {
-        send_state_packet(ipc, motors, motor_hash, monotonic_ns());
-      }
+      drain_policy_feedback(sockets, motors, feedback_map, 0, strict, strict);
+      drain_tx();
+      drain_target_packets(ipc, options.policy_joint_hash, joint_safety, monotonic_ns(), strict);
+      enforce_pending_deadline();
+      publish(slot, preparation_start, true);
       if (!ipc.has_target || !all_seen()) continue;
 
       std::array<double, kJointCount> measured_joint{};
@@ -1652,13 +2042,23 @@ int run_native_protected_policy(
     }
     ipc.motor_preview_count = 0;
 
-    for (auto& motor : motors) {
-      send_special(sockets[socket_index.at(motor.interface)], motor, 0xFC);
+    if (strict) {
+      // Check the quantized measured-pose command for every motor before enable.
+      preview_final_motor_commands(motors, ipc, kinematics, false, pd_position_saturation);
+      for (auto& motor : motors) (void)protected_policy_payload(motor, false, pd_position_saturation);
+      check_policy_cycle_deadline(ipc, ipc.source_feedback_ns, monotonic_ns(), "startup_before_enable");
+    }
+    if (powered) {
+      for (auto& motor : motors) {
+        ++enable_attempts;
+        send_special(sockets[socket_index.at(motor.interface)], motor, 0xFC);
+      }
     }
     for (auto& motor : motors) motor.tx_count = 0;
 
-    const std::size_t transport_slots =
-        static_cast<std::size_t>(std::llround(options.duration_s * kTransportRateHz));
+    for (auto& motor : motors) motor.cadence_monitors = options.coherent_action_send;
+
+    last_published_cycle = std::numeric_limits<std::size_t>::max();
     const std::int64_t start_ns = monotonic_ns() + 20'000'000LL;
     for (std::size_t slot = 0; slot < transport_slots; ++slot) {
       if (g_shutdown_requested) {
@@ -1673,26 +2073,85 @@ int run_native_protected_policy(
             std::max(0.0, static_cast<double>(woke_ns - deadline_ns) / 1.0e6);
         maximum_lateness_ms = std::max(maximum_lateness_ms, lateness_ms);
         deadline_misses += static_cast<std::size_t>(lateness_ms >= 2.0);
+        if (strict && lateness_ms >= 2.0) {
+          ipc.deadline_stage = "can_wake";
+          throw std::runtime_error("protected-policy realtime deadline gate failed");
+        }
       }
 
-      drain_target_packets(ipc, options.policy_joint_hash, joint_safety, woke_ns);
+      drain_target_packets(ipc, options.policy_joint_hash, joint_safety, woke_ns, strict);
+      enforce_pending_deadline();
       if (!ipc.has_target || woke_ns - ipc.last_target_ns > kTargetTimeoutNs) {
         throw std::runtime_error("protected-policy target watchdog expired");
       }
+      if (options.direct_policy_start && ipc.last_target_source_sequence>1) {
+        for (std::size_t j=0; j<kJointCount; ++j) {
+          if (ipc.latest_target.kp[j]!=joint_safety[j].kp_max ||
+              ipc.latest_target.kd[j]!=joint_safety[j].kd_max ||
+              ipc.latest_target.velocity_rad_s[j]!=0. ||
+              ipc.latest_target.feedforward_torque_nm[j]!=0.)
+            throw std::runtime_error("direct policy target must use full configured gains and pure PD");
+        }
+      }
+      if (sling && !sling_blend_started && ipc.last_target_source_sequence != sling_checked_target_sequence) {
+        sling_checked_target_sequence = ipc.last_target_source_sequence;
+        const auto nonzero_gain = [](double gain) { return gain != 0.0; };
+        const auto& target = ipc.latest_target;
+        if (std::any_of(std::begin(target.kp), std::end(target.kp), nonzero_gain) ||
+            std::any_of(std::begin(target.kd), std::end(target.kd), nonzero_gain)) {
+          if (!options.direct_policy_start && !sprite_policy::sling_notice_elapsed(sling_notice_ns, woke_ns))
+            throw std::runtime_error("sling policy ramp arrived before the two-second notice elapsed");
+          if (options.direct_policy_start)
+            emit_status(powered ? "POLICY_DIRECT\n" : "DRY_POLICY_DIRECT\n");
+          else emit_status(powered ? "POLICY_BLEND\n" : "DRY_POLICY_BLEND\n");
+          sling_notice_to_blend_ns = options.direct_policy_start?0:woke_ns - sling_notice_ns;
+          sling_blend_started = true;
+        }
+      }
+      const bool commit = options.coherent_action_send &&
+          sprite_policy::coherent_commit_due(slot, ipc.last_target_source_sequence,
+                                             active_action_sequence);
       if (slot % 4 == 0) {
-        preview_final_motor_commands(
-            motors, ipc, kinematics, options.saturate_policy_torque);
+        preview_final_motor_commands(motors, ipc, kinematics, bound_command, pd_position_saturation);
       }
-      for (auto& motor : motors) {
-        if (!due(motor, slot)) continue;
-        const auto payload = protected_policy_payload(motor, options.saturate_policy_torque);
-        send_payload(sockets[socket_index.at(motor.interface)], motor, payload);
+      // Validate the entire group before the first write. No old-action motor
+      // command may be interleaved once this single-threaded commit begins.
+      std::array<std::array<std::uint8_t, 8>, kJointCount> payloads{};
+      if (commit) {
+        for (std::size_t i=0; i<motors.size(); ++i)
+          payloads[i] = protected_policy_payload(motors[i], bound_command, pd_position_saturation);
+        const auto& timing = ipc.timing.back();
+        if (timing.sequence != ipc.last_target_source_sequence || !timing.accept_ns)
+          throw std::runtime_error("coherent action lacks accepted source timing");
+        active_action = {timing.sequence, timing.feedback_ns, timing.accept_ns, false, powered};
+        active_action_sequence = timing.sequence;
       }
+      for (std::size_t i=0; i<motors.size(); ++i) {
+        auto& motor = motors[i];
+        const bool nominal = due(motor, slot);
+        if (!commit && !nominal) continue;
+        const auto payload = commit ? payloads[i] :
+            protected_policy_payload(motor, bound_command, pd_position_saturation);
+        auto& socket = sockets[socket_index.at(motor.interface)];
+        socket.tx_trace.context = active_action;
+        socket.tx_trace.context.group = commit;
+        if (commit) check_policy_cycle_deadline(ipc, active_action.feedback_ns,
+                                                monotonic_ns(), "action_group_dispatch");
+        if (nominal) {
+          ++motor.nominal_sends;
+          motor.monitor_poll_ns = monotonic_ns();
+          if (strict && motor.poll_rate_hz == 50) motor.cycle_poll_ns = motor.monitor_poll_ns;
+        }
+        if (powered) send_payload(socket, motor, payload);
+        else send_poll(socket, motor);
+      }
+      if (commit) ++coherent_groups;
+      drain_tx();
       // Permit only the short enable transition; require all endpoints enabled
       // after 100 ms and throughout the remaining active interval.
       drain_policy_feedback(
-          sockets, motors, feedback_map, slot < 200 ? -1 : 1, true);
-      if (slot == 200) {
+          sockets, motors, feedback_map, powered ? (slot < 200 ? -1 : 1) : 0, true, strict);
+      if (powered && slot == 200) {
         for (const auto& motor : motors) {
           if (motor.last_status_code != 1) {
             throw std::runtime_error("protected-policy enable verification failed for " +
@@ -1700,12 +2159,62 @@ int run_native_protected_policy(
           }
         }
       }
-      if (slot % 40 == 39 && all_seen()) {
-        send_state_packet(ipc, motors, motor_hash, monotonic_ns());
+      if (sling && slot == 200) {
+        emit_status(powered ? "ENABLED_31\n" : "DRY_ENABLE_NOTICE\n");
+        sling_notice_ns = monotonic_ns();
       }
+      if (sling && slot % kTransportRateHz == 0) {
+        const auto seconds = slot / kTransportRateHz;
+        constexpr std::size_t first = sprite_policy::kSlingStandSeconds;
+        constexpr std::size_t last = first + sprite_policy::kSlingCountdownSeconds;
+        if (seconds == first) {
+          if (!sling_blend_started) throw std::runtime_error("sling policy ramp did not start");
+          read_readiness(sling_readiness, sprite_policy::kSlingReadySequence);
+          if (powered && !sprite_policy::sling_ready(sling_readiness, ipc.last_target_source_sequence,
+                                                    sprite_policy::kSlingReadySequence, !walking)) {
+            emit_status("NOT_STABLE\n");
+            throw std::runtime_error("zero-command standing not settled at sling checkpoint");
+          }
+          if (walking)
+            emit_status(powered ? "WALK_SLING_WINDOW_OPEN\n" : "DRY_WALK_SLING_WINDOW_OPEN\n");
+          else emit_status(powered ? "SLING_WINDOW_OPEN\n" : "DRY_WINDOW_OPEN\n");
+          sling_window_opened = powered;
+        } else if (seconds > first && seconds < last) {
+          char message[] = "COUNTDOWN_0\n";
+          message[10] = static_cast<char>('0' + last - seconds);
+          emit_status(message);
+        } else if (seconds == last) {
+          if (walking) {
+            read_readiness(walk_readiness, sprite_policy::kWalkReadySequence);
+            if (powered && !sprite_policy::sling_ready(walk_readiness, ipc.last_target_source_sequence,
+                                                      sprite_policy::kWalkReadySequence, false)) {
+              emit_status("NOT_STABLE\n");
+              throw std::runtime_error("zero-command standing not settled before walking");
+            }
+            emit_status(powered ? "WALK_RAMP\n" : "DRY_WALK_RAMP\n");
+          } else emit_status("WINDOW_END\n");
+        } else if (walking && seconds == sprite_policy::kWalkFullSeconds) {
+          emit_status(powered ? "WALK_FULL\n" : "DRY_WALK_FULL\n");
+        } else if (walking && seconds == sprite_policy::kWalkStopSeconds) {
+          emit_status(powered ? "WALK_STOP\n" : "DRY_WALK_STOP\n");
+        } else if (walking && seconds == sprite_policy::kWalkZeroSeconds) {
+          emit_status(powered ? "WALK_ZERO\n" : "DRY_WALK_ZERO\n");
+        }
+      }
+      publish(slot, start_ns, false);
     }
     usleep(2000);
-    drain_policy_feedback(sockets, motors, feedback_map, 1, true);
+    drain_policy_feedback(sockets, motors, feedback_map, powered ? 1 : 0, true, strict);
+    if (strict) {
+      drain_target_packets(ipc, options.policy_joint_hash, joint_safety, monotonic_ns(), strict);
+      if (ipc.target_count != 1 + transport_slots / 40 ||
+          ipc.last_target_source_sequence != ipc.state_sequence ||
+          (options.coherent_action_send &&
+           (active_action_sequence != ipc.last_target_source_sequence ||
+            coherent_groups + 1 != ipc.target_count))) {
+        throw std::runtime_error("SuperMimic writeback coverage incomplete");
+      }
+    }
     for (std::size_t index = 0; index < motors.size(); ++index) {
       active_tx[index] = motors[index].tx_count;
       active_rx[index] = motors[index].rx_count;
@@ -1727,48 +2236,97 @@ int run_native_protected_policy(
     active_rx[index] = motors[index].rx_count;
   }
 
-  try {
-    for (int attempt = 0; attempt < 3; ++attempt) {
-      for (auto& motor : motors) {
+  auto append_failure = [&](const std::string& error) {
+    if (!failure.empty()) failure += "; ";
+    failure += error;
+  };
+  bool disable_tx_failed = false;
+  for (auto& socket : sockets) socket.tx_trace.context = {};
+  for (auto& motor : motors) motor.cadence_monitors = false;
+  for (int attempt = 0; (!strict || enable_attempts) && attempt < 3; ++attempt) {
+    for (auto& motor : motors) {
+      try {
         send_special(sockets[socket_index.at(motor.interface)], motor, 0xFD);
+      } catch (const std::exception&) {
+        disable_tx_failed = true;
       }
-      usleep(10000);
     }
+    usleep(10000);
+  }
+  if (disable_tx_failed) append_failure("at least one disable transmission failed");
+  try {
     for (auto& motor : motors) {
       motor.seen = false;
       motor.final_disabled = false;
     }
     const std::int64_t verify_start = monotonic_ns() + 10'000'000LL;
+    bool verify_tx_failed = false;
     for (std::size_t slot = 0; slot < 400; ++slot) {
       sleep_until(verify_start + static_cast<std::int64_t>(slot) * kTransportPeriodNs);
       for (auto& motor : motors) {
-        if (due(motor, slot)) send_poll(sockets[socket_index.at(motor.interface)], motor);
+        if (!due(motor, slot)) continue;
+        try {
+          send_poll(sockets[socket_index.at(motor.interface)], motor);
+        } catch (const std::exception&) {
+          verify_tx_failed = true;
+        }
       }
-      drain_policy_feedback(sockets, motors, feedback_map, -1, false);
+      drain_policy_feedback(sockets, motors, feedback_map, powered ? -1 : 0, false);
+      // Evidence failure must never prevent the remaining disable-state polls.
+      try { drain_tx(); }
+      catch (const std::exception& error) { if (failure.find(error.what()) == std::string::npos) append_failure(error.what()); }
     }
     usleep(2000);
-    drain_policy_feedback(sockets, motors, feedback_map, -1, false);
+    drain_policy_feedback(sockets, motors, feedback_map, powered ? -1 : 0, false);
+    if (verify_tx_failed) append_failure("at least one final disabled-state poll failed");
     for (const auto& motor : motors) {
       if (!motor.final_disabled) {
         throw std::runtime_error("final disabled verification failed for " + motor.name);
       }
     }
   } catch (const std::exception& error) {
-    if (!failure.empty()) failure += "; ";
-    failure += error.what();
+    append_failure(error.what());
+  }
+  if (sling) {
+    const bool all_disabled = std::all_of(motors.begin(), motors.end(),
+        [](const Motor& motor) { return motor.final_disabled; });
+    try { emit_status(all_disabled ? "DISABLED_31\n" : "DISABLE_UNCONFIRMED\n"); }
+    catch (const std::exception& error) { append_failure(error.what()); }
   }
 
   std::ostringstream report;
   report << std::fixed << std::setprecision(6)
-      << "{\n  \"mode\": \"native_suspended_protected_policy_actuation\",\n"
+      << "{\n  \"mode\": \"" << (powered ? "native_suspended_protected_policy_actuation"
+                                               : "native_supermimic_zero_gain_writeback") << "\",\n"
       << "  \"duration_s\": " << options.duration_s << ",\n"
       << "  \"memory_locked\": " << (memory_locked ? "true" : "false") << ",\n"
       << "  \"deadline_misses\": " << deadline_misses << ",\n"
       << "  \"maximum_lateness_ms\": " << maximum_lateness_ms << ",\n"
       << "  \"policy_state_count\": " << ipc.state_sequence << ",\n"
       << "  \"policy_target_count\": " << ipc.target_count << ",\n"
+      << "  \"oldest_feedback_to_target_accept_max_ms\": " << ipc.maximum_feedback_to_target_ms << ",\n"
+      << "  \"deadline_stage\": \"" << ipc.deadline_stage << "\",\n"
+      << "  \"can_cpu\": " << options.cpu << ",\n"
+      << "  \"can_realtime_priority\": " << options.realtime_priority << ",\n"
+      << "  \"missing_feedback_motor\": \"" << ipc.missing_feedback_motor << "\",\n"
+      << "  \"motor_enable_attempts\": " << enable_attempts << ",\n"
       << "  \"policy_torque_saturation_enabled\": "
-      << (options.saturate_policy_torque ? "true" : "false") << ",\n"
+      << ((bound_command || pd_position_saturation) ? "true" : "false") << ",\n"
+      << "  \"pd_position_saturation\": " << (pd_position_saturation ? "true" : "false") << ",\n"
+      << "  \"tracked_startup\": " << (options.tracked_startup ? "true" : "false") << ",\n"
+      << "  \"direct_policy_start\": " << (options.direct_policy_start ? "true" : "false") << ",\n"
+      << "  \"coherent_action_send\": " << (options.coherent_action_send ? "true" : "false") << ",\n"
+      << "  \"coherent_action_groups\": " << coherent_groups << ",\n"
+      << "  \"sling_window_opened\": " << (sling_window_opened ? "true" : "false") << ",\n"
+      << "  \"sling_notice_to_blend_ms\": " << sling_notice_to_blend_ns / 1.0e6 << ",\n"
+      << "  \"sling_checkpoint_sequence\": " << sling_readiness.sequence << ",\n"
+      << "  \"sling_checkpoint_joint_frames\": " << sling_readiness.joint_stable_frames << ",\n"
+      << "  \"sling_checkpoint_body_frames\": " << sling_readiness.body_stable_frames << ",\n"
+      << "  \"walk_checkpoint_sequence\": " << walk_readiness.sequence << ",\n"
+      << "  \"walk_checkpoint_joint_frames\": " << walk_readiness.joint_stable_frames << ",\n"
+      << "  \"walk_checkpoint_body_frames\": " << walk_readiness.body_stable_frames << ",\n"
+      << "  \"walk_joint_settling_required\": " << (walking ? "false" : "true") << ",\n"
+      << "  \"walk_speed_m_s\": " << options.walk_speed << ",\n"
       << "  \"automatic_mode_switch_attempts\": 0,\n"
       << "  \"automatic_zero_reset_attempts\": 0,\n"
       << "  \"motors\": {\n";
@@ -1807,6 +2365,8 @@ int run_native_protected_policy(
         << ", \"max_unsaturated_torque_nm\": "
         << motor.preview_maximum_abs_unsaturated_torque
         << ", \"max_speed_rad_s\": " << motor.maximum_abs_speed
+        << ", \"nominal_sends\": " << motor.nominal_sends
+        << ", \"cadenced_monitor_samples\": " << motor.monitor_samples
         << ", \"final_disabled\": " << (motor.final_disabled ? "true" : "false")
         << "}" << (index + 1 == motors.size() ? "\n" : ",\n");
   }
@@ -1818,10 +2378,33 @@ int run_native_protected_policy(
   std::ofstream output(options.output);
   if (!output) throw std::runtime_error("cannot open protected-policy report output");
   output << report.str();
+  if (options.coherent_action_send) {
+    std::ofstream trace(options.output + ".tx.csv");
+    trace << "interface,packet_id,motor_id,sequence,feedback_ns,accept_ns,group,powered,call_begin_ns,call_end_ns,realtime_before_ns,software_realtime_ns,hardware_raw_ns,hardware_received_ns\n";
+    for (const auto& socket : sockets) for (const auto& e : socket.tx_trace.events)
+      trace << socket.interface << ',' << e.id << ',' << e.motor_id << ',' << e.context.sequence << ','
+            << e.context.feedback_ns << ',' << e.context.accepted_ns << ',' << e.context.group << ','
+            << e.context.powered << ',' << e.call_begin_ns << ',' << e.call_end_ns << ','
+            << e.realtime_before_ns << ',' << e.software_realtime_ns << ',' << e.hardware_raw_ns << ','
+            << e.hardware_received_ns << '\n';
+    trace.close();
+    if (!trace) throw std::runtime_error("cannot write action TX trace");
+  }
+  if (strict) {
+    std::ofstream trace(options.output + ".timing.csv");
+    trace << "sequence,feedback_ns,publish_ns,actor_target_ns,receive_ns,accept_ns,oldest_motor\n";
+    for (const auto& t : ipc.timing) {
+      trace << t.sequence << ',' << t.feedback_ns << ',' << t.publish_ns << ',' << t.actor_target_ns << ','
+            << t.receive_ns << ',' << t.accept_ns << ',' << motors[t.oldest_motor].name << '\n';
+    }
+    trace.close();
+    if (!trace) throw std::runtime_error("cannot write protected-policy timing trace");
+  }
   return passed ? 0 : 2;
 }
 
 void apply_affinity(int cpu) {
+  if (cpu < 0 || cpu >= CPU_SETSIZE) throw std::runtime_error("invalid CAN CPU index");
   cpu_set_t set;
   CPU_ZERO(&set);
   CPU_SET(cpu, &set);
@@ -1839,6 +2422,11 @@ void apply_realtime_priority(int priority) {
     throw std::runtime_error(
         "failed to apply SCHED_FIFO priority " + std::to_string(priority) + ": " +
         std::strerror(status));
+  }
+  int policy = 0;
+  if (pthread_getschedparam(pthread_self(), &policy, &parameters) != 0 ||
+      policy != SCHED_FIFO || parameters.sched_priority != priority) {
+    throw std::runtime_error("could not verify requested CAN real-time scheduling");
   }
 }
 
@@ -1976,6 +2564,15 @@ int main(int argc, char** argv) {
   std::vector<Socket> sockets;
   IpcSocket ipc;
   try {
+    if (argc == 3 && std::string(argv[1]) == "--check-commissioning-scheduler") {
+      const auto cpu = unsigned_number(argv[2]);
+      if (cpu >= CPU_SETSIZE) throw std::runtime_error("invalid CAN CPU index");
+      apply_affinity(static_cast<int>(cpu));
+      apply_realtime_priority(kSuperMimicRealtimePriority);
+      std::cout << "CAN scheduler verified: SCHED_FIFO " << kSuperMimicRealtimePriority
+                << ", CPU " << cpu << '\n';
+      return 0;
+    }
     const Options options = parse_options(argc, argv);
     auto motors = load_motors(options.config);
     const auto joint_safety = options.joint_safety_config.empty()
@@ -1993,11 +2590,16 @@ int main(int argc, char** argv) {
         throw std::runtime_error("native kinematics joint order/hash mismatch");
       }
     }
+    if (options.supermimic_commissioning) {
+      apply_affinity(options.cpu);
+      apply_realtime_priority(options.realtime_priority);
+    }
     std::map<std::string, std::size_t> socket_index;
     for (const auto& motor : motors) {
       if (socket_index.count(motor.interface) == 0) {
         socket_index[motor.interface] = sockets.size();
-        sockets.push_back(open_socket(motor.interface));
+        sockets.push_back(open_socket(motor.interface, options.supermimic_commissioning,
+                                      options.coherent_action_send));
       }
     }
     if (sockets.size() != 4) throw std::runtime_error("exactly four CAN interfaces required");
@@ -2015,8 +2617,10 @@ int main(int argc, char** argv) {
         static_cast<std::size_t>(std::llround(options.duration_s * kTransportRateHz));
     const std::size_t state_ticks = transport_slots / 4;
     std::vector<double> lateness(state_ticks);
-    apply_affinity(options.cpu);
-    apply_realtime_priority(options.realtime_priority);
+    if (!options.supermimic_commissioning) {
+      apply_affinity(options.cpu);
+      apply_realtime_priority(options.realtime_priority);
+    }
     const bool memory_locked = mlockall(MCL_CURRENT | MCL_FUTURE) == 0;
     if (options.measured_pose_hold) {
       const int result = run_native_measured_pose_hold(
@@ -2026,7 +2630,7 @@ int main(int argc, char** argv) {
       close_ipc(ipc);
       return result;
     }
-    if (options.policy_actuation) {
+    if (options.policy_actuation || options.supermimic_commissioning) {
       std::signal(SIGINT, request_shutdown);
       std::signal(SIGTERM, request_shutdown);
       const int result = run_native_protected_policy(

@@ -1,84 +1,156 @@
 # OpenSprite-SuperMimic
 
-面向 **Open Sprite v5（四肩 J4340P、2026-11-05 腰部惯量修订）** 的联合 SuperMimic 实验。
-从原生机器人参考动作学习动作跟踪与速度命令接口，再通过原生 CPU 回放和电机空间闭环验证。
+Joint motion tracking and velocity-command learning for **Open Sprite v5**, a
+31-joint humanoid with four proximal shoulder J4340P motors. The project carries
+SuperMimic from native robot reference motions through training, CPU deployment,
+actuator-level validation, and supervised hardware experiments.
 
-代码采用仓库原有的 **AGPL-3.0**。这不是 G1 论文成绩的复刻，也不是已经可直接上真机的控制器。
+**License: [AGPL-3.0](LICENSE).** External code, assets, and motion datasets retain
+their own terms; see [Data and licenses](DATA_AND_LICENSES.md).
 
-## 当前成果：run002 / 2026-11-06
+## Current progress — November 10, 2026
 
-| 阶段 | 已完成的结果 | 范围 |
+**The robot has walked under the SuperMimic policy in supervised hardware tests.**
+Two direct-start trials completed using a **0.25 m/s forward command**, full
+training gains on all 31 joints, and fall protection. That value is the command,
+not an externally measured walking speed. The operator reported intermittent
+steps, right-foot dragging, outward-facing feet, and startup yaw. Reliable gait
+quality and unrestricted operation remain open work.
+
+The newest transport change commits each policy action to all 31 motors as one
+group, avoiding an extra low-rate send cycle for hips and knees. It has passed
+**disabled-motor validation and a deliberate 20 ms timeout test**; it has not yet
+been evaluated during powered walking.
+
+| Stage | Recorded result | Scope |
 |---|---|---|
-| 联合训练 | L40S 48GB，12 小时，15398 次更新，从随机权重开始 | 4096 环境，FP32，TF32 关闭 |
-| 训练环境评估 | 60/60 次速度测试，每次 30 秒；4/4 段连续测试，每段 62 秒 | 原训练串联关节执行器；非真机 |
-| 动作跟踪评估 | 15/15 次，每次约 7.98 秒 | 五段原生参考、三个种子 |
-| Jetson CPU | 14 组 / 21000 帧回放通过；双线程服务 P99 6.889 ms | 50 Hz，3000 周期，0 截止期遗漏；不含真实传感器/CAN |
-| 严格电机闭环候选 | **88/88 次，每次 50 秒**；无原始力矩饱和、速度超限或前馈字段越界 | 1.5 s 交接、残余阻尼、命令斜率限制、明确的保守命令集 |
-| 真机零增益 | **31 电机通过 C++ 四总线 500 Hz、45 秒并发检查** | 全部 disabled；并发 C++ ICM 800 Hz 采集，SPI 固定 on 后仅 1 个超周期样本 |
-| 真实输入策略只读 shadow | **10 秒/500帧、60 秒/3000帧通过** | C++全链，993维；P99 6.493ms，0截止期遗漏，反向字节0 |
-| 完整时序与真实初态审计 | **压力准入未通过** | 逐电机时隙、量化、采样余量下仍有启动/右转保护触发；保持未使能 |
-| 带电行走 | **未准入** | 电机使能为 0；执行器带载与动态平衡尚未验证 |
+| Joint training, run002 | L40S 48 GB, 12 hours, 15,398 updates from random weights | 4,096 environments; FP32; TF32 disabled |
+| Training-environment velocity evaluation | 60/60 trials of 30 s; 4/4 continuous sequences of 62 s | Serial-joint training actuators; simulation |
+| Motion tracking | 15/15 trials of approximately 7.98 s | Five native reference clips, three seeds |
+| Native policy interface | 10 history frames, 993 inputs, 31 outputs, 50 Hz | C++/ONNX Runtime CPU inference |
+| Supervised hardware walking | Two direct-start trials completed; all 31 motors disabled afterward | Existing send schedule; remaining gait issues above |
+| Coherent action sending | 2,475 actions × 31 motors = 76,725 matched hardware TX records | Motors remained disabled throughout |
+| Transport timing | Maximum per-bus physical group span **0.646 ms**; target-to-TX-completion upper bound **3.109 ms** | Adapter timestamps and host receipt bounds; not motor execution timing |
+| Timeout verification | Intentional policy pause triggered the original **20 ms** guard | Zero enables; **31/31 disabled** on both final validation runs |
 
-**两种仿真的结论不能混用。** 训练环境中测试过前进 0.6 m/s；严格电机闭环目前只验证到
-前进请求 0.25 m/s 及明确的转弯、倒退、横移场景。请求速度不等于实际速度；后者仍有偏差和漂移。
-原配置 1.30 秒的启动保护事件仍可精确复现，没有放宽保护。
+Read the [action-history contract](docs/ACTION_HISTORY_CONTRACT_20261110.md),
+[direct-start validation](docs/DIRECT_POLICY_START_20261110.md), and
+[coherent-send results](docs/COHERENT_ACTION_SEND_20261110.md). Dated historical
+reports describe earlier stages and may retain their original language.
 
-![严格启动的原始力矩与同一保护包络](docs/images/strict-startup-comparison.png)
+## Why the deployment contract matters
 
-## 从哪里开始
+- The previous-action observation contains the **raw previous policy action**.
+  Joint positions and velocities come from real feedback. A protected or scaled
+  target must not be substituted for the policy's previous action.
+- Warmup is separate from control. Direct takeover resets history from fresh
+  feedback and immediately uses all 31 training Kp/Kd values. There is no
+  zero-gain policy pre-roll or gain/position ramp in this mode.
+- The PD layer preserves Kp/Kd and limits estimated motor torque by adjusting
+  the position target. Parallel ankles retain their motor-space mapping and
+  constraints. No extra feedforward torque is added.
+- Training PD is **500 Hz** and the policy is **50 Hz**. These are distinct from
+  CAN refresh rates and from the motor's internal control loop.
+- Hardware time, driver handoff time, and policy timing use different clocks.
+  The transport audit records their identities and bounds rather than
+  subtracting unrelated timestamps.
 
-- [安装、训练和评估](docs/REPRODUCE.md)：固定版本、500 Hz PD、预检、短训练、完整训练与导出。
-- [如何获得重定向动作](docs/REFERENCE_MOTIONS.md)：源动作、UMR、接触优化及 QA；数据仅在本地使用。
-- [CPU 回放与严格闭环](docs/RUNTIME.md)：10 帧 / 993 维接口、native 构建、仿真复现和 Jetson 时延。
-- [Jetson SPI0 电源管理](docs/SPI_POWER_MANAGEMENT.md)：ICM 采集必需的固定 `on` 设置、开机安装和退出行为。
-- [真实输入 C++ 只读 shadow](docs/LIVE_SHADOW_20261106.md)：3000帧实时验证、数值一致性和故障退出。
-- [执行器时序与启动审计](docs/SLOT_SCHEDULE_AUDIT_20261106.md)：132次实验、197项C++文件门禁检查、真实姿态调整与未通过项。
-- [结果与经验](docs/RESULTS_AND_LESSONS.md)：已有证据、失败消融、速度偏差和后续工作。
-- [数据与第三方声明](DATA_AND_LICENSES.md)：代码许可证与外部数据条款分别记录。
-- [Release](https://github.com/BeijingDynamics/OpenSprite-SuperMimic/releases)：训练检查点、ONNX、场景和验证成果，附 SHA256。
+## Reproduce the training experiment
 
-下载模型后，不需要参考动作即可使用 CPU 速度接口和严格电机闭环工具。
-重新训练、原始动作跟踪评估和基于原参考初态的 GPU 评估，需要在本地另行准备参考动作。
+The recorded training environment used Linux, Python 3.12, and CUDA 12.8.
+Install the pinned dependencies and robot meshes:
 
-## 固定的训练契约
+```bash
+git clone https://github.com/BeijingDynamics/OpenSprite-SuperMimic.git
+cd OpenSprite-SuperMimic
+python3.12 -m venv .venv
+source .venv/bin/activate
+python -m pip install -r requirements-training.txt
+python -m pip install -e .
+python scripts/fetch_robot_assets.py
+```
 
-- 机器人版本：`sprite0825_v5_4340_shoulders_waist20261105`，31 自由度，腰部 yaw link 质量 3.7391 kg。
-- 全套发布 Kp/Kd、力矩上限和默认姿态按关节名绑定；训练 **500 Hz PD / 50 Hz 策略 / 10 子步**。
-  上游控制快照的原始 200 Hz 元数据保留，500 Hz 覆盖在实验配置中明确记录。
-- 完整联合方法：独立动作/速度编码器与价值网络，共享解码器和世界模型，环境 50/50 分配，
-  10 帧历史、10 帧未来参考、参考/随机速度采样与潜变量对齐；不是 PPO 或单独速度策略。
-- 训练配置：[configs/run002.json](configs/run002.json)；资产、源码与依赖身份见 [provenance/](provenance/)。
+Prepare authorized motion data locally using the
+[reference-motion procedure](docs/REFERENCE_MOTIONS.md). The mesh downloader
+checks all 33 STL hashes against the pinned manifest. It does not substitute
+the latest upstream robot for the trained asset.
 
-| 成果 | SHA256 |
+```bash
+export MUJOCO_GL=egl
+python scripts/preflight_run002.py
+python scripts/test_joint_gradient_routing.py
+python scripts/check_reference_fk_precision.py
+python scripts/train_joint.py --config configs/run002.json \
+  --motion data/motions/contact_v5_v11/v5_locomotion.npz \
+  --quality data/motions/contact_v5_v11/v5_locomotion.qa.json \
+  --output outputs/smoke --smoke
+```
+
+For the full run, choose a new output directory and omit `--smoke`. The recorded
+12-hour budget ended at 15,398 updates; the configuration's 100,000-update limit
+was not reached. See [reproduction details](docs/REPRODUCE.md),
+[runtime integration](docs/RUNTIME.md), and [results and lessons](docs/RESULTS_AND_LESSONS.md)
+for the original experiment records.
+
+[Release assets](https://github.com/BeijingDynamics/OpenSprite-SuperMimic/releases)
+include checkpoints, the ONNX actor, scenes, and validation results with hashes.
+The exported CPU velocity interface does not require reference motion data.
+Retraining and motion-tracking evaluation require separately prepared references.
+
+## Frozen model and training configuration
+
+- Robot: `sprite0825_v5_4340_shoulders_waist20261105`; waist yaw link mass 3.7391 kg.
+- Published Kp/Kd, effort limits, and default pose are matched by joint name.
+  The experiment explicitly overrides the source control metadata to
+  **500 Hz PD / 50 Hz policy / 10 substeps**.
+- Full joint method: separate motion/velocity encoders and critics, shared
+  decoder and world model, 50/50 environment split, 10 history frames,
+  10 future reference frames, and latent alignment.
+- Configuration: [configs/run002.json](configs/run002.json).
+  Asset, code, and dependency identities: [provenance/](provenance/).
+
+| Artifact | SHA256 |
 |---|---|
 | `model_015398.pt` | `094b52267159d26f4d5bfb41edc5823a9becc32f706c87df05f8aa36b4016282` |
 | `policy.onnx` | `f3529c927a44f970908d48e5694e63302d0fc838121aba2fa87c0a0863968bba` |
-| 发布控制快照 | `184ec989fd24b4bc6ea5034e6fdae796b5b9ce83ef2c884dfe4fc61d8d6987dc` |
+| Published control snapshot | `184ec989fd24b4bc6ea5034e6fdae796b5b9ce83ef2c884dfe4fc61d8d6987dc` |
 
-## 仓库结构
+## Repository layout
 
 ```text
-opensprite_tracker/supermimic/  世界模型、双接口、BPTT、回放与仿真
-scripts/                       训练、评估、导出、动作处理与质量检查
-configs/                       run002、评估命令、UMR 与冻结硬件仿真配置
-upstream_asset/                固定 URDF/MJCF/控制快照；网格按哈希下载
-retarget/ + third_party/umr/   UMR 适配及接触优化源码，保留第三方许可证
-data/                          来源、片段选择与 QA 元数据；不含动作序列
-runtime/                       验证过的 runtime 源码快照与测试
-reports/                       数值结果与验证汇总
-docs/                          复现步骤、经验及带日期的历史记录
+opensprite_tracker/supermimic/  World model, joint interfaces, BPTT, replay, simulation
+scripts/                       Training, evaluation, export, reference processing, QA
+configs/                       Experiment, evaluation, retargeting, actuator simulation
+upstream_asset/                Pinned URDF/MJCF/control snapshots; meshes fetched by hash
+retarget/ + third_party/umr/   Retargeting and contact optimization; original licenses
+data/                          Provenance, clip selection, QA metadata; no motion sequences
+runtime/                       Native runtime sources, commissioning tools, tests
+reports/                       Numerical results and validation summaries
+docs/                          Reproduction notes and dated development records
 ```
 
-本仓库与 [open_sprite](https://github.com/BeijingDynamics/open_sprite) 的模型仓库、
-[open_sprite_runtime](https://github.com/BeijingDynamics/open_sprite_runtime) 的真机 runtime 各有职责。
-runtime 以 `5f8225c` 为基线，另外维护已验证的 C++ 零增益探针与 SPI 常开策略；
-源码位于本仓库 `runtime/`，安装 Python 包不会替换机器人上的当前部署。
+The [robot model](https://github.com/BeijingDynamics/open_sprite) and
+[hardware runtime](https://github.com/BeijingDynamics/open_sprite_runtime) are
+separate repositories. The runtime snapshot here contains experiment-specific
+commissioning tools and pinned hardware configuration checks; installing the
+Python package does not deploy or arm a robot. Review the native replay,
+[SPI power-management requirement](docs/SPI_POWER_MANAGEMENT.md), actuator
+mapping, scheduling, and shutdown checks for the exact target machine.
 
-## 来源
+## Contributing and attribution
 
-训练实现基于 [lzjever/opensprite-tracker](https://github.com/lzjever/opensprite-tracker)
-的固定版本及其 SuperMimic 实现，针对 v5、联合接口、参考动作与实际执行器差异继续开发。
-方法参考 [SuperMimic](https://arxiv.org/abs/2610.28480)，重定向使用
-[UMR](https://hanyang9.github.io/UMR/)，动作源为
-[LAFAN1](https://github.com/ubisoft/ubisoft-laforge-animation-dataset)。
-本仓库和 Release **均不分发 LAFAN1、重定向动作或参考动作录像**。
+The primary README, first-party code comments, terminal messages, operator
+prompts, and generated labels are **English** so contributors worldwide can
+use and review the project. Preserve original third-party notices and historical
+measurement records. Run `python scripts/check_language_policy.py` before publishing.
+
+Training builds on a pinned version of
+[lzjever/opensprite-tracker](https://github.com/lzjever/opensprite-tracker) and its
+[SuperMimic](https://arxiv.org/abs/2610.28480) implementation, with Open Sprite v5
+references and actuator/deployment work. Retargeting uses
+[UMR](https://hanyang9.github.io/UMR/); source motions include
+[LAFAN1](https://github.com/ubisoft/ubisoft-laforge-animation-dataset).
+
+Neither this repository nor its releases distribute **LAFAN1 data, retargeted
+motion sequences, or reference-motion videos**. Keep those local and follow
+their original terms. This project does not claim the paper's G1 results.
