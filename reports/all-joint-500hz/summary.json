@@ -1,0 +1,670 @@
+{
+  "date": "2026-11-11",
+  "branch": "supermimic_500hz",
+  "validation_session": "20261111-151758-7385",
+  "scope": "Disabled transport and fault validation; powered gait not evaluated.",
+  "policy_hz": 50,
+  "motor_send_hz": 500,
+  "motor_count": 31,
+  "gains": "All 31 joints use unchanged training gains.",
+  "action_scale_changed": false,
+  "protection_limits_changed": false,
+  "native_tests_passed": 10,
+  "python_tests_passed": 26,
+  "python_subtests_passed": 18,
+  "recorded_state_frames": 2476,
+  "motor_audit_identical_to_baseline": true,
+  "local_evidence_sha256": "d9dd1fce5e978e63d548700af54a9daad458131ca0b1d75d6c5103531d7e3e08",
+  "local_evidence_files_verified": 333,
+  "stages": {
+    "dry": {
+      "passed": true,
+      "final_disabled_count": 31,
+      "motor_enable_attempts": 0,
+      "full_rate": {
+        "passed": true,
+        "control_hz": 500,
+        "policy_hz": 50,
+        "control_ticks": 24750,
+        "motor_dispatches": 767250,
+        "maximum_physical_tx_gap_ms": 2.579,
+        "maximum_feedback_age_at_send_ms": 3.45173,
+        "maximum_tx_completion_from_boundary_ms": 2.081936,
+        "completion_notifications_after_period": 1,
+        "actual_rx": {
+          "left_hip_pitch_motor": {
+            "count": 24750,
+            "rate_hz": 500.0,
+            "max_gap_ms": 2.422426
+          },
+          "left_hip_roll_motor": {
+            "count": 24750,
+            "rate_hz": 500.0,
+            "max_gap_ms": 2.817795
+          },
+          "left_hip_yaw_motor": {
+            "count": 24750,
+            "rate_hz": 500.0,
+            "max_gap_ms": 2.819651
+          },
+          "left_knee_motor": {
+            "count": 24750,
+            "rate_hz": 500.0,
+            "max_gap_ms": 2.727393
+          },
+          "left_ankle_motor_a": {
+            "count": 24750,
+            "rate_hz": 500.0,
+            "max_gap_ms": 3.092491
+          },
+          "left_ankle_motor_b": {
+            "count": 24750,
+            "rate_hz": 500.0,
+            "max_gap_ms": 3.172492
+          },
+          "waist_yaw_motor": {
+            "count": 24750,
+            "rate_hz": 500.0,
+            "max_gap_ms": 3.245166
+          },
+          "waist_roll_motor": {
+            "count": 24750,
+            "rate_hz": 500.0,
+            "max_gap_ms": 3.269038
+          },
+          "right_hip_pitch_motor": {
+            "count": 24750,
+            "rate_hz": 500.0,
+            "max_gap_ms": 2.423578
+          },
+          "right_hip_roll_motor": {
+            "count": 24750,
+            "rate_hz": 500.0,
+            "max_gap_ms": 2.716129
+          },
+          "right_hip_yaw_motor": {
+            "count": 24750,
+            "rate_hz": 500.0,
+            "max_gap_ms": 2.765185
+          },
+          "right_knee_motor": {
+            "count": 24750,
+            "rate_hz": 500.0,
+            "max_gap_ms": 2.669664
+          },
+          "right_ankle_motor_a": {
+            "count": 24750,
+            "rate_hz": 500.0,
+            "max_gap_ms": 3.149772
+          },
+          "right_ankle_motor_b": {
+            "count": 24750,
+            "rate_hz": 500.0,
+            "max_gap_ms": 3.18494
+          },
+          "head_motor_a": {
+            "count": 24750,
+            "rate_hz": 500.0,
+            "max_gap_ms": 3.226829
+          },
+          "head_motor_b": {
+            "count": 24750,
+            "rate_hz": 500.0,
+            "max_gap_ms": 3.320592
+          },
+          "left_shoulder_pitch_motor": {
+            "count": 24750,
+            "rate_hz": 500.0,
+            "max_gap_ms": 2.427322
+          },
+          "left_shoulder_roll_motor": {
+            "count": 24750,
+            "rate_hz": 500.0,
+            "max_gap_ms": 2.903013
+          },
+          "left_shoulder_yaw_motor": {
+            "count": 24750,
+            "rate_hz": 500.0,
+            "max_gap_ms": 2.775266
+          },
+          "left_elbow_motor": {
+            "count": 24750,
+            "rate_hz": 500.0,
+            "max_gap_ms": 3.023337
+          },
+          "left_wrist_yaw_motor": {
+            "count": 24750,
+            "rate_hz": 500.0,
+            "max_gap_ms": 3.223757
+          },
+          "left_wrist_pitch_motor": {
+            "count": 24750,
+            "rate_hz": 500.0,
+            "max_gap_ms": 3.303439
+          },
+          "left_wrist_roll_motor": {
+            "count": 24750,
+            "rate_hz": 500.0,
+            "max_gap_ms": 3.245614
+          },
+          "head_yaw_motor": {
+            "count": 24750,
+            "rate_hz": 500.0,
+            "max_gap_ms": 3.261358
+          },
+          "right_shoulder_pitch_motor": {
+            "count": 24750,
+            "rate_hz": 500.0,
+            "max_gap_ms": 2.473787
+          },
+          "right_shoulder_roll_motor": {
+            "count": 24750,
+            "rate_hz": 500.0,
+            "max_gap_ms": 2.712929
+          },
+          "right_shoulder_yaw_motor": {
+            "count": 24750,
+            "rate_hz": 500.0,
+            "max_gap_ms": 2.728673
+          },
+          "right_elbow_motor": {
+            "count": 24750,
+            "rate_hz": 500.0,
+            "max_gap_ms": 2.731937
+          },
+          "right_wrist_yaw_motor": {
+            "count": 24750,
+            "rate_hz": 500.0,
+            "max_gap_ms": 3.035785
+          },
+          "right_wrist_pitch_motor": {
+            "count": 24750,
+            "rate_hz": 500.0,
+            "max_gap_ms": 3.225485
+          },
+          "right_wrist_roll_motor": {
+            "count": 24750,
+            "rate_hz": 500.0,
+            "max_gap_ms": 3.232366
+          }
+        }
+      },
+      "policy_action_groups": 2475,
+      "per_bus_new_action_span_max_ms": 0.684,
+      "actor_target_to_hardware_completion_upper_max_ms": 3.118891,
+      "oldest_feedback_to_driver_upper_max_ms": 9.887882,
+      "max_can_wake_lateness_ms": 0.031886,
+      "deadline_stage": "",
+      "timing_max_ms": {
+        "can_feedback": 2.282934,
+        "state_ipc": 0.4715,
+        "actor_preprocess": 0.059041,
+        "inference": 7.251466,
+        "actor_postprocess": 0.060257,
+        "target_ipc": 0.623311,
+        "total": 9.586853
+      },
+      "monitor_samples": {
+        "left_hip_pitch_motor": {
+          "nominal_sends": 24750,
+          "admitted_samples": 24750
+        },
+        "left_hip_roll_motor": {
+          "nominal_sends": 24750,
+          "admitted_samples": 24750
+        },
+        "left_hip_yaw_motor": {
+          "nominal_sends": 24750,
+          "admitted_samples": 24750
+        },
+        "left_knee_motor": {
+          "nominal_sends": 24750,
+          "admitted_samples": 24750
+        },
+        "left_ankle_motor_a": {
+          "nominal_sends": 24750,
+          "admitted_samples": 24750
+        },
+        "left_ankle_motor_b": {
+          "nominal_sends": 24750,
+          "admitted_samples": 24750
+        },
+        "waist_yaw_motor": {
+          "nominal_sends": 24750,
+          "admitted_samples": 24750
+        },
+        "waist_roll_motor": {
+          "nominal_sends": 24750,
+          "admitted_samples": 24750
+        },
+        "right_hip_pitch_motor": {
+          "nominal_sends": 24750,
+          "admitted_samples": 24750
+        },
+        "right_hip_roll_motor": {
+          "nominal_sends": 24750,
+          "admitted_samples": 24750
+        },
+        "right_hip_yaw_motor": {
+          "nominal_sends": 24750,
+          "admitted_samples": 24750
+        },
+        "right_knee_motor": {
+          "nominal_sends": 24750,
+          "admitted_samples": 24750
+        },
+        "right_ankle_motor_a": {
+          "nominal_sends": 24750,
+          "admitted_samples": 24750
+        },
+        "right_ankle_motor_b": {
+          "nominal_sends": 24750,
+          "admitted_samples": 24750
+        },
+        "head_motor_a": {
+          "nominal_sends": 24750,
+          "admitted_samples": 24750
+        },
+        "head_motor_b": {
+          "nominal_sends": 24750,
+          "admitted_samples": 24750
+        },
+        "left_shoulder_pitch_motor": {
+          "nominal_sends": 24750,
+          "admitted_samples": 24750
+        },
+        "left_shoulder_roll_motor": {
+          "nominal_sends": 24750,
+          "admitted_samples": 24750
+        },
+        "left_shoulder_yaw_motor": {
+          "nominal_sends": 24750,
+          "admitted_samples": 24750
+        },
+        "left_elbow_motor": {
+          "nominal_sends": 24750,
+          "admitted_samples": 24750
+        },
+        "left_wrist_yaw_motor": {
+          "nominal_sends": 24750,
+          "admitted_samples": 24750
+        },
+        "left_wrist_pitch_motor": {
+          "nominal_sends": 24750,
+          "admitted_samples": 24750
+        },
+        "left_wrist_roll_motor": {
+          "nominal_sends": 24750,
+          "admitted_samples": 24750
+        },
+        "head_yaw_motor": {
+          "nominal_sends": 24750,
+          "admitted_samples": 24750
+        },
+        "right_shoulder_pitch_motor": {
+          "nominal_sends": 24750,
+          "admitted_samples": 24750
+        },
+        "right_shoulder_roll_motor": {
+          "nominal_sends": 24750,
+          "admitted_samples": 24750
+        },
+        "right_shoulder_yaw_motor": {
+          "nominal_sends": 24750,
+          "admitted_samples": 24750
+        },
+        "right_elbow_motor": {
+          "nominal_sends": 24750,
+          "admitted_samples": 24750
+        },
+        "right_wrist_yaw_motor": {
+          "nominal_sends": 24750,
+          "admitted_samples": 24750
+        },
+        "right_wrist_pitch_motor": {
+          "nominal_sends": 24750,
+          "admitted_samples": 24750
+        },
+        "right_wrist_roll_motor": {
+          "nominal_sends": 24750,
+          "admitted_samples": 24750
+        }
+      },
+      "native_errors": []
+    },
+    "fault": {
+      "passed": true,
+      "final_disabled_count": 31,
+      "motor_enable_attempts": 0,
+      "full_rate": {
+        "passed": true,
+        "control_hz": 500,
+        "policy_hz": 50,
+        "control_ticks": 18033,
+        "motor_dispatches": 559023,
+        "maximum_physical_tx_gap_ms": 2.709,
+        "maximum_feedback_age_at_send_ms": 3.333586,
+        "maximum_tx_completion_from_boundary_ms": 1.860782,
+        "completion_notifications_after_period": 0,
+        "actual_rx": {
+          "left_hip_pitch_motor": {
+            "count": 18033,
+            "rate_hz": 499.99999999999994,
+            "max_gap_ms": 2.603489
+          },
+          "left_hip_roll_motor": {
+            "count": 18033,
+            "rate_hz": 499.99999999999994,
+            "max_gap_ms": 2.937673
+          },
+          "left_hip_yaw_motor": {
+            "count": 18033,
+            "rate_hz": 499.99999999999994,
+            "max_gap_ms": 2.971818
+          },
+          "left_knee_motor": {
+            "count": 18033,
+            "rate_hz": 499.99999999999994,
+            "max_gap_ms": 2.657218
+          },
+          "left_ankle_motor_a": {
+            "count": 18033,
+            "rate_hz": 499.99999999999994,
+            "max_gap_ms": 2.905992
+          },
+          "left_ankle_motor_b": {
+            "count": 18032,
+            "rate_hz": 499.97227305495477,
+            "max_gap_ms": 3.348371
+          },
+          "waist_yaw_motor": {
+            "count": 18032,
+            "rate_hz": 499.97227305495477,
+            "max_gap_ms": 3.486901
+          },
+          "waist_roll_motor": {
+            "count": 18032,
+            "rate_hz": 499.97227305495477,
+            "max_gap_ms": 3.493877
+          },
+          "right_hip_pitch_motor": {
+            "count": 18033,
+            "rate_hz": 499.99999999999994,
+            "max_gap_ms": 2.603457
+          },
+          "right_hip_roll_motor": {
+            "count": 18033,
+            "rate_hz": 499.99999999999994,
+            "max_gap_ms": 3.031339
+          },
+          "right_hip_yaw_motor": {
+            "count": 18033,
+            "rate_hz": 499.99999999999994,
+            "max_gap_ms": 3.003083
+          },
+          "right_knee_motor": {
+            "count": 18033,
+            "rate_hz": 499.99999999999994,
+            "max_gap_ms": 2.788452
+          },
+          "right_ankle_motor_a": {
+            "count": 18033,
+            "rate_hz": 499.99999999999994,
+            "max_gap_ms": 3.166541
+          },
+          "right_ankle_motor_b": {
+            "count": 18033,
+            "rate_hz": 499.99999999999994,
+            "max_gap_ms": 3.385331
+          },
+          "head_motor_a": {
+            "count": 18032,
+            "rate_hz": 499.97227305495477,
+            "max_gap_ms": 3.381651
+          },
+          "head_motor_b": {
+            "count": 18032,
+            "rate_hz": 499.97227305495477,
+            "max_gap_ms": 3.074059
+          },
+          "left_shoulder_pitch_motor": {
+            "count": 18033,
+            "rate_hz": 499.99999999999994,
+            "max_gap_ms": 2.604801
+          },
+          "left_shoulder_roll_motor": {
+            "count": 18033,
+            "rate_hz": 499.99999999999994,
+            "max_gap_ms": 2.971882
+          },
+          "left_shoulder_yaw_motor": {
+            "count": 18033,
+            "rate_hz": 499.99999999999994,
+            "max_gap_ms": 2.747012
+          },
+          "left_elbow_motor": {
+            "count": 18033,
+            "rate_hz": 499.99999999999994,
+            "max_gap_ms": 2.915688
+          },
+          "left_wrist_yaw_motor": {
+            "count": 18033,
+            "rate_hz": 499.99999999999994,
+            "max_gap_ms": 3.112173
+          },
+          "left_wrist_pitch_motor": {
+            "count": 18033,
+            "rate_hz": 499.99999999999994,
+            "max_gap_ms": 3.263632
+          },
+          "left_wrist_roll_motor": {
+            "count": 18032,
+            "rate_hz": 499.97227305495477,
+            "max_gap_ms": 3.32613
+          },
+          "head_yaw_motor": {
+            "count": 18032,
+            "rate_hz": 499.97227305495477,
+            "max_gap_ms": 3.222575
+          },
+          "right_shoulder_pitch_motor": {
+            "count": 18033,
+            "rate_hz": 499.99999999999994,
+            "max_gap_ms": 2.606208
+          },
+          "right_shoulder_roll_motor": {
+            "count": 18033,
+            "rate_hz": 499.99999999999994,
+            "max_gap_ms": 2.574944
+          },
+          "right_shoulder_yaw_motor": {
+            "count": 18033,
+            "rate_hz": 499.99999999999994,
+            "max_gap_ms": 2.647906
+          },
+          "right_elbow_motor": {
+            "count": 18033,
+            "rate_hz": 499.99999999999994,
+            "max_gap_ms": 3.10638
+          },
+          "right_wrist_yaw_motor": {
+            "count": 18033,
+            "rate_hz": 499.99999999999994,
+            "max_gap_ms": 3.114188
+          },
+          "right_wrist_pitch_motor": {
+            "count": 18033,
+            "rate_hz": 499.99999999999994,
+            "max_gap_ms": 3.176398
+          },
+          "right_wrist_roll_motor": {
+            "count": 18032,
+            "rate_hz": 499.97227305495477,
+            "max_gap_ms": 3.072363
+          }
+        }
+      },
+      "policy_action_groups": 1802,
+      "per_bus_new_action_span_max_ms": 0.632,
+      "actor_target_to_hardware_completion_upper_max_ms": 3.111245,
+      "oldest_feedback_to_driver_upper_max_ms": 9.78648,
+      "max_can_wake_lateness_ms": 0.031415,
+      "deadline_stage": "target_ipc_pending",
+      "timing_max_ms": null,
+      "monitor_samples": {
+        "left_hip_pitch_motor": {
+          "nominal_sends": 18033,
+          "admitted_samples": 18033
+        },
+        "left_hip_roll_motor": {
+          "nominal_sends": 18033,
+          "admitted_samples": 18033
+        },
+        "left_hip_yaw_motor": {
+          "nominal_sends": 18033,
+          "admitted_samples": 18033
+        },
+        "left_knee_motor": {
+          "nominal_sends": 18033,
+          "admitted_samples": 18033
+        },
+        "left_ankle_motor_a": {
+          "nominal_sends": 18033,
+          "admitted_samples": 18033
+        },
+        "left_ankle_motor_b": {
+          "nominal_sends": 18033,
+          "admitted_samples": 18032
+        },
+        "waist_yaw_motor": {
+          "nominal_sends": 18033,
+          "admitted_samples": 18032
+        },
+        "waist_roll_motor": {
+          "nominal_sends": 18033,
+          "admitted_samples": 18032
+        },
+        "right_hip_pitch_motor": {
+          "nominal_sends": 18033,
+          "admitted_samples": 18033
+        },
+        "right_hip_roll_motor": {
+          "nominal_sends": 18033,
+          "admitted_samples": 18033
+        },
+        "right_hip_yaw_motor": {
+          "nominal_sends": 18033,
+          "admitted_samples": 18033
+        },
+        "right_knee_motor": {
+          "nominal_sends": 18033,
+          "admitted_samples": 18033
+        },
+        "right_ankle_motor_a": {
+          "nominal_sends": 18033,
+          "admitted_samples": 18033
+        },
+        "right_ankle_motor_b": {
+          "nominal_sends": 18033,
+          "admitted_samples": 18033
+        },
+        "head_motor_a": {
+          "nominal_sends": 18033,
+          "admitted_samples": 18032
+        },
+        "head_motor_b": {
+          "nominal_sends": 18033,
+          "admitted_samples": 18032
+        },
+        "left_shoulder_pitch_motor": {
+          "nominal_sends": 18033,
+          "admitted_samples": 18033
+        },
+        "left_shoulder_roll_motor": {
+          "nominal_sends": 18033,
+          "admitted_samples": 18033
+        },
+        "left_shoulder_yaw_motor": {
+          "nominal_sends": 18033,
+          "admitted_samples": 18033
+        },
+        "left_elbow_motor": {
+          "nominal_sends": 18033,
+          "admitted_samples": 18033
+        },
+        "left_wrist_yaw_motor": {
+          "nominal_sends": 18033,
+          "admitted_samples": 18033
+        },
+        "left_wrist_pitch_motor": {
+          "nominal_sends": 18033,
+          "admitted_samples": 18033
+        },
+        "left_wrist_roll_motor": {
+          "nominal_sends": 18033,
+          "admitted_samples": 18032
+        },
+        "head_yaw_motor": {
+          "nominal_sends": 18033,
+          "admitted_samples": 18032
+        },
+        "right_shoulder_pitch_motor": {
+          "nominal_sends": 18033,
+          "admitted_samples": 18033
+        },
+        "right_shoulder_roll_motor": {
+          "nominal_sends": 18033,
+          "admitted_samples": 18033
+        },
+        "right_shoulder_yaw_motor": {
+          "nominal_sends": 18033,
+          "admitted_samples": 18033
+        },
+        "right_elbow_motor": {
+          "nominal_sends": 18033,
+          "admitted_samples": 18033
+        },
+        "right_wrist_yaw_motor": {
+          "nominal_sends": 18033,
+          "admitted_samples": 18033
+        },
+        "right_wrist_pitch_motor": {
+          "nominal_sends": 18033,
+          "admitted_samples": 18033
+        },
+        "right_wrist_roll_motor": {
+          "nominal_sends": 18033,
+          "admitted_samples": 18032
+        }
+      },
+      "native_errors": [
+        "SuperMimic oldest-feedback 20 ms deadline exceeded"
+      ]
+    }
+  },
+  "fingerprints": {
+    "run_supermimic_commissioning.py": "6db3128e79a1f8e6fd3468dad2f3253d890f71b21519e50ff2a520832000e832",
+    "policy.onnx": "f3529c927a44f970908d48e5694e63302d0fc838121aba2fa87c0a0863968bba",
+    "sprite_icm45686": "fbdc98f7b7f885023618c8111de16c33525af7d0530d46049a5148cc787a330b",
+    "sprite_can_shadow": "db7e35d545bc9cc33f84bfd2fc8c6c1e0b19dbab00d1635ab29e5745cb93061f",
+    "sprite_supermimic_protected_ipc": "26d7eb913502c961d7eb89b872cf7f0ca9b61c9bfaaaf31a1a6ab0da51dc306d",
+    "motors.tsv": "31fa43578b6bbd22f102ae269157dd85cc84c8b5f934f6db98f2f89c5a22e0c1",
+    "kinematics.tsv": "9b47255137997ae1f0da2845be8b8548dae537c1658741469ffe9d3c6ab38cc9",
+    "joints.tsv": "850bfefb763eee4666129a269fac5d68c7be6dd23df085bb00a88ece30e6c56b",
+    "feedback.bin": "d03e9f0c34f8c7f6182474178927b9749699a54c7885a859fdbeffc82111191c",
+    "target.bin": "e1d086c8129cab2f09d3ade7911ef6aeb31f7b6da846db400158a5d571cd4653",
+    "input.bin": "c886d213879891fcc2dd29b6d12f665cac51c934084bfd0ac4d2ddd88793d960",
+    "action_tx_audit.py": "cef6249f3bbe2e4ccce7d5671a0ac334c26454ddc54ca965dd33f67a960bd232",
+    "transport_profile.py": "6e07de11aa7650f0edd0042e31e91b16c35609fb617c824570a48777d85523c9",
+    "full_rate_tx_audit.py": "029e7931cbd6805be3c35af3911036db68bec5473a51c03d54825fbd797f6a44",
+    "loaded_kcan_srcversion": "A2BA84DDB53927675FFA1CB"
+  },
+  "limitations": [
+    "Disabled zero-gain frames do not validate powered torque, balance or gait.",
+    "Motor internal PD frequency is not changed by CAN refresh rate.",
+    "TX timestamps measure delivery, not motor execution acknowledgement.",
+    "Physical adapter clock offsets are not assumed synchronized.",
+    "Observed timing maxima are sample maxima, not hard real-time guarantees.",
+    "Recorded 50 Hz state replay cannot reconstruct missing physical 500 Hz state."
+  ]
+}

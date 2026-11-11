@@ -24,7 +24,10 @@ reported no clear gait improvement during powered walking.
 
 This **`supermimic_500hz` experimental branch** extends that transport to all
 31 motors every 2 ms, while retaining the 50 Hz policy, full training gains and
-existing protections. Its isolated deployment and validation status are recorded
+existing protections. Its **49.5-second disabled rehearsal and deliberate 20 ms
+timeout test have passed**: 767,250 full-rate motor dispatches in the complete
+run, with every motor returning an average 500 Hz of feedback. Its deployment,
+monitor-accounting correction and validation results are recorded
 in the [500 Hz design and implementation report](docs/ALL_JOINT_500HZ_DESIGN_20261111.md).
 Powered gait improvement with this mode has not been established.
 

@@ -1,7 +1,7 @@
-# All-joint 500 Hz transport proposal
+# All-joint 500 Hz transport experiment
 
-Status: implemented in an isolated candidate; disabled hardware qualification
-is in progress. Powered walking with this candidate has not been tested.
+Status: full disabled hardware qualification and deliberate 20 ms timeout
+verification passed. Powered walking with this candidate has not been tested.
 Branch: `supermimic_500hz`, based on `32d6dfb`. This repository's runtime snapshot
 is the source of the deployed coherent-send executable; the separate runtime
 checkout is older. Existing working trees and previous Jetson deployments are
@@ -193,3 +193,53 @@ sample; at fault exit one final reply can still be in flight. Native tests cover
 delayed replies drained together, pre-control samples, excess samples, and the
 unchanged mixed-rate behavior. This monitor correction requires fresh hardware
 qualification; earlier passing records do not admit the new binary.
+
+## Final disabled qualification
+
+Session `20261111-151758-7385` passes both the complete rehearsal and intentional
+inference-pause test with the monitor correction. The controller, actor and
+trace checks completed normally. There were zero enable attempts; final motor
+feedback confirmed all 31 disabled in both stages. The fault stage passes by
+rejecting the delayed action, not by continuing through it.
+
+| Measurement | Complete rehearsal | Inference-pause test |
+|---|---:|---:|
+| Active 500 Hz control ticks | 24,750 | 18,033 |
+| Whole-motor dispatches | 767,250 | 559,023 |
+| New policy action groups | 2,475 | 1,802 |
+| Maximum same-motor physical TX interval | 2.579 ms | 2.709 ms |
+| Maximum per-bus new-action physical span | 0.684 ms | 0.632 ms |
+| Target creation to hardware completion receipt, maximum upper bound | 3.119 ms | 3.111 ms |
+| Oldest source feedback to driver handoff, maximum upper bound | 9.888 ms | 9.786 ms |
+| Original deadline result | No violation | `target_ipc_pending`, 20 ms rejection |
+| Final disabled readbacks | 31/31 | 31/31 |
+
+Every motor returned 24,750 active replies during the 49.5 s complete rehearsal,
+an average 500 Hz. During fault shutdown, some final replies were still in
+flight at the end of active recording; retained active counts were 18,032 or
+18,033. Monitor coverage in that stage was 99.994% to 100%, with the original
+95% audit requirement preserved. Every control tick had all 31 motors and a
+single action identity. CAN error/drop counter checks passed.
+
+The full-run inference maximum was 7.251 ms and oldest-feedback-to-target-accept
+maximum was 9.587 ms. These are observed sample maxima. Earlier trials include
+a 12.085 ms inference and 14.537 ms feedback-to-accept tail; the earlier
+mixed-rate 13.97 ms inference tail is not claimed to have been eliminated.
+The policy binary and model are unchanged, so this is not an inference-speed
+optimization.
+
+Final CAN SHA256:
+`db7e35d545bc9cc33f84bfd2fc8c6c1e0b19dbab00d1635ab29e5745cb93061f`.
+Frozen actor SHA256:
+`26d7eb913502c961d7eb89b872cf7f0ca9b61c9bfaaaf31a1a6ab0da51dc306d`.
+See the [machine-readable summary](../reports/all-joint-500hz/summary.json)
+for component fingerprints, per-motor coverage, timing and evidence identity.
+
+The operator entry point retains 0.25 m/s forward for 10 seconds, zero lateral
+and yaw commands, the existing zero-command startup/sling window, and unchanged
+speed ramps. Full training gains, raw previous-action history and dynamic PD
+position saturation are unchanged. Matching disabled evidence is checked before
+onsite `READY`; the script then recalibrates the IMU and checks current CAN and
+scheduler state. The final disable check remains mandatory on normal and early
+exits. No powered result or gait improvement is inferred from these disabled
+measurements.
