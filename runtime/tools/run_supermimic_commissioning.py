@@ -16,6 +16,9 @@ import time
 
 import numpy as np
 
+sys.path.insert(0, str(Path(__file__).resolve().parent))
+from transport_profile import apply_all_joint_500hz, require_rate_only_change
+
 from open_sprite_runtime.contracts import PolicyContract
 from open_sprite_runtime.native_ipc import ordered_name_hash
 from open_sprite_runtime.socketcan import audit_socketcan_active_fd_snapshot
@@ -338,18 +341,34 @@ def run(args, out, mode):
         if args.training_full_body:
             reviewed = apply_training_gains(out/"joints.tsv", reviewed, contract)
         target_path.write_bytes(b"SPMTGT02" + reviewed[8:] + roles)
+    if args.all_joint_500hz:
+        apply_all_joint_500hz(out/"motors.tsv")
     fingerprints = {p.name: file_sha256(p) for p in (
         Path(__file__), model, args.icm, can_binary, actor_binary, out/"motors.tsv",
         out/"kinematics.tsv", out/"joints.tsv", out/"feedback.bin", out/"target.bin", out/"input.bin")}
     if args.coherent_action_send:
         tx_audit_path = Path(__file__).with_name('action_tx_audit.py')
         fingerprints[tx_audit_path.name] = file_sha256(tx_audit_path)
+        if args.all_joint_500hz:
+            for name in ('transport_profile.py', 'full_rate_tx_audit.py'):
+                fingerprints[name] = file_sha256(Path(__file__).with_name(name))
         fingerprints['loaded_kcan_srcversion'] = Path('/sys/module/kcan/srcversion').read_text().strip()
     standing_admission = None
     if mode == "powered":
         if args.walk_speed:
+            standing_fingerprints = dict(fingerprints)
+            if args.all_joint_500hz:
+                directory = args.standing_body_checkpoint or args.passed_standing
+                recorded = json.loads((directory/"commissioning.json").read_text())
+                if file_sha256(directory/"motors.tsv") != recorded['fingerprints']['motors.tsv']:
+                    raise ValueError('standing motor profile evidence modified')
+                require_rate_only_change(directory/"motors.tsv", out/"motors.tsv")
+                standing_fingerprints['motors.tsv'] = recorded['fingerprints']['motors.tsv']
+                (out/'standing-rate-compatibility.json').write_text(json.dumps(dict(
+                    rate_only=True, original_motor_sha256=standing_fingerprints['motors.tsv'],
+                    candidate_motor_sha256=fingerprints['motors.tsv'])))
             standing_admission = verify_standing_evidence(
-                args.standing_body_checkpoint or args.passed_standing, fingerprints,
+                args.standing_body_checkpoint or args.passed_standing, standing_fingerprints,
                 args.training_full_body, bool(args.standing_body_checkpoint))
         for directory, expected_mode in ((args.passed_disabled, "disabled"), (args.passed_deadline_fault, "deadline_fault")):
             prior = json.loads((directory/"commissioning.json").read_text())
@@ -361,6 +380,7 @@ def run(args, out, mode):
                 prior.get("training_full_body", False) != args.training_full_body or
                 prior.get("direct_policy_start", False) != args.direct_policy_start or
                 prior.get("coherent_action_send", False) != args.coherent_action_send or
+                prior.get("all_joint_500hz", False) != args.all_joint_500hz or
                 prior.get("can_schedule") != can_schedule or
                 prior["final_disabled_count"] != 31):
                 raise ValueError(f"same-build {expected_mode} gate required before enable")
@@ -437,6 +457,7 @@ def run(args, out, mode):
         full_body = ["--training-full-body"] if args.training_full_body else []
         direct = ["--direct-policy-start"] if args.direct_policy_start else []
         coherent = ["--coherent-action-send"] if args.coherent_action_send else []
+        if args.all_joint_500hz: coherent.append("--all-joint-500hz")
         ack = "ZERO_GAIN_SUPERMIMIC_WRITEBACK"
         if mode == "powered":
             ack = "ENABLE_SUSPENDED_SUPERMIMIC_LOW_GAIN"
@@ -495,13 +516,15 @@ def run(args, out, mode):
             raise RuntimeError("CAN startup mode differs from admission")
         if report.get("coherent_action_send", False) != args.coherent_action_send:
             raise RuntimeError("CAN coherent-action mode differs from admission")
+        if report.get("all_joint_500hz", False) != args.all_joint_500hz:
+            raise RuntimeError("CAN all-joint rate mode differs from admission")
         if paused:
             actor.send_signal(signal.SIGCONT)
             paused = False
         actor_code = actor.wait(timeout=5)
         if args.coherent_action_send:
             tx_audit = subprocess.run([sys.executable, str(Path(__file__).with_name('action_tx_audit.py')), str(out)],
-                                      capture_output=True, text=True, timeout=30)
+                                      capture_output=True, text=True, timeout=180)
             (out/'action-tx-audit.log').write_text(tx_audit.stdout + tx_audit.stderr)
             if tx_audit.returncode:
                 raise RuntimeError('per-action motor TX audit failed; see action-tx-audit.log')
@@ -643,6 +666,7 @@ def run(args, out, mode):
                     training_full_body=args.training_full_body, standing_admission=standing_admission,
                     direct_policy_start=args.direct_policy_start,
                     coherent_action_send=args.coherent_action_send,
+                    all_joint_500hz=args.all_joint_500hz,
                     action_history="policy_output" if args.training_full_body else "admitted_waypoint",
                     tracked_startup=bool(args.tracked_startup), startup=startup,
                     sling_window=args.sling_window, walk_020=args.walk_speed == .20,
@@ -677,6 +701,7 @@ def main():
     parser.add_argument("--training-full-body", action="store_true")
     parser.add_argument("--direct-policy-start", action="store_true")
     parser.add_argument("--coherent-action-send", action="store_true")
+    parser.add_argument("--all-joint-500hz", action="store_true")
     walking = parser.add_mutually_exclusive_group()
     walking.add_argument("--walk-020", dest="walk_speed", action="store_const", const=.20, default=0.)
     walking.add_argument("--walk-025", dest="walk_speed", action="store_const", const=.25)
@@ -687,6 +712,8 @@ def main():
                           help="full-body zero-speed evidence stopped only by all-joint settling")
     parser.add_argument("--operator-status", type=Path)
     args = parser.parse_args()
+    if args.all_joint_500hz and not args.coherent_action_send:
+        parser.error("all-joint 500 Hz requires coherent action sending")
     if args.coherent_action_send and not args.direct_policy_start:
         parser.error("coherent action sending requires direct policy start")
     if args.direct_policy_start and not args.training_full_body:

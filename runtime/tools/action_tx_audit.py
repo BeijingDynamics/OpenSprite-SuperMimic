@@ -20,26 +20,29 @@ def audit(folder):
     for motor in can['motors'].values():
         assert 0 < motor['cadenced_monitor_samples'] <= motor['nominal_sends']
         assert motor['cadenced_monitor_samples'] >= .95*motor['nominal_sends'], 'nominal monitor cadence lost'
-    with (folder/'can.json.tx.csv').open() as f:
-        rows=[{k:v if k=='interface' else int(v) for k,v in r.items()} for r in csv.DictReader(f)]
     with (folder/'can.json.timing.csv').open() as f:
         timing={int(r['sequence']):r for r in csv.DictReader(f)}
     groups=defaultdict(list)
-    per_socket=defaultdict(list)
-    for r in rows:
-        key=(r['interface'],r['motor_id'])
-        assert key in names
-        per_socket[r['interface']].append(r)
-        if r['group']: groups[r['sequence']].append(r)
+    sockets={}
+    with (folder/'can.json.tx.csv').open() as f:
+        for raw in csv.DictReader(f):
+            r={k:v if k=='interface' else int(v) for k,v in raw.items()}
+            assert (r['interface'],r['motor_id']) in names
+            state=sockets.setdefault(r['interface'],dict(packet=0,seq=0,previous_hw=0,current_hw=0))
+            assert r['packet_id']==state['packet']
+            state['packet']+=1
+            if r['sequence']>1:
+                assert r['sequence']>=state['seq'], 'old action sent after new one'
+                if r['sequence']>state['seq']:
+                    state['previous_hw']=state['current_hw']
+                    state['seq']=r['sequence']
+                if r['hardware_raw_ns']:
+                    assert r['hardware_raw_ns']>=state['previous_hw'], 'hardware sent old action after new one'
+                    state['current_hw']=max(state['current_hw'],r['hardware_raw_ns'])
+            if r['group']: groups[r['sequence']].append(r)
     assert len(groups)==can['coherent_action_groups']
     expected={s for s,t in timing.items() if s>1 and int(t['accept_ns'])}
     assert set(groups)==expected, 'accepted action lacks whole-group dispatch'
-    for stream in per_socket.values():
-        assert [r['packet_id'] for r in stream]==list(range(len(stream)))
-        active=[r for r in stream if r['sequence']>1]
-        assert all(a['sequence']<=b['sequence'] for a,b in zip(active,active[1:])), 'old action sent after new one'
-        physical=sorted((r for r in active if r['hardware_raw_ns']),key=lambda r:r['hardware_raw_ns'])
-        assert all(a['sequence']<=b['sequence'] for a,b in zip(physical,physical[1:])), 'hardware sent old action after new one'
     output=[]
     spans=[]
     hardware_spans=[]
@@ -91,6 +94,11 @@ def audit(folder):
                     'Raw hardware clock is not assumed synchronized between adapters or with the host.',
                     'Disabled validation measures zero-gain frame transport, not powered motion.'])
     assert summary['final_disabled_count']==31
+    if can.get('all_joint_500hz', False):
+        import sys
+        sys.path.insert(0,str(Path(__file__).resolve().parent))
+        from full_rate_tx_audit import audit_full_rate
+        summary['full_rate'] = audit_full_rate(folder,can,names)
     (folder/'action-tx-audit.json').write_text(json.dumps(summary,indent=2)+'\n')
     return summary
 

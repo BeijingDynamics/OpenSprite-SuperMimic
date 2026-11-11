@@ -34,6 +34,7 @@
 #include <unistd.h>
 #include "sling_window.hpp"
 #include "action_tx_trace.hpp"
+#include "full_rate_schedule.hpp"
 #include <linux/sockios.h>
 
 namespace {
@@ -124,6 +125,8 @@ struct Motor {
   std::int64_t monitor_poll_ns = 0;
   std::size_t monitor_samples = 0;
   std::size_t nominal_sends = 0;
+  bool trace_feedback = false;
+  std::vector<std::array<std::int64_t, 2>> feedback_trace;
   int maximum_mos_temperature = 0;
   int maximum_rotor_temperature = 0;
   double filtered_mos_temperature = 0.0;
@@ -201,6 +204,7 @@ struct Options {
   bool tracked_startup = false;
   bool direct_policy_start = false;
   bool coherent_action_send = false;
+  bool all_joint_500hz = false;
   bool supermimic_commissioning = false;
   double walk_speed = 0.0;
   int sling_ready_fd = -1, operator_status_fd = -1;
@@ -319,7 +323,7 @@ std::uint64_t ordered_joint_name_hash(
   return result;
 }
 
-std::vector<Motor> load_motors(const std::string& path) {
+std::vector<Motor> load_motors(const std::string& path, bool all_joint_500hz = false) {
   std::ifstream file(path);
   if (!file) {
     throw std::runtime_error("cannot open native motor config: " + path);
@@ -410,6 +414,11 @@ std::vector<Motor> load_motors(const std::string& path) {
   std::map<std::string, int> next_ankle_phase;
   std::map<std::string, int> next_other_phase;
   for (auto& motor : motors) {
+    if (all_joint_500hz) {
+      if (motor.poll_rate_hz != 500) throw std::runtime_error("all-joint schedule requires 500 Hz for every motor");
+      motor.poll_phase = 0;
+      continue;
+    }
     if (motor.poll_rate_hz == 500) {
       motor.poll_phase = 2 * next_ankle_phase[motor.interface]++;
       if (motor.poll_phase >= 4) {
@@ -573,6 +582,7 @@ Options parse_options(int argc, char** argv) {
     else if (argument == "--tracked-startup") result.tracked_startup = true;
     else if (argument == "--direct-policy-start") result.direct_policy_start = true;
     else if (argument == "--coherent-action-send") result.coherent_action_send = true;
+    else if (argument == "--all-joint-500hz") result.all_joint_500hz = true;
     else if (argument == "--walk-020" || argument == "--walk-025" || argument == "--walk-030") {
       if (result.walk_speed > 0.0) throw std::runtime_error("only one walking profile can be selected");
       result.walk_speed = argument == "--walk-020" ? .20 : argument == "--walk-025" ? .25 : .30;
@@ -603,6 +613,8 @@ Options parse_options(int argc, char** argv) {
   }
   if (result.direct_policy_start && !result.tracked_startup)
     throw std::runtime_error("direct policy start requires protected tracked transport");
+  if (result.all_joint_500hz && !result.coherent_action_send)
+    throw std::runtime_error("500 Hz transport requires coherent direct control");
   if (result.coherent_action_send && !result.direct_policy_start)
     throw std::runtime_error("coherent send requires direct protected control");
   if (result.supermimic_commissioning && result.realtime_priority != kSuperMimicRealtimePriority) {
@@ -755,7 +767,7 @@ std::array<std::uint8_t, 8> zero_gain_payload(const Motor& motor) {
   return data;
 }
 
-Socket open_socket(const std::string& interface, bool timestamp_feedback = false, bool trace_tx = false) {
+Socket open_socket(const std::string& interface, bool timestamp_feedback = false, bool trace_tx = false, std::size_t trace_capacity = 200000) {
   const int fd = socket(PF_CAN, SOCK_RAW | SOCK_NONBLOCK, CAN_RAW);
   if (fd < 0) throw std::runtime_error("failed to open CAN socket");
   int enable_fd = 1;
@@ -799,7 +811,7 @@ Socket open_socket(const std::string& interface, bool timestamp_feedback = false
   Socket result;
   result.interface = interface;
   result.fd = fd;
-  if (trace_tx) result.tx_trace.prepare();
+  if (trace_tx) result.tx_trace.prepare(trace_capacity);
   return result;
 }
 
@@ -1208,7 +1220,7 @@ void send_poll(Socket& socket, Motor& motor) {
         "CAN-FD zero-gain write failed for " + motor.name + ": " + std::strerror(errno));
   }
   ++motor.tx_count;
-  socket.tx_trace.sent(motor.can_id, begin, socket.tx_trace.enabled ? monotonic_ns() : 0, realtime);
+  socket.tx_trace.sent(motor.can_id, begin, socket.tx_trace.enabled ? monotonic_ns() : 0, realtime, motor.feedback_ns);
 }
 
 std::array<std::uint8_t, 8> hold_payload(
@@ -1347,7 +1359,7 @@ void send_payload(Socket& socket, Motor& motor,
     throw std::runtime_error("CAN-FD hold write failed for " + motor.name);
   }
   ++motor.tx_count;
-  socket.tx_trace.sent(motor.can_id, begin, socket.tx_trace.enabled ? monotonic_ns() : 0, realtime);
+  socket.tx_trace.sent(motor.can_id, begin, socket.tx_trace.enabled ? monotonic_ns() : 0, realtime, motor.feedback_ns);
 }
 
 void send_special(Socket& socket, Motor& motor, std::uint8_t opcode) {
@@ -1581,6 +1593,11 @@ void drain_policy_feedback(
           decode_uint(raw_torque, motor.torque_min, motor.torque_max, 12);
       motor.last_status_code = status_code;
       if (timestamp_feedback) motor.feedback_ns = feedback_ns;
+      if (timestamp_feedback && motor.trace_feedback) {
+        if (motor.feedback_trace.size() == motor.feedback_trace.capacity())
+          throw std::runtime_error("500 Hz feedback evidence capacity exceeded");
+        motor.feedback_trace.push_back({feedback_ns, monotonic_ns()});
+      }
       motor.maximum_abs_speed =
           std::max(motor.maximum_abs_speed, std::abs(motor.last_velocity));
       motor.maximum_abs_feedback_torque = std::max(
@@ -1871,6 +1888,8 @@ int run_native_protected_policy(
   const bool pd_position_saturation = options.tracked_startup;
   const bool sling = options.sling_ready_fd >= 0;
   const bool walking = options.walk_speed > 0.0;
+  const bool full_rate = options.all_joint_500hz;
+  const auto send_order = sprite_policy::interleaved_motor_order(motors, full_rate);
   bool sling_window_opened = false;
   bool sling_blend_started = false;
   std::int64_t sling_notice_ns = 0;
@@ -1910,6 +1929,8 @@ int run_native_protected_policy(
   std::size_t last_published_cycle = std::numeric_limits<std::size_t>::max();
   std::uint64_t active_action_sequence = 1;
   std::size_t coherent_groups = 0;
+  std::size_t full_rate_ticks = 0;
+  std::size_t full_rate_feedback_period_misses = 0;
   sprite_policy::ActionTxContext active_action;
   const auto drain_tx = [&]() {
     for (auto& socket : sockets) socket.tx_trace.drain(socket.fd);
@@ -1962,7 +1983,7 @@ int run_native_protected_policy(
     if (strict) {
       if (prctl(PR_SET_TIMERSLACK, 1UL, 0UL, 0UL, 0UL) != 0)
         throw std::runtime_error("cannot set strict CAN timer slack");
-      pack_supermimic_polls(motors);
+      if (!full_rate) pack_supermimic_polls(motors);
       ipc.timing.reserve(1 + transport_slots / 40);
     }
     if (pd_position_saturation) use_peak_pd_command_caps(motors);
@@ -1976,7 +1997,8 @@ int run_native_protected_policy(
         throw std::runtime_error("protected-policy shutdown signal received during preparation");
       }
       sleep_until(preparation_start + static_cast<std::int64_t>(slot) * kTransportPeriodNs);
-      for (auto& motor : motors) {
+      for (const auto index : send_order) {
+        auto& motor = motors[index];
         if (!due(motor, slot)) continue;
         if (strict && motor.poll_rate_hz == 50) motor.cycle_poll_ns = monotonic_ns();
         send_poll(sockets[socket_index.at(motor.interface)], motor);
@@ -2079,6 +2101,21 @@ int run_native_protected_policy(
         }
       }
 
+      if (full_rate) {
+        // Read all available RX before making this boundary's state snapshot.
+        drain_policy_feedback(sockets, motors, feedback_map,
+                              powered ? (slot < 200 ? -1 : 1) : 0, true, strict);
+        drain_tx();
+        if (sprite_policy::full_rate_due(slot) && slot >= 4) {
+          for (const auto& motor : motors) {
+            const auto checked_ns = monotonic_ns();
+            // A 2 ms output period is not a 2 ms RX deadline. Measure lag;
+            // retain the existing source-feedback and target-watchdog gates.
+            if (checked_ns - motor.feedback_ns > sprite_policy::kFullRatePeriodNs)
+              ++full_rate_feedback_period_misses;
+          }
+        }
+      }
       drain_target_packets(ipc, options.policy_joint_hash, joint_safety, woke_ns, strict);
       enforce_pending_deadline();
       if (!ipc.has_target || woke_ns - ipc.last_target_ns > kTargetTimeoutNs) {
@@ -2117,20 +2154,28 @@ int run_native_protected_policy(
       // Validate the entire group before the first write. No old-action motor
       // command may be interleaved once this single-threaded commit begins.
       std::array<std::array<std::uint8_t, 8>, kJointCount> payloads{};
-      if (commit) {
+      const bool send_all = full_rate && sprite_policy::full_rate_due(slot);
+      if (commit || send_all) {
         for (std::size_t i=0; i<motors.size(); ++i)
           payloads[i] = protected_policy_payload(motors[i], bound_command, pd_position_saturation);
-        const auto& timing = ipc.timing.back();
-        if (timing.sequence != ipc.last_target_source_sequence || !timing.accept_ns)
-          throw std::runtime_error("coherent action lacks accepted source timing");
-        active_action = {timing.sequence, timing.feedback_ns, timing.accept_ns, false, powered};
-        active_action_sequence = timing.sequence;
+        if (commit || active_action.sequence == 0) {
+          const auto& timing = ipc.timing.back();
+          if (timing.sequence != ipc.last_target_source_sequence || !timing.accept_ns)
+            throw std::runtime_error("coherent action lacks accepted source timing");
+          active_action = {timing.sequence, timing.feedback_ns, timing.accept_ns, false, powered};
+          active_action_sequence = timing.sequence;
+        }
+        if (send_all) {
+          active_action.control_tick = ++full_rate_ticks;
+          active_action.scheduled_ns = deadline_ns;
+        }
       }
-      for (std::size_t i=0; i<motors.size(); ++i) {
+      for (std::size_t rank=0; rank<motors.size(); ++rank) {
+        const auto i = full_rate ? send_order[rank] : rank;
         auto& motor = motors[i];
         const bool nominal = due(motor, slot);
         if (!commit && !nominal) continue;
-        const auto payload = commit ? payloads[i] :
+        const auto payload = (commit || send_all) ? payloads[i] :
             protected_policy_payload(motor, bound_command, pd_position_saturation);
         auto& socket = sockets[socket_index.at(motor.interface)];
         socket.tx_trace.context = active_action;
@@ -2145,6 +2190,8 @@ int run_native_protected_policy(
         if (powered) send_payload(socket, motor, payload);
         else send_poll(socket, motor);
       }
+      if (send_all && monotonic_ns() >= deadline_ns + sprite_policy::kFullRatePeriodNs)
+        throw std::runtime_error("500 Hz full-group dispatch overran its control period");
       if (commit) ++coherent_groups;
       drain_tx();
       // Permit only the short enable transition; require all endpoints enabled
@@ -2207,7 +2254,8 @@ int run_native_protected_policy(
     drain_policy_feedback(sockets, motors, feedback_map, powered ? 1 : 0, true, strict);
     if (strict) {
       drain_target_packets(ipc, options.policy_joint_hash, joint_safety, monotonic_ns(), strict);
-      if (ipc.target_count != 1 + transport_slots / 40 ||
+      if ((full_rate && full_rate_ticks != transport_slots / 4) ||
+          ipc.target_count != 1 + transport_slots / 40 ||
           ipc.last_target_source_sequence != ipc.state_sequence ||
           (options.coherent_action_send &&
            (active_action_sequence != ipc.last_target_source_sequence ||
@@ -2263,7 +2311,8 @@ int run_native_protected_policy(
     bool verify_tx_failed = false;
     for (std::size_t slot = 0; slot < 400; ++slot) {
       sleep_until(verify_start + static_cast<std::int64_t>(slot) * kTransportPeriodNs);
-      for (auto& motor : motors) {
+      for (const auto index : send_order) {
+        auto& motor = motors[index];
         if (!due(motor, slot)) continue;
         try {
           send_poll(sockets[socket_index.at(motor.interface)], motor);
@@ -2294,6 +2343,11 @@ int run_native_protected_policy(
     catch (const std::exception& error) { append_failure(error.what()); }
   }
 
+  // Shutdown and final feedback verification are complete. Do not make the
+  // actor wait for the large 500 Hz evidence files to be serialized. Its EOF
+  // only signals transport completion; the supervisor still checks this report.
+  if (full_rate) close_ipc(ipc);
+
   std::ostringstream report;
   report << std::fixed << std::setprecision(6)
       << "{\n  \"mode\": \"" << (powered ? "native_suspended_protected_policy_actuation"
@@ -2316,6 +2370,9 @@ int run_native_protected_policy(
       << "  \"tracked_startup\": " << (options.tracked_startup ? "true" : "false") << ",\n"
       << "  \"direct_policy_start\": " << (options.direct_policy_start ? "true" : "false") << ",\n"
       << "  \"coherent_action_send\": " << (options.coherent_action_send ? "true" : "false") << ",\n"
+      << "  \"all_joint_500hz\": " << (full_rate ? "true" : "false") << ",\n"
+      << "  \"full_rate_ticks\": " << full_rate_ticks << ",\n"
+      << "  \"full_rate_feedback_period_misses\": " << full_rate_feedback_period_misses << ",\n"
       << "  \"coherent_action_groups\": " << coherent_groups << ",\n"
       << "  \"sling_window_opened\": " << (sling_window_opened ? "true" : "false") << ",\n"
       << "  \"sling_notice_to_blend_ms\": " << sling_notice_to_blend_ns / 1.0e6 << ",\n"
@@ -2380,15 +2437,24 @@ int run_native_protected_policy(
   output << report.str();
   if (options.coherent_action_send) {
     std::ofstream trace(options.output + ".tx.csv");
-    trace << "interface,packet_id,motor_id,sequence,feedback_ns,accept_ns,group,powered,call_begin_ns,call_end_ns,realtime_before_ns,software_realtime_ns,hardware_raw_ns,hardware_received_ns\n";
+    trace << "interface,packet_id,motor_id,sequence,feedback_ns,accept_ns,group,powered,call_begin_ns,call_end_ns,realtime_before_ns,software_realtime_ns,hardware_raw_ns,hardware_received_ns,control_tick,scheduled_ns,motor_feedback_ns\n";
     for (const auto& socket : sockets) for (const auto& e : socket.tx_trace.events)
       trace << socket.interface << ',' << e.id << ',' << e.motor_id << ',' << e.context.sequence << ','
             << e.context.feedback_ns << ',' << e.context.accepted_ns << ',' << e.context.group << ','
             << e.context.powered << ',' << e.call_begin_ns << ',' << e.call_end_ns << ','
             << e.realtime_before_ns << ',' << e.software_realtime_ns << ',' << e.hardware_raw_ns << ','
-            << e.hardware_received_ns << '\n';
+            << e.hardware_received_ns << ',' << e.context.control_tick << ','
+            << e.context.scheduled_ns << ',' << e.motor_feedback_ns << '\n';
     trace.close();
     if (!trace) throw std::runtime_error("cannot write action TX trace");
+  }
+  if (full_rate) {
+    std::ofstream trace(options.output + ".rx.csv");
+    trace << "interface,motor_id,feedback_ns,dequeue_ns\n";
+    for (const auto& motor : motors) for (const auto& sample : motor.feedback_trace)
+      trace << motor.interface << ',' << motor.can_id << ',' << sample[0] << ',' << sample[1] << '\n';
+    trace.close();
+    if (!trace) throw std::runtime_error("cannot write 500 Hz feedback trace");
   }
   if (strict) {
     std::ofstream trace(options.output + ".timing.csv");
@@ -2574,7 +2640,11 @@ int main(int argc, char** argv) {
       return 0;
     }
     const Options options = parse_options(argc, argv);
-    auto motors = load_motors(options.config);
+    auto motors = load_motors(options.config, options.all_joint_500hz);
+    if (options.all_joint_500hz) for (auto& motor : motors) {
+      motor.trace_feedback = true;
+      motor.feedback_trace.reserve(sprite_policy::full_rate_trace_capacity(options.duration_s, 1));
+    }
     const auto joint_safety = options.joint_safety_config.empty()
         ? std::vector<JointSafety>{}
         : load_joint_safety(options.joint_safety_config);
@@ -2599,7 +2669,8 @@ int main(int argc, char** argv) {
       if (socket_index.count(motor.interface) == 0) {
         socket_index[motor.interface] = sockets.size();
         sockets.push_back(open_socket(motor.interface, options.supermimic_commissioning,
-                                      options.coherent_action_send));
+                                      options.coherent_action_send, options.all_joint_500hz
+                                          ? sprite_policy::full_rate_trace_capacity(options.duration_s, 8) : 200000));
       }
     }
     if (sockets.size() != 4) throw std::runtime_error("exactly four CAN interfaces required");

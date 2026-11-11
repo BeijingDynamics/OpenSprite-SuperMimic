@@ -13,11 +13,11 @@ if [[ "$mode" != --check-cache-only ]]; then
   printf '%s\n' "$session" > "$stage/latest-session.txt"
 fi
 exec > >(tee -a "$session/operator-run.log") 2>&1
-printf '\n[Configuration check; no hardware TX] Full training gains on all 31 joints; forward command 0.25 m/s for 10 seconds; lateral/yaw commands zero.\n'
+printf '\n[Configuration check; no hardware TX] All 31 motors at 500 Hz, policy at 50 Hz; full training gains; forward command 0.25 m/s for 10 seconds; lateral/yaw commands zero.\n'
 validation="$session"
 if [[ "$mode" == run || "$mode" == --check-cache-only ]]; then
   set +e
-  "$python" "$stage/select-validation.py" --stage "$stage" --direct-policy-start --coherent-action-send --report "$session/validation-cache.json" > "$session/config-preflight.log" 2>&1
+  "$python" "$stage/select-validation.py" --stage "$stage" --direct-policy-start --coherent-action-send --all-joint-500hz --report "$session/validation-cache.json" > "$session/config-preflight.log" 2>&1
   cache_result=$?
   set -e
   if [[ $cache_result -eq 0 ]]; then

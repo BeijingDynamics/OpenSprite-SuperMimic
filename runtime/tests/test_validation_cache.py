@@ -34,6 +34,17 @@ class ValidationCacheTests(unittest.TestCase):
     def test_same_build_pair_reusable(self):
         cache.check_reports(self.session,self.expected)
 
+    def test_full_rate_cannot_reuse_mixed_rate_records(self):
+        with self.assertRaises(ValueError):
+            cache.check_reports(self.session,self.expected,all_joint_500hz=True)
+        for mode in ('dry','fault'):
+            path=self.session/mode/'commissioning.json'
+            report=json.loads(path.read_text());report['all_joint_500hz']=True
+            path.write_text(json.dumps(report))
+        cache.check_reports(self.session,self.expected,all_joint_500hz=True)
+        with self.assertRaises(ValueError):
+            cache.check_reports(self.session,self.expected)
+
     def test_direct_start_cannot_reuse_ramped_start_evidence(self):
         with self.assertRaises(ValueError):
             cache.check_reports(self.session,self.expected,direct_policy_start=True)

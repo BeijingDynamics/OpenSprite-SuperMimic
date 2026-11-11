@@ -17,6 +17,8 @@ struct ActionTxContext {
   std::uint64_t sequence=0;
   std::int64_t feedback_ns=0, accepted_ns=0;
   bool group=false, powered=false;
+  std::uint64_t control_tick=0;
+  std::int64_t scheduled_ns=0;
 };
 struct ActionTxEvent {
   ActionTxContext context;
@@ -26,17 +28,18 @@ struct ActionTxEvent {
   std::int64_t realtime_before_ns=0;
   std::int64_t software_realtime_ns=0, hardware_raw_ns=0;
   std::int64_t hardware_received_ns=0;
+  std::int64_t motor_feedback_ns=0;
 };
 class ActionTxTrace {
 public:
   bool enabled=false;
   ActionTxContext context;
   std::vector<ActionTxEvent> events;
-  void prepare() { enabled=true; events.reserve(200000); }
-  void sent(int motor_id, std::int64_t begin, std::int64_t end, std::int64_t realtime=0) {
+  void prepare(std::size_t capacity=200000) { enabled=true; events.reserve(capacity); }
+  void sent(int motor_id, std::int64_t begin, std::int64_t end, std::int64_t realtime=0, std::int64_t feedback=0) {
     if (!enabled) return;
     if (events.size()==events.capacity()) throw std::runtime_error("TX evidence capacity exceeded");
-    events.push_back({context,static_cast<std::uint32_t>(events.size()),motor_id,begin,end,realtime,0,0,0});
+    events.push_back({context,static_cast<std::uint32_t>(events.size()),motor_id,begin,end,realtime,0,0,0,feedback});
   }
   void stamp(std::uint32_t id,std::int64_t software,std::int64_t hardware,std::int64_t received=0) {
     if(id>=events.size()) throw std::runtime_error("TX timestamp unmatched packet ID");

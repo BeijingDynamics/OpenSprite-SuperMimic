@@ -14,6 +14,10 @@ target_compile_options(sprite_can_shadow PRIVATE -Wall -Wextra -Wpedantic -Werro
 target_link_libraries(sprite_can_shadow PRIVATE pthread)
 
 enable_testing()
+add_executable(test_full_rate tests/test_full_rate.cpp)
+target_compile_options(test_full_rate PRIVATE -Wall -Wextra -Wpedantic -Werror -UNDEBUG)
+target_link_libraries(test_full_rate PRIVATE pthread)
+add_test(NAME full_rate COMMAND test_full_rate)
 add_executable(test_action_tx tests/test_action_tx.cpp)
 target_compile_options(test_action_tx PRIVATE -Wall -Wextra -Wpedantic -Werror -UNDEBUG)
 add_test(NAME action_tx COMMAND test_action_tx)

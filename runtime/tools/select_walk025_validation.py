@@ -19,7 +19,7 @@ def sha(path):
     return hashlib.sha256(path.read_bytes()).hexdigest()
 
 
-def check_reports(session, expected, direct_policy_start=False, coherent_action_send=False):
+def check_reports(session, expected, direct_policy_start=False, coherent_action_send=False, all_joint_500hz=False):
     """Fail closed on mismatched, failed, incomplete or modified evidence."""
     for directory, mode in (('dry', 'disabled'), ('fault', 'deadline_fault')):
         folder = session/directory
@@ -36,12 +36,14 @@ def check_reports(session, expected, direct_policy_start=False, coherent_action_
             raise ValueError(f'{directory}: startup mode mismatch')
         if prior.get('coherent_action_send', False) != coherent_action_send:
             raise ValueError(f'{directory}: action send mode mismatch')
+        if prior.get('all_joint_500hz', False) != all_joint_500hz:
+            raise ValueError(f'{directory}: all-joint rate mode mismatch')
         for name in ('motors.tsv','kinematics.tsv','joints.tsv','feedback.bin','target.bin','input.bin'):
             if sha(folder/name) != expected[name]:
                 raise ValueError(f'{directory}: archived {name} modified')
 
 
-def current_fingerprints(stage, coherent_action_send=False):
+def current_fingerprints(stage, coherent_action_send=False, all_joint_500hz=False):
     base = stage.parent
     sys.path.insert(0, str(base/'live-shadow-1700/src'))
     launcher = stage/'tools/run_supermimic_commissioning.py'
@@ -74,9 +76,12 @@ def current_fingerprints(stage, coherent_action_send=False):
                 raise ValueError('transmission changed: '+name)
         target = module.apply_training_gains(out/'joints.tsv',(out/'target.bin').read_bytes(),contract)
         (out/'target.bin').write_bytes(b'SPMTGT02'+target[8:]+module.startup_joint_roles(contract.data['joint_names']))
+        if all_joint_500hz:
+            module.apply_all_joint_500hz(out/"motors.tsv")
         paths = [launcher, model, base/'zero-gain-1618/build/icm/sprite_icm45686',
                  stage/'build/sprite_can_shadow',stage/'build/sprite_supermimic_protected_ipc']
         if coherent_action_send: paths.append(stage/'tools/action_tx_audit.py')
+        if all_joint_500hz: paths += [stage/'tools'/name for name in ('transport_profile.py','full_rate_tx_audit.py')]
         paths += [out/name for name in ('motors.tsv','kinematics.tsv','joints.tsv','feedback.bin','target.bin','input.bin')]
         result = {path.name: sha(path) for path in paths}
         if coherent_action_send:
@@ -90,20 +95,21 @@ def main():
     parser.add_argument('--report',type=Path,required=True)
     parser.add_argument('--direct-policy-start',action='store_true')
     parser.add_argument('--coherent-action-send',action='store_true')
+    parser.add_argument('--all-joint-500hz',action='store_true')
     args = parser.parse_args()
     stage = args.stage.resolve()
     report = dict(selected=None, file_only=True, rejected=[])
     try:
         # prepare() child processes write to stdout; reserve selection in JSON.
-        expected = current_fingerprints(stage,args.coherent_action_send)
+        expected = current_fingerprints(stage,args.coherent_action_send,args.all_joint_500hz)
         report['fingerprints'] = expected
         for session in sorted((stage/'runs').glob('*'),reverse=True):
             if not session.is_dir() or session.is_symlink():
                 continue
             try:
-                check_reports(session,expected,args.direct_policy_start,args.coherent_action_send)
+                check_reports(session,expected,args.direct_policy_start,args.coherent_action_send,args.all_joint_500hz)
                 result = subprocess.run([sys.executable,str(stage/'check-records.py'),str(session)],
-                                        capture_output=True,text=True,timeout=30)
+                                        capture_output=True,text=True,timeout=180)
                 if result.returncode:
                     raise ValueError('retained command/history/disable trace check failed')
                 report['selected'] = str(session.resolve())

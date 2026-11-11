@@ -8,7 +8,7 @@ actuator-level validation, and supervised hardware experiments.
 **License: [AGPL-3.0](LICENSE).** External code, assets, and motion datasets retain
 their own terms; see [Data and licenses](DATA_AND_LICENSES.md).
 
-## Current progress — November 10, 2026
+## Current progress — November 11, 2026
 
 **The robot has walked under the SuperMimic policy in supervised hardware tests.**
 Two direct-start trials completed using a **0.25 m/s forward command**, full
@@ -17,10 +17,16 @@ not an externally measured walking speed. The operator reported intermittent
 steps, right-foot dragging, outward-facing feet, and startup yaw. Reliable gait
 quality and unrestricted operation remain open work.
 
-The newest transport change commits each policy action to all 31 motors as one
-group, avoiding an extra low-rate send cycle for hips and knees. It has passed
-**disabled-motor validation and a deliberate 20 ms timeout test**; it has not yet
-been evaluated during powered walking.
+The coherent-send change commits each policy action to all 31 motors as one
+group, avoiding an extra low-rate send cycle for hips and knees. Its disabled
+validation and deliberate 20 ms timeout test passed. The operator subsequently
+reported no clear gait improvement during powered walking.
+
+This **`supermimic_500hz` experimental branch** extends that transport to all
+31 motors every 2 ms, while retaining the 50 Hz policy, full training gains and
+existing protections. Its isolated deployment and validation status are recorded
+in the [500 Hz design and implementation report](docs/ALL_JOINT_500HZ_DESIGN_20261111.md).
+Powered gait improvement with this mode has not been established.
 
 | Stage | Recorded result | Scope |
 |---|---|---|

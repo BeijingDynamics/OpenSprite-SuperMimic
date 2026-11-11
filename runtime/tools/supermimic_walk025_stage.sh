@@ -25,5 +25,5 @@ exec /home/tony/open_sprite_runtime/.venv/bin/python "$stage/tools/run_supermimi
   --joint-limits "$base/strict-sm-20261109/sprite0825_urdf_limit_candidates.json" \
   --build "$stage/build" --icm "$base/zero-gain-1618/build/icm/sprite_icm45686" \
   --lock "$base/commissioning.lock" --output "$session/$result" \
-  --tracked-startup "$stage/reviewed-profile" --training-full-body --direct-policy-start --coherent-action-send --sling-window --walk-025 \
+  --tracked-startup "$stage/reviewed-profile" --training-full-body --direct-policy-start --coherent-action-send --all-joint-500hz --sling-window --walk-025 \
   --operator-status "$session/operator-status.log" "${extra[@]}"

@@ -1,9 +1,11 @@
 # All-joint 500 Hz transport proposal
 
-Status: analysis only; no controller implementation or deployment in this branch.
+Status: implemented in an isolated candidate; disabled hardware qualification
+is in progress. Powered walking with this candidate has not been tested.
 Branch: `supermimic_500hz`, based on `32d6dfb`. This repository's runtime snapshot
 is the source of the deployed coherent-send executable; the separate runtime
-checkout is older. Existing working trees and Jetson deployment are unchanged.
+checkout is older. Existing working trees and previous Jetson deployments are
+preserved. The candidate uses its own `walk025-500hz-1111` stage.
 
 ## Contract
 
@@ -20,7 +22,7 @@ delivery of dynamic torque saturation and parallel-linkage mapping. This reduces
 one deployment mismatch; it does not make the physical system identical to the
 serial-actuator training simulation or establish that transport causes the gait.
 
-## Current implementation findings
+## Baseline implementation findings
 
 - Four ankle motors have a nominal 500 Hz schedule; 27 others have 50 Hz slots.
   Coherent sending additionally transmits the whole group for every new action,
@@ -122,3 +124,52 @@ Expected benefit is fresher all-body feedback and prompt delivery of state-based
 PD protection. It cannot by itself repair outward foot placement already present
 in simulation, and does not accelerate ONNX inference. The first November 11
 validation's 13.97 ms inference tail remains a separately recorded issue.
+
+## Implementation and first-trial correction
+
+The opt-in `--all-joint-500hz` mode requires coherent direct control and a
+31-motor profile in which only `poll_rate_hz` changes. Each boundary computes and
+checks all mapped payloads before sending any member. An accepted policy action
+is latched once, then reused at subsequent boundaries with fresh motor feedback.
+The action source timestamp is not refreshed by repeated transmission.
+
+TX evidence includes action ID, control-tick ID, scheduled boundary, send-call
+timestamps, software and adapter timestamps, completion receipt, and the latest
+motor feedback timestamp. RX evidence separately records receive and dequeue
+times. Trace storage is reserved before realtime control; CSV output and audits
+run after shutdown. Separate adapter clocks are never directly subtracted.
+
+The first disabled trial stopped after 141 control ticks because the candidate
+incorrectly introduced a 2 ms feedback deadline, treating the send period as a
+mandatory reply deadline. Its TX audit also treated completion-notification
+receipt as physical send time. These were additional checks, not baseline
+protections. The corrected build measures both delays while retaining the
+original 20 ms action deadline, 2 ms wake guard and all motor protections.
+The first failure and binary are retained. All 31 motors were read back disabled;
+there were no enable attempts. Its longest per-bus physical group span was about
+0.61 ms and longest same-motor physical send interval about 2.22 ms, which did
+not show accumulating TX queues during that short trial.
+
+Qualification still requires complete, unmixed 31-motor groups on every 2 ms
+boundary, host dispatch within its period, complete timestamps, no skipped
+control ticks, and actual per-motor physical TX intervals below 4 ms. The latter
+is an experiment qualification bound, not a claim of zero transport jitter.
+Actual RX coverage and gaps are measured separately. Existing source-feedback
+and motor protections remain authoritative during control.
+
+Ten native tests and 26 Python tests (plus 18 parameterized subtests) pass.
+Recorded replay covers 2476 state frames / 2475 formal policy frames, with
+bit-identical warmup/no-warmup output and motor-protection audit output matching
+the mixed-rate baseline byte for byte: zero rejected frames, 661 saturation
+events. These recorded 50 Hz samples cannot reconstruct missing physical
+500 Hz feedback or predict powered gait.
+
+A second trial completed all 24,750 control ticks / 767,250 motor dispatches
+and received exactly 24,750 replies from every motor over 49.5 s. TX/RX audits
+passed, but the actor reported a controller-close timeout: the CAN owner kept
+the IPC connection open while serializing the much larger evidence files after
+final disable verification. That trial remains a failed commissioning result.
+The final candidate closes IPC after shutdown/feedback verification and before
+writing evidence. It preserves the actor binary and its completion timeout;
+supervisor admission still requires the CAN report and 31 disabled readbacks.
+An EOF test covers the close operation. No motor was enabled in these trials.
