@@ -36,6 +36,28 @@ int main() {
   assert(fast.short_torque_squared_samples.size()==500);
   assert(fast.long_torque_squared_samples.size()==5000);
   assert(fast.maximum_short_torque_rms==2. && fast.maximum_long_torque_rms==2.);
+  Motor delayed;
+  delayed.cadence_monitors=true;
+  delayed.full_rate_monitors=true;
+  delayed.monitor_epoch_ns=1'000'000;
+  delayed.monitor_poll_ns=3'000'000;
+  delayed.nominal_sends=2;
+  assert(!admit_monitor_sample(delayed,999'999));
+  // Two replies are drained together after the second send. Both must feed
+  // the unchanged 1 s/10 s RMS and temperature monitoring, not just the latter.
+  assert(admit_monitor_sample(delayed,2'500'000));
+  assert(admit_monitor_sample(delayed,3'500'000));
+  assert(delayed.monitor_samples==2);
+  assert(!admit_monitor_sample(delayed,3'600'000));
+  ++delayed.nominal_sends;
+  assert(admit_monitor_sample(delayed,5'500'000));
+  Motor mixed;
+  mixed.cadence_monitors=true;
+  mixed.monitor_poll_ns=3'000'000;
+  assert(!admit_monitor_sample(mixed,2'500'000));
+  assert(admit_monitor_sample(mixed,3'500'000));
+  assert(!admit_monitor_sample(mixed,3'600'000));
+  assert(mixed.monitor_samples==1);
   // Completion EOF must not depend on serialization of the recorded evidence.
   int pair[2];
   assert(socketpair(AF_UNIX, SOCK_SEQPACKET | SOCK_NONBLOCK, 0, pair)==0);

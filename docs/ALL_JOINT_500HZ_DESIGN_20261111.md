@@ -173,3 +173,23 @@ The final candidate closes IPC after shutdown/feedback verification and before
 writing evidence. It preserves the actor binary and its completion timeout;
 supervisor admission still requires the CAN report and 31 disabled readbacks.
 An EOF test covers the close operation. No motor was enabled in these trials.
+
+The next candidate completed a full disabled run and closed normally. During
+its deliberate inference-pause run, the original 20 ms guard fired and all 31
+motors were read back disabled, but the unchanged monitor-coverage audit rejected
+head yaw: 16,937 monitor samples for 18,033 nominal sends. Independent physical
+TX/RX auditing passed. Replaying the receive order reproduced the loss in the
+old latest-poll filter: replies received after a subsequent send were excluded
+from RMS/temperature sampling even though the feedback itself was valid.
+
+In the full-rate mode every send is nominal. The corrected monitor therefore
+consumes each fresh active feedback sample once, bounded by the number of
+nominal sends, instead of filtering by only the latest poll. Monotonic timestamp
+validation still runs before sample admission. No reply is assigned a fabricated
+action identity. Mixed-rate filtering is unchanged. The 1 s/10 s RMS windows,
+2 s temperature time constant, equations, thresholds and 95% coverage audit
+remain unchanged. Recorded-order replay accounts for every retained active
+sample; at fault exit one final reply can still be in flight. Native tests cover
+delayed replies drained together, pre-control samples, excess samples, and the
+unchanged mixed-rate behavior. This monitor correction requires fresh hardware
+qualification; earlier passing records do not admit the new binary.

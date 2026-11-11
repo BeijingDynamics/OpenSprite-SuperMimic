@@ -125,6 +125,8 @@ struct Motor {
   std::int64_t monitor_poll_ns = 0;
   std::size_t monitor_samples = 0;
   std::size_t nominal_sends = 0;
+  bool full_rate_monitors = false;
+  std::int64_t monitor_epoch_ns = 0;
   bool trace_feedback = false;
   std::vector<std::array<std::int64_t, 2>> feedback_trace;
   int maximum_mos_temperature = 0;
@@ -1536,6 +1538,23 @@ ssize_t read_timestamped_feedback(int fd, canfd_frame& frame, std::int64_t& feed
   throw std::runtime_error("missing, stale or future kernel CAN feedback timestamp");
 }
 
+bool admit_monitor_sample(Motor& motor, std::int64_t feedback_ns) {
+  if (!motor.cadence_monitors) return true;
+  if (motor.full_rate_monitors) {
+    // Every send is nominal in this mode. Consume each fresh active RX once,
+    // even if it arrives after a later send. Replies do not echo action IDs;
+    // this is sample accounting, not a fabricated command/reply association.
+    if (motor.monitor_epoch_ns <= 0 || feedback_ns < motor.monitor_epoch_ns ||
+        motor.monitor_samples >= motor.nominal_sends) return false;
+    ++motor.monitor_samples;
+    return true;
+  }
+  if (motor.monitor_poll_ns <= 0 || feedback_ns < motor.monitor_poll_ns) return false;
+  motor.monitor_poll_ns = 0;
+  ++motor.monitor_samples;
+  return true;
+}
+
 void drain_policy_feedback(
     std::vector<Socket>& sockets, std::vector<Motor>& motors,
     const std::map<std::pair<std::string, int>, std::size_t>& feedback_map,
@@ -1602,10 +1621,7 @@ void drain_policy_feedback(
           std::max(motor.maximum_abs_speed, std::abs(motor.last_velocity));
       motor.maximum_abs_feedback_torque = std::max(
           motor.maximum_abs_feedback_torque, std::abs(feedback_torque));
-      const bool monitor_sample = !motor.cadence_monitors ||
-          (motor.monitor_poll_ns > 0 && feedback_ns >= motor.monitor_poll_ns);
-      if (monitor_sample) motor.monitor_poll_ns = 0;
-      if (motor.cadence_monitors && monitor_sample) ++motor.monitor_samples;
+      const bool monitor_sample = admit_monitor_sample(motor, feedback_ns);
       if (enforce_dynamic_guards && status_code == 1 && monitor_sample) {
         update_torque_rms_monitor(motor, feedback_torque);
       }
@@ -2185,6 +2201,8 @@ int run_native_protected_policy(
         if (nominal) {
           ++motor.nominal_sends;
           motor.monitor_poll_ns = monotonic_ns();
+          if (full_rate && motor.monitor_epoch_ns == 0)
+            motor.monitor_epoch_ns = motor.monitor_poll_ns;
           if (strict && motor.poll_rate_hz == 50) motor.cycle_poll_ns = motor.monitor_poll_ns;
         }
         if (powered) send_payload(socket, motor, payload);
@@ -2642,6 +2660,7 @@ int main(int argc, char** argv) {
     const Options options = parse_options(argc, argv);
     auto motors = load_motors(options.config, options.all_joint_500hz);
     if (options.all_joint_500hz) for (auto& motor : motors) {
+      motor.full_rate_monitors = true;
       motor.trace_feedback = true;
       motor.feedback_trace.reserve(sprite_policy::full_rate_trace_capacity(options.duration_s, 1));
     }
