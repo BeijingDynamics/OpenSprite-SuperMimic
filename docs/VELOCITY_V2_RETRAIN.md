@@ -57,8 +57,9 @@ training and must not be confused with zero-gain policy operation on hardware.
 
 Update after the November 12 video review: the operator approved PM01/G71 as
 the primary ordinary-walk reference style and rejected the displayed LAFAN/UMR
-upper-body posture. The LAFAN candidate batch is stopped; production training
-has not started. See [the reference style review](REFERENCE_STYLE_REVIEW_20261112.md)
+upper-body posture. The LAFAN candidate batch was stopped before production
+training. The subsequently launched PM01 baseline is recorded in
+[the recovery experiment](PM01_RECOVERY_TRAINING.md). See [the reference style review](REFERENCE_STYLE_REVIEW_20261112.md)
 for the measured postprocessing artifact, pending PM01 numerical qualification,
 and the distinction between optional dance references and world-model data.
 

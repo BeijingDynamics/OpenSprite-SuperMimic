@@ -6,6 +6,21 @@ SuperMimic: motion and velocity interfaces, shared decoder and world model,
 separate critics, equal environment allocation and the current v2 algorithm.
 It does not introduce AMP or a discriminator.
 
+## Launched run
+
+The first phase started at **2026-11-12 14:53 Asia/Shanghai**, from source
+commit `818792eefe3148141dee13546a9e1a23d352551a`. The rented-server run is
+`outputs/pm01-baseline-20261112-064405/training`. The first checkpoint was
+saved during dynamics warmup. Training startup is not a walking-quality result.
+The bounded evaluator is running alongside training. A hidden local backup job
+copies this run's essential artifacts hourly, with its first copy completed;
+it requires this Windows host to remain running and connected.
+
+Local destination: `outputs/retrain-20261112/pm01-recovery-training`.
+It includes the prepared reference, preserved audits, exact source snapshot,
+run configuration, checkpoint and subsequent evaluation evidence. Generic raw
+source datasets and dependency caches are excluded.
+
 ## Reference and qualification
 
 Use the operator-reviewed PM01/G71 whole-body walk adapted by name to the
