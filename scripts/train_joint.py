@@ -19,6 +19,7 @@ from opensprite_tracker.supermimic.rotations import yaw_mat
 from opensprite_tracker.supermimic.sampling import ReturnSampler
 from opensprite_tracker.supermimic.recovery import RecoveryImpulses
 from opensprite_tracker.supermimic.revisions import revision_contract,motion_goal
+from opensprite_tracker.supermimic.checkpoints import checkpoint_milestones,prunable_checkpoints
 
 class MixedReplay:
     def __init__(self,a,b):self.buffers=[a,b]
@@ -38,6 +39,7 @@ def reference_commands(motion):
 
 def train(cli):
     cfg=json.loads(cli.config.read_text())
+    milestones=checkpoint_milestones(cfg.get('checkpoint_iterations',[]))
     production_shape_smoke=getattr(cli,'smoke_production_shapes',False)
     if production_shape_smoke and not cli.smoke:
         raise ValueError('Production-shape benchmarking requires --smoke; it is not production training')
@@ -203,7 +205,7 @@ def train(cli):
         # Local synchronization runs every five minutes. Keep forty minutes of
         # recent checkpoints plus the first; hourly audits retain best policies.
         checkpoints=sorted(cli.output.glob('model_*.pt'))
-        for obsolete in checkpoints[1:-4]:obsolete.unlink()
+        for obsolete in prunable_checkpoints(checkpoints,milestones):obsolete.unlink()
     validation_generators=[torch.Generator(device=b.storage_device).manual_seed(cfg['seed']+991+i) for i,b in enumerate(buffers)]
     def validate_world(iteration):
         if not cfg['effective_wm_validation_envs_per_interface'] or min(b.size for b in buffers)<32:return
@@ -247,7 +249,7 @@ def train(cli):
                     (cli.output/'numerical_failure.json').write_text(json.dumps(dict(iteration=it+1,nonfinite=bad),indent=2))
                     raise FloatingPointError('Nonfinite training telemetry: '+str(bad))
                 log.write(json.dumps(row)+'\n');print('JOINT_UPDATE',json.dumps(row),flush=True);last_log=now;last_it=it+1
-            if it==0 or now-last_save>=cfg['save_seconds'] or finished:
+            if it==0 or now-last_save>=cfg['save_seconds'] or finished or it+1 in milestones:
                 save(it+1);validate_world(it+1);last_save=time.monotonic()
             if finished:break
     for env in envs:env.close()

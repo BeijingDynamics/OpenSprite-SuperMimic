@@ -236,3 +236,19 @@ explicit requested split. It rejects overlapping retarget/time-scaled
 alternatives and reserves a one-second source-time margin against the opposite
 split. An admission-withheld record takes precedence over earlier visual notes.
 Packing does not claim dynamic feasibility or hardware readiness.
+
+The first v13 standing and short forward references have passed independent
+bank validation and sampled front/side visual review. A two-clip assembly
+also passes the real packer and canonical FK/velocity validation. Its 499
+frames are an integration fixture, not the final locomotion training library.
+A further 5-second source walking segment (6.64 seconds after retiming) and a
+disjoint held-out idle segment have also passed numeric and visual review.
+
+The remaining arm errors are not primarily a missing filter. In two rejected
+walking/lateral candidates, torso-relative orientation smoothing changes the
+targets by less than 1.35 degrees, while upper-arm residuals reach 16.8 and
+22.5 degrees. Independent-frame arm-only optimization shows a tradeoff:
+increasing orientation weight reduces angular error but increases limb-direction
+error. This diagnostic omits temporal and collision constraints and is not a
+new reference. It supports retaining the existing quality gates and selecting
+compatible clips rather than hiding the errors with filtering or looser limits.

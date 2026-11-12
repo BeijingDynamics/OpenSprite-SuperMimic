@@ -85,3 +85,15 @@ material-point sliding, zero-command drift, forward/reverse/lateral/yaw
 response, starts/stops, foot headings and finite-force recovery. Inspect source
 arm/head fidelity as well as feet. No reference or simulated checkpoint in this
 record is automatically qualified for hardware deployment.
+
+Longer follow-up experiments can request exact `checkpoint_iterations` in their
+configuration. These snapshots survive ordinary retention; the evaluation
+watcher accepts `--required-iterations` and prioritizes them before regular
+latest-checkpoint reviews. This preserves an exact update-6,030 comparison
+while allowing training to continue. It changes checkpoint scheduling only,
+not optimization or the active isolated sole-height experiment. Eight focused
+tests cover retention, delayed polling, final draining and invalid inputs.
+
+Recorded rollout rendering optionally uses a brighter floor and closer camera.
+The physical rollout and telemetry remain unchanged; these are playback views,
+not newly simulated trajectories or reference animation substituted for policy.

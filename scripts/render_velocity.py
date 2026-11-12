@@ -38,7 +38,8 @@ def render(args):
                     for first,last in [([x0+k*step,y0,.002],[x0+k*step,y0+13*step,.002]),
                                        ([x0,y0+k*step,.002],[x0+13*step,y0+k*step,.002])]:
                         geom=scn.geoms[scn.ngeom]
-                        mujoco.mjv_initGeom(geom,mujoco.mjtGeom.mjGEOM_LINE,np.zeros(3),np.zeros(3),np.eye(3).ravel(),np.array([.38,.42,.46,1.]))
+                        grid_color=[.12,.15,.18,1.] if bright else [.38,.42,.46,1.]
+                        mujoco.mjv_initGeom(geom,mujoco.mjtGeom.mjGEOM_LINE,np.zeros(3),np.zeros(3),np.eye(3).ravel(),np.array(grid_color))
                         mujoco.mjv_connector(geom,mujoco.mjtGeom.mjGEOM_LINE,1.,np.array(first),np.array(last));scn.ngeom+=1
                 image=Image.fromarray(renderer.render());draw=ImageDraw.Draw(image)
                 cmd=data['commands'][t,env]

@@ -42,7 +42,11 @@ def main():
         if not quality['passed'] or 'arm_orientation_p95_deg' not in quality or not report.get('elbow_branch_passed'):
             raise ValueError('Candidate lacks complete arm orientation and elbow-branch QA')
         if not review['passed'] or review['candidate_sha256']!=sha(clip):raise ValueError('Missing or stale visual review')
+        if summary['candidate_sha256']!=sha(clip):raise ValueError('Candidate changed after independent validation')
         if review['review_bank_sha256']!=sha(folder/'review-bank.npz'):raise ValueError('Reviewed bank changed')
+        candidate_qa=json.loads((folder/'review-bank.qa.json').read_text())
+        if not candidate_qa['accepted_for_training'] or candidate_qa['motion_bank_sha256']!=review['review_bank_sha256']:
+            raise ValueError('Independent bank qualification is missing or stale')
         if any(value!=0 for value in summary['results'].values()):raise ValueError('Independent candidate validation failed')
         for name_,digest in review['evidence_sha256'].items():
             if sha(folder/name_)!=digest:raise ValueError('Visual evidence changed: '+name_)

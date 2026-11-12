@@ -2,6 +2,8 @@
 import argparse,json,os,shutil,subprocess,sys,time
 from pathlib import Path
 ROOT=Path(__file__).resolve().parents[1]
+sys.path.insert(0,str(ROOT))
+from opensprite_tracker.supermimic.checkpoints import checkpoint_milestones,evaluation_checkpoint
 
 
 def main():
@@ -9,7 +11,8 @@ def main():
     p.add_argument('--motion',type=Path,required=True);p.add_argument('--training-pid',type=int,required=True)
     p.add_argument('--max-seconds',type=int,default=46800);p.add_argument('--interval-seconds',type=int,default=3600)
     p.add_argument('--sole-audit',action='store_true',help='Audit reference, motion-interface and velocity-interface sole geometry')
-    a=p.parse_args();started=time.monotonic();last=0;done=set();env={**os.environ,'MUJOCO_GL':'egl'}
+    p.add_argument('--required-iterations',type=int,nargs='*',default=[],help='Evaluate these saved update counts before regular latest-checkpoint reviews')
+    a=p.parse_args();required=checkpoint_milestones(a.required_iterations);started=time.monotonic();last=0;done=set();env={**os.environ,'MUJOCO_GL':'egl'}
     status_path=a.training/'recovery_evaluation_status.json'
     if status_path.exists():
         prior=json.loads(status_path.read_text());done=set(prior['evaluated_iterations'])
@@ -20,9 +23,9 @@ def main():
         proc=Path('/proc',str(a.training_pid),'cmdline')
         alive=proc.exists() and str(a.training).encode() in proc.read_bytes()
         checkpoints=sorted(a.training.glob('model_*.pt'))
-        if checkpoints:
-            checkpoint=checkpoints[-1];iteration=int(checkpoint.stem.split('_')[-1])
-            due=iteration not in done and (not alive or (iteration>=1000 and (not done or time.monotonic()-last>=a.interval_seconds)))
+        checkpoint=evaluation_checkpoint(checkpoints,done,required,alive=alive,regular_due=not done or time.monotonic()-last>=a.interval_seconds)
+        if checkpoint is not None:
+            iteration=int(checkpoint.stem.split('_')[-1]);due=True
             if due:
                 audit=a.training/f'recovery-audit-{iteration:06d}';audit.mkdir(exist_ok=True)
                 frozen=audit/'checkpoint.pt'
@@ -48,14 +51,16 @@ def main():
                                  '--velocity-rollout',str(output/'rollout.npz'),
                                  '--output',str(audit/'sole-tracking-audit.json')],audit/'sole-audit.log')
                     done.add(iteration);last=time.monotonic()
-                    status_path.write_text(json.dumps(dict(evaluated_iterations=sorted(done),latest_audit=str(audit),sole_audit_enabled=a.sole_audit),indent=2)+'\n')
+                    status_path.write_text(json.dumps(dict(evaluated_iterations=sorted(done),required_iterations=sorted(required),latest_audit=str(audit),sole_audit_enabled=a.sole_audit),indent=2)+'\n')
                     print('RECOVERY_AUDIT_COMPLETE',iteration,flush=True)
                 except Exception as exc:
                     (audit/'evaluation_error.json').write_text(json.dumps(dict(error=str(exc)),indent=2)+'\n')
                     print('RECOVERY_AUDIT_ERROR',iteration,str(exc),flush=True)
                     if not alive:break
                     time.sleep(30)
-        if not alive:break
+        if not alive:
+            if evaluation_checkpoint(checkpoints,done,required,alive=False,regular_due=True) is None:break
+            continue
         time.sleep(30)
     print('RECOVERY_WATCH_FINISHED',flush=True)
 
