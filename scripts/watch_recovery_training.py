@@ -8,7 +8,12 @@ def main():
     p=argparse.ArgumentParser();p.add_argument('--training',type=Path,required=True)
     p.add_argument('--motion',type=Path,required=True);p.add_argument('--training-pid',type=int,required=True)
     p.add_argument('--max-seconds',type=int,default=46800);p.add_argument('--interval-seconds',type=int,default=3600)
+    p.add_argument('--sole-audit',action='store_true',help='Audit reference, motion-interface and velocity-interface sole geometry')
     a=p.parse_args();started=time.monotonic();last=0;done=set();env={**os.environ,'MUJOCO_GL':'egl'}
+    status_path=a.training/'recovery_evaluation_status.json'
+    if status_path.exists():
+        prior=json.loads(status_path.read_text());done=set(prior['evaluated_iterations'])
+        last=started-max(0.,time.time()-status_path.stat().st_mtime)
     def run(cmd,log):
         with log.open('w') as stream:subprocess.run([sys.executable,*cmd],cwd=ROOT,env=env,stdout=stream,stderr=subprocess.STDOUT,check=True,timeout=1800)
     while time.monotonic()-started<a.max_seconds:
@@ -32,8 +37,18 @@ def main():
                     output=audit/'velocity-seed101'
                     run(['scripts/render_velocity.py','--rollout',str(output/'rollout.npz'),'--output',str(audit/'walking-recovery.mp4'),
                          '--envs','0','13','23','24','--seconds','20'],audit/'render.log')
+                    if a.sole_audit:
+                        motion_output=audit/'motion-seed101'
+                        if not (motion_output/'summary.json').exists():
+                            run(['scripts/evaluate_joint.py','--checkpoint',str(frozen),'--motion',str(a.motion),'--interface','motion',
+                                 '--output',str(motion_output),'--seed','101'],audit/'evaluate-motion.log')
+                        if not (audit/'sole-tracking-audit.json').exists():
+                            run(['scripts/audit_sole_tracking.py','--motion',str(a.motion),
+                                 '--motion-rollout',str(motion_output/'rollout.npz'),
+                                 '--velocity-rollout',str(output/'rollout.npz'),
+                                 '--output',str(audit/'sole-tracking-audit.json')],audit/'sole-audit.log')
                     done.add(iteration);last=time.monotonic()
-                    (a.training/'recovery_evaluation_status.json').write_text(json.dumps(dict(evaluated_iterations=sorted(done),latest_audit=str(audit)),indent=2)+'\n')
+                    status_path.write_text(json.dumps(dict(evaluated_iterations=sorted(done),latest_audit=str(audit),sole_audit_enabled=a.sole_audit),indent=2)+'\n')
                     print('RECOVERY_AUDIT_COMPLETE',iteration,flush=True)
                 except Exception as exc:
                     (audit/'evaluation_error.json').write_text(json.dumps(dict(error=str(exc)),indent=2)+'\n')
