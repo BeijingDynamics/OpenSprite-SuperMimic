@@ -72,3 +72,40 @@ Reference commands must be derived from the final robot trajectory. The natural
 paths include turns faster than the present random-command range; report this
 coverage explicitly rather than silently clamping labels or changing the active
 PM01 experiment. Full joint SuperMimic and runtime safeguards remain unchanged.
+
+## November 12 retargeting review
+
+All eight Neutral files were retrieved and CRC-checked without an account or
+gated access. The complete first screening selected three non-overlapping
+20-second natural paths, two six-second idle segments, and a three-second
+forward segment. A separate earlier three-second turn is also retained for
+research. One idle segment is reserved for validation. These are source
+candidates, not an accepted robot-motion bank.
+
+The default contact refiner passed coarse geometry checks on the short forward
+clip but introduced excessive root acceleration and rapid knee motion. The
+isolated `refine_neutral_contacts.py` investigation keeps the native output and
+uses source-bounded root translation, calibrated source pelvis and torso
+orientation, a 3 m/s^2 root acceleration bound, and the natural knee-flexion
+branch. It preserves measured support headings and interpolates heading through
+the ill-conditioned human toe-off projection. Complete rigid-sole swings use
+source timing, support anchors and peak height with a smooth trajectory; this
+is an explicitly engineered retargeting step, not unmodified motion capture.
+
+The seventh short-clip candidate has approximately 32.5/41.3 mm peak left/right
+sole clearance, two/three sustained events above 5 mm, 0.80 mm maximum inferred
+support-target residual, and 0.038 m/s near-floor center-slip proxy. Its maximum
+joint-speed ratio remains approximately 0.956, so a numerical pass is not a
+claim of generous actuator margin or dynamic feasibility. Front/side sampled
+frames show alternating steps and arms beside the torso. Long-path, turn and
+idle processing remains separate; the active PM01 training is unchanged.
+
+Failed candidates remain evidence: one long native path failed the unchanged
+human/native alignment check at approximately 0.299 m RMS; an earlier smooth
+swing candidate slid near the floor and was rejected. No existing training
+quality gate or runtime protection was relaxed to admit these candidates.
+
+Local research artifacts live under `outputs/retrain-20261112/`; public source
+BVH files remain on the rented host and are reproducible with the downloader.
+Derived motion remains outside Git. Candidate reports preserve source, native
+input and refiner hashes. No candidate is approved for hardware use.
