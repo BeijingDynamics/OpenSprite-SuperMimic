@@ -41,6 +41,18 @@ def test_partial_boundary_swings_and_standing_are_not_reinvented():
     assert np.array_equal(continuous_rigid_sole_swing(path,np.ones(15,bool)),path)
 
 
+def test_optional_peak_correction_does_not_lift_support_or_add_swings():
+    contact=np.r_[np.ones(6,bool),np.zeros(19,bool),np.ones(6,bool)]
+    path=np.zeros((31,3));path[:,2]=.0005;path[6:25,2]=.0155
+    adapted=continuous_rigid_sole_swing(path,contact,.025)
+    assert adapted[:,2].max()==pytest.approx(.0255)
+    np.testing.assert_array_equal(adapted[contact],path[contact])
+    assert adapted[6,2]-.0005<.001 and adapted[24,2]-.0005<.001
+    np.testing.assert_array_equal(continuous_rigid_sole_swing(path,np.ones(31,bool),.025),path)
+    partial=np.r_[np.zeros(10,bool),np.ones(21,bool)]
+    np.testing.assert_array_equal(continuous_rigid_sole_swing(path,partial,.025),path)
+
+
 def test_limb_direction_derivative_and_length_invariance():
     vector=np.array([.1,.2,-.3]);jacobian=np.array([[.4,.2],[-.1,.5],[.8,-.2]])
     direction,analytic=unit_direction_and_jacobian(vector,jacobian)

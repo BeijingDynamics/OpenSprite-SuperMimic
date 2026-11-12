@@ -252,3 +252,21 @@ increasing orientation weight reduces angular error but increases limb-direction
 error. This diagnostic omits temporal and collision constraints and is not a
 new reference. It supports retaining the existing quality gates and selecting
 compatible clips rather than hiding the errors with filtering or looser limits.
+
+### Explicit minimum swing-peak experiment
+
+Source-preserving backward and lateral candidates can fail bilateral clearance
+because their scaled source targets are themselves low. The longer backward
+candidate has left/right target maxima of 20.3/31.8 mm; the rightward candidate
+has 18.9/36.5 mm. No solver can reproduce those exact left-foot targets and
+also consistently exceed the unchanged 20 mm reference check.
+
+An optional `--minimum-swing-peak 0.025` therefore defines a separate, explicitly
+engineered reference variant. It retains complete source swing intervals and
+support anchors, with the existing C2 rise/fall profile, and raises only a low
+complete swing's peak to 25 mm. It does not impose a positive height at toe-off
+or touchdown, create missing swings, change partial boundary swings, or change
+runtime targets. Source maxima and adapted maxima are both recorded. The
+default remains source-peak preservation, and v13 candidates remain immutable.
+Nine focused preprocessing tests pass. These candidates still require all
+existing geometry, velocity, upper-body and visual gates before admission.

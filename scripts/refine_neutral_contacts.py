@@ -101,7 +101,7 @@ def stabilize_support_yaw(yaw,contact):
         result[first:last+1]=anchors[i]+blend*(anchors[i+1]-anchors[i])
     return result
 
-def continuous_rigid_sole_swing(desired,contact):
+def continuous_rigid_sole_swing(desired,contact,minimum_peak_m=0.):
     """Retain source support anchors, phases and peaks with smooth rigid-sole travel."""
     result=desired.copy()
     for begin,end in intervals(~contact):
@@ -111,11 +111,11 @@ def continuous_rigid_sole_swing(desired,contact):
         travel=np.clip((s-.1)/.8,0.,1.)
         blend=travel**3*(10-15*travel+6*travel*travel)
         result[first:last+1,:2]=desired[first,:2]+blend[:,None]*(desired[last,:2]-desired[first,:2])
-        peak=max(0.,float(desired[begin:end,2].max())-.0005)
+        peak=max(minimum_peak_m,float(desired[begin:end,2].max())-.0005)
         result[first:last+1,2]=.0005+peak*64*s**3*(1-s)**3
     return result
 
-def source_targets_neutral(source,prior,native):
+def source_targets_neutral(source,prior,native,minimum_swing_peak_m=0.):
     info=inspect_bvh(source)
     frame_audit=verify_source_frame(source)
     _,names,_,_,_,positions,rotations=read_transforms(source)
@@ -214,7 +214,8 @@ def source_targets_neutral(source,prior,native):
             desired[begin:end,:2]=xy[begin:end]+(1-blend)*left+blend*right
         report.append(dict(side=side,contact_fraction=float(contact.mean()),plant_intervals=intervals(contact),vertical_clearance_scale=clearance_scale,maximum_target_swing_clearance_m=float(height.max())))
         yaw=stabilize_support_yaw(yaw,contact)
-        desired=continuous_rigid_sole_swing(desired,contact)
+        desired=continuous_rigid_sole_swing(desired,contact,minimum_swing_peak_m)
+        report[-1]['adapted_maximum_target_swing_clearance_m']=float(desired[:,2].max()-.0005)
         targets.append((desired,yaw,contact))
     return targets,dict(human_to_robot_scale=scale,native_surface_scale=surface_scale,robot_leg_length_m=float(robot_length),human_leg_length_m=float(human_length),
                        root_orientation_source='BVH Hips SO(3), independently verified native Geno source frame',
@@ -225,6 +226,7 @@ def source_targets_neutral(source,prior,native):
                        robot_pelvis_to_hip_offset_m=pelvis_to_hip.tolist(),native_root_height_median_m=float(np.median(prior[:,2])),
                        root_alignment_rotation=rot.tolist(),root_alignment_offset=offset.tolist(),native_root_fit_rms_diagnostic_m=rms,
                        native_root_fit_note='Retained diagnostic, never used to infer or admit the known source coordinate transform.',source_contacts=report,
+                       minimum_complete_swing_peak_m=minimum_swing_peak_m,
                        torso_orientation_source='Geno Spine3 world orientation, same calibration as Hips; 15-frame relative SO(3) smoothing',
                        source_torso_orientation_world=torso_rotation.tolist(),
                        source_upper_body_vectors=upper_body,source_head_orientation_world=head_rotation.tolist(),
@@ -430,19 +432,24 @@ def main():
     p.add_argument('--input-dir',type=Path,required=True);p.add_argument('--native-dir',type=Path,required=True)
     p.add_argument('--output-dir',type=Path,required=True)
     p.add_argument('--source-speed',type=float,default=1.,help='Explicit source time scaling before constrained optimization')
+    p.add_argument('--minimum-swing-peak',type=float,default=0.,help='Explicit reference-only minimum peak for complete source swings; preserves support phases and boundary swings')
     a=p.parse_args()
     if not np.isfinite(a.source_speed) or not .25<=a.source_speed<=1:
         p.error('Source speed must be between 0.25 and 1.0')
+    if not np.isfinite(a.minimum_swing_peak) or not 0<=a.minimum_swing_peak<=.05:
+        p.error('Minimum swing peak must be between 0 and 0.05 metres')
     src=a.input_dir/(a.name+'.npz')
     with np.load(src,allow_pickle=False) as z:payload={k:z[k] for k in z.files}
     source=ROOT/'data/sources/lafan1-resolved'/(a.name+'.bvh')
-    targets,provenance,prior=source_targets_neutral(source,np.asarray(payload['qpos'],float),a.native_dir/a.name/'native.npz')
+    targets,provenance,prior=source_targets_neutral(source,np.asarray(payload['qpos'],float),a.native_dir/a.name/'native.npz',a.minimum_swing_peak)
     model=mujoco.MjModel.from_xml_path(str(ROOT/'assets/opensprite/retarget_scene.xml'));data=mujoco.MjData(model)
     times=np.arange(len(prior))/50;name=a.name
     provenance['source_speed']=a.source_speed
     if a.source_speed!=1:
         prior,targets,provenance,times=retime_source_tasks(prior,targets,provenance,a.source_speed,model)
         name+=f'_speed{round(a.source_speed*1000):04d}'
+    if a.minimum_swing_peak:
+        name+=f'_clearance{round(a.minimum_swing_peak*1000):03d}'
     feet=[model.geom(side+'_foot_collision').id for side in ('left','right')]
     qids=np.array([model.jnt_qposadr[j] for j in range(1,model.njnt)],int)
     vids=np.array([model.jnt_dofadr[j] for j in range(1,model.njnt)],int)
@@ -468,7 +475,7 @@ def main():
     accepted=accepted and bool(elbow_branch)
     upper_quality=source_upper_body_error(model,data,result,provenance['source_upper_body_vectors'],np.asarray(provenance['source_head_orientation_world']),provenance['source_arm_orientations'])
     accepted=accepted and upper_quality['passed']
-    method='neutral_anatomical_arm_frames_contact_sqp_v13'
+    method='neutral_phase_preserving_peak_clearance_v14' if a.minimum_swing_peak else 'neutral_anatomical_arm_frames_contact_sqp_v13'
     payload.update(kinematics(plain,result),qpos=result,time=times,source_name=np.array(name),source_speed=np.array(a.source_speed),parent_source_name=np.array(a.name),postprocess=np.array(method),dataset_revision=np.array('100style-neutral-v5-research-20261112'))
     a.output_dir.mkdir(parents=True,exist_ok=False);out=a.output_dir/(name+'.npz');np.savez_compressed(out,**payload)
     report=dict(motion=name,parent_source_name=a.name,final_geometry=geometry_quality(plain,result),postprocess=method,
@@ -478,7 +485,7 @@ def main():
                 shared_refiner_sha256=hashlib.sha256((ROOT/'scripts/refine_reference_contacts.py').read_bytes()).hexdigest(),
                 source_sha256=hashlib.sha256(source.read_bytes()).hexdigest(),native_input_sha256=hashlib.sha256(src.read_bytes()).hexdigest(),
                 maximum_plant_error_m=metrics['plant_max_m'],sqp_iterations=count,source_torso_task_enabled=True,
-                swing_height_note='Complete source swing intervals use C2 source-peak clearance with horizontal travel in the middle80percent; partial boundary swings retain their source path. No constant swing-height floor.',
+                swing_height_note='Complete source swing intervals use C2 clearance with horizontal travel in the middle80percent. An explicit optional minimum applies to the peak only; support phases and partial boundary swings are unchanged. No constant swing-height floor or runtime correction.',
                 joint_acceleration_weight=1e-4,
                 source_upper_body_quality=upper_quality,
                 upper_body_note='Source limb directions, head orientation, and upper-arm/hand orientations mapped with actual FBX bind axes. Reference-only natural elbow branch and weak default-pose null-space prior; hardware limits unchanged.',
