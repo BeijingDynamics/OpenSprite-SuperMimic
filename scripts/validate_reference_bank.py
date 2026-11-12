@@ -11,8 +11,9 @@ from opensprite_tracker.supermimic.motion import MotionLib
 from opensprite_tracker.supermimic.rotations import mat_to_quat
 from opensprite_tracker.robot import ASSET_REVISION,URDF,JOINT_CONTROL
 
-def validate(bank):
-    source_manifest=json.loads((ROOT/'data/sources/lafan1-resolved/selected_segments.json').read_text())
+def validate(bank,manifest=None):
+    manifest=manifest or ROOT/'data/sources/lafan1-resolved/selected_segments.json'
+    source_manifest=json.loads(manifest.read_text())
     expected={row['name']:row['category'] for row in source_manifest}
     m=mujoco.MjModel.from_xml_path(str(ROOT/'assets/opensprite/opensprite.xml'));d=mujoco.MjData(m)
     kin=OpenSpriteKinematics('cpu',active_collision_only=True)
@@ -30,11 +31,13 @@ def validate(bank):
     feet=[m.geom(side+'_foot_collision').id for side in ['left','right']]
     rows=[];all_errors=[]
     for name,begin,end in zip(motion.clip_names,motion.clip_start.tolist(),motion.clip_end.tolist()):
-        category=expected[name];positions=[];height=[]
+        category=expected[name];positions=[];height=[];torso_yaw=[]
         for pose in qpos[begin:end+1]:
             d.qpos[:7]=pose[:7];d.qpos[qids]=pose[7:];mujoco.mj_forward(m,d)
             positions.append(d.geom_xpos[feet].copy())
             height.append([d.geom_xpos[g,2]-abs(d.geom_xmat[g].reshape(3,3)[2])@m.geom_size[g] for g in feet])
+            torso=d.xmat[m.body('waist_yaw_link').id].reshape(3,3)
+            torso_yaw.append(np.arctan2(torso[1,0],torso[0,0]))
         positions=np.array(positions);height=np.array(height)
         speed=np.linalg.norm(np.diff(positions[...,:2],axis=0)*50,axis=-1)
         contact=height<.008;stable=contact[:-1]&contact[1:];lift=height>.02
@@ -54,11 +57,23 @@ def validate(bank):
         source_qa=bank.parent/(name+'.json')
         if not source_qa.exists():errors.append('missing native conversion geometry report')
         else:
-            native=json.loads(source_qa.read_text())['final_geometry']
+            native_report=json.loads(source_qa.read_text());native=native_report['final_geometry']
+            source_row=next(row for row in source_manifest if row['name']==name)
+            if 'crop_sha256' in source_row and native_report.get('source_sha256')!=source_row['crop_sha256']:
+                errors.append('refined source hash differs from selected crop')
+            if source_row.get('require_source_torso'):
+                if native_report.get('source_torso_task_enabled') is not True:
+                    errors.append('missing source-derived torso task')
+                desired=np.asarray(native_report.get('source_torso_orientation_world',[]))
+                if desired.shape!=(len(torso_yaw),3,3):errors.append('missing source torso trajectory')
+                else:
+                    wanted=np.arctan2(desired[:,1,0],desired[:,0,0]);delta=np.asarray(torso_yaw)-wanted
+                    if np.max(np.abs(np.arctan2(np.sin(delta),np.cos(delta))))>np.deg2rad(5):
+                        errors.append('torso heading differs from source by more than 5 degrees')
             if native['self_minimum_signed_distance_m']<-.01:errors.append('self-penetration exceeds 1cm')
             if native['minimum_collision_z_m']<-.002:errors.append('non-foot collision penetrates ground')
         if float(height.min())<-.002:errors.append('foot penetrates ground by more than 2mm')
-        if category in ('straight','left','right') and min(lifts)<2:errors.append('insufficient actual bilateral foot lifts')
+        if category in ('straight','left','right','locomotion','run') and min(lifts)<2:errors.append('insufficient actual bilateral foot lifts')
         if slip is None or slip>.08:errors.append('stance-foot RMS sliding exceeds 0.08m/s or no support detected')
         if ratio>1.01:errors.append('joint velocity exceeds official limits')
         if (root_speed>np.array([1.,1.,.5])+1e-3).any():errors.append('reference root velocity exceeds preprocessing envelope')
@@ -75,9 +90,10 @@ def validate(bank):
         all_errors.extend([name+': '+e for e in errors])
     report=dict(accepted_for_training=not all_errors,asset_revision=ASSET_REVISION,
                 motion_bank_sha256=hashlib.sha256(bank.read_bytes()).hexdigest(),references=rows,
-                source_manifest_sha256=hashlib.sha256((ROOT/'data/sources/lafan1-resolved/selected_segments.json').read_bytes()).hexdigest(),
+                source_manifest_sha256=hashlib.sha256(manifest.read_bytes()).hexdigest(),
                 errors=all_errors,limitations='Kinematic ground/contact/velocity checks only; not dynamic feasibility or hardware admission')
     bank.with_suffix('.qa.json').write_text(json.dumps(report,indent=2));print(json.dumps(report,indent=2),flush=True)
     if all_errors:raise RuntimeError('Reference bank rejected; do not train')
 if __name__=='__main__':
-    p=argparse.ArgumentParser();p.add_argument('--motion',type=Path,required=True);validate(p.parse_args().motion)
+    p=argparse.ArgumentParser();p.add_argument('--motion',type=Path,required=True);p.add_argument('--manifest',type=Path)
+    args=p.parse_args();validate(args.motion,args.manifest)

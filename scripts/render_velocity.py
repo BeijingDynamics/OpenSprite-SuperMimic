@@ -8,7 +8,7 @@ from opensprite_tracker.robot import ROBOT_XML,BODY_JOINT_NAMES
 
 def render(args):
     with np.load(args.rollout,allow_pickle=False) as archive:
-        data={key:archive[key] for key in ['qpos','commands','failed','velocity','yaw_rate','case_names'] if key in archive}
+        data={key:archive[key] for key in ['qpos','commands','failed','velocity','yaw_rate','case_names','external_force_world_n'] if key in archive}
     spec=mujoco.MjSpec.from_file(str(ROBOT_XML))
     spec.worldbody.add_geom(name='floor',type=mujoco.mjtGeom.mjGEOM_PLANE,size=[0,0,.05],rgba=[.28,.3,.32,1])
     model=spec.compile();state=mujoco.MjData(model)
@@ -46,6 +46,10 @@ def render(args):
                 if 'velocity' in data:
                     measured=data['velocity'][t,env];yaw=data['yaw_rate'][t,env]
                     draw.text((8,37),f'MEAS vx={measured[0]:+.2f} vy={measured[1]:+.2f} yaw={yaw:+.2f}',fill='#7fffd4')
+                if 'external_force_world_n' in data:
+                    force=data['external_force_world_n'][t,env]
+                    draw.rectangle((0,340,480,360),fill='black')
+                    draw.text((8,342),f'EXTERNAL FORCE [N] x={force[0]:+.1f} y={force[1]:+.1f} z={force[2]:+.1f}',fill='#ffd080')
                 panels.append(np.asarray(image))
             writer.append_data(np.concatenate((np.concatenate(panels[:2],1),np.concatenate(panels[2:],1)),0))
     finally:writer.close();renderer.close()

@@ -5,6 +5,7 @@ from datetime import datetime,timezone
 import filecmp
 import json
 import os
+import re
 from pathlib import Path
 import shutil
 import signal
@@ -35,7 +36,8 @@ def stage_sources(motions=MOTIONS,cache_dir=None):
     motion_directory=owned(directory/'motion_actor_retarget_205_with_ids');motion_directory.mkdir(parents=True,exist_ok=True)
     # Skeleton validation uses the repository-owned Geno stance.
     for name in motions:
-        if name not in MOTIONS:raise ValueError(f'Unsupported source motion: {name}')
+        if not re.fullmatch(r'[A-Za-z0-9][A-Za-z0-9_-]*',name):
+            raise ValueError(f'Expected a plain source motion name: {name}')
         source=owned(ROOT/'data/sources/lafan1-resolved'/f'{name}.bvh')
         info=inspect_bvh(source)
         if info['adapter']!='orangeduck_geno':raise ValueError(f'Not canonical Geno: {source}')
@@ -180,7 +182,7 @@ def run_stage(stage,config_path,*,record_path=None):
 def main(argv=None):
     parser=argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--stage',choices=['build','train','retarget','convert','all'],default='all')
-    parser.add_argument('--motion','--motions',dest='motions',nargs='+',choices=list(MOTIONS),default=list(MOTIONS),help='Complete released dance. --motions is a compatibility alias.')
+    parser.add_argument('--motion','--motions',dest='motions',nargs='+',default=list(MOTIONS),help='Named complete BVH sources in the repository-owned source directory')
     parser.add_argument('--output-dir',type=Path,default=ROOT/'outputs/umr/rebuild',help='Native solver output; repository-owned, separate from published data')
     parser.add_argument('--cache-dir',type=Path,default=ROOT/'outputs/umr/cache',help='Unchanged staged Geno FBX/BVH input cache')
     parser.add_argument('--motion-output-dir',type=Path,help='Converted individual trajectories and packed bank; default OUTPUT_DIR/motions')

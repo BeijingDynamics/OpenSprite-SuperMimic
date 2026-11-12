@@ -215,7 +215,12 @@ class ReplayBuffer:
         out = {key: storage[rows, envs].to(self.device) for key, storage in self.data.items()}
         # Include the terminal transition itself, exclude its post-reset successors.
         continuation = 1-out["done"].float()
-        out["mask"] = torch.cat((torch.ones_like(continuation[:, :1]), continuation[:, :-1]), -1).cumprod(-1)
+        links=torch.cat((torch.ones_like(continuation[:, :1]), continuation[:, :-1]), -1)
+        if 'wm_discontinuity' in out:
+            # Impulses occur BEFORE this row's s. Its own s->s1 remains valid,
+            # but an earlier open-loop prediction cannot cross the intervention.
+            links[:,1:]*=1-out['wm_discontinuity'][:,1:].float()
+        out["mask"] = links.cumprod(-1)
         return out
 
     def sample_starts(self, B, hist, *, priority_frame_ends=None, priority_horizon=0):

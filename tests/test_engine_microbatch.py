@@ -209,6 +209,24 @@ def test_heldout_diagnostics_are_eager_masked_per_clip_and_do_not_update_state(m
     assert learner.steps == {"wm": 0, "pi": 0, "v": 0}
 
 
+def test_policy_horizon_diagnostics_exclude_post_reset_truth():
+    learner=make_learner(True)
+    base=flat_state(2)
+    window={'s':base[:,None].expand(-1,32,-1).clone(),
+            's1':base[:,None].expand(-1,32,-1).clone(),
+            'a':torch.zeros(2,32,31),'xi':torch.zeros(2,32,2),
+            'f':torch.arange(32)[None].expand(2,-1),'mask':torch.ones(2,32)}
+    window['mask'][1,8:]=0
+    window['s1'][1,8:]=torch.nan
+    result=learner.wm_diagnostics(window,horizons=(1,8,32))
+    assert result['step8/valid_count']==2
+    assert result['step32/valid_count']==1
+    assert torch.isfinite(result['step32/error'])
+    assert learner.steps=={'wm':0,'pi':0,'v':0}
+    with pytest.raises(ValueError,match='horizon'):
+        learner.wm_diagnostics(window,horizons=(33,))
+
+
 def test_diagnostics_separate_normalized_actuator_memory_from_physical_errors():
     learner = make_learner(True)
     learner.wm = WorldModel(hidden=(16, 16, 16), context_dim=2, memory_dim=66)

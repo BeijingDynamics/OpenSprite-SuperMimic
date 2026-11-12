@@ -53,8 +53,12 @@ def _clip_ranges(data, frame_count):
 
 
 class MotionLib:
-    def __init__(self, files=None, kin=None, device="cpu", **kwargs):
+    def __init__(self, files=None, kin=None, device="cpu", *, goal_mode="reference_v1", goal_stride=1, **kwargs):
         del kwargs
+        if goal_mode not in ("reference_v1", "robot_relative_v2") or goal_stride < 1:
+            raise ValueError("invalid motion goal configuration")
+        self.goal_mode, self.goal_stride = goal_mode, goal_stride
+        self.state_dependent_goal = goal_mode == "robot_relative_v2"
         paths = (
             [MOTION_PATH]
             if files is None
@@ -202,16 +206,26 @@ class MotionLib:
 
     def future_frames(self, f, K):
         return torch.minimum(
-            f[..., None] + torch.arange(1, K + 1, device=f.device),
+            f[..., None] + 1 + torch.arange(K, device=f.device) * self.goal_stride,
             self.clip_end[self.clip_id[f]][..., None],
         )
 
-    def goal(self, f, K):
+    def goal(self, f, K, state=None):
         fut = self.future_frames(f, K)
         Ht = yaw_mat(self.root_R[f]).transpose(-1, -2).unsqueeze(-3)
         dp = (
             Ht @ (self.root_p[fut] - self.root_p[f].unsqueeze(-2))[..., None]
         ).squeeze(-1)
+        if self.state_dependent_goal:
+            if state is None:
+                raise ValueError("robot-relative goal requires the actual current state")
+            recorded = (f[..., None] + 1 + torch.arange(K, device=f.device) * self.goal_stride
+                        <= self.clip_end[self.clip_id[f]][..., None])[..., None]
+            robot_inverse = state[1].transpose(-1, -2).unsqueeze(-3)
+            return torch.cat((self.q[fut], torch.where(recorded, 0.1 * self.qd[fut], 0.),
+                              dp, torch.where(recorded, self.root_v_local[fut], 0.),
+                              torch.where(recorded, self.root_w_local[fut], 0.),
+                              mat_to_6d(robot_inverse @ self.root_R[fut])), -1).flatten(-2)
         feats = torch.cat(
             (
                 dp,
@@ -224,3 +238,9 @@ class MotionLib:
             -1,
         )
         return feats.flatten(-2)
+
+    def relative_positions(self, f, K, state):
+        """Privileged future reference positions in the current robot frame."""
+        fut = self.future_frames(f, K)
+        return (state[1].transpose(-1, -2).unsqueeze(-3)
+                @ (self.root_p[fut] - state[0].unsqueeze(-2))[..., None]).squeeze(-1).flatten(-2)

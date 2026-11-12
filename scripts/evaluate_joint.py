@@ -9,22 +9,27 @@ from opensprite_tracker.supermimic.motion import MotionLib
 from opensprite_tracker.supermimic.env import TrackingSim
 from opensprite_tracker.supermimic.joint_interfaces import SharedController,MotionActor,VelocityActor,MotionTrackingMDP,VelocityMDP
 from opensprite_tracker.supermimic.rotations import mat_to_quat,yaw_mat
+from opensprite_tracker.supermimic.revisions import revision_contract,motion_goal
+from opensprite_tracker.supermimic.recovery import force_schedule,validate_force_cases
 
 @torch.no_grad()
 def evaluate(args):
     torch.set_num_threads(4);torch.manual_seed(args.seed)
     ck=torch.load(args.checkpoint,map_location=args.device,weights_only=False)
-    if ck.get('schema')!='sprite_v5_joint_supermimic_v1':raise ValueError('Not a joint-interface policy')
+    revision=revision_contract(ck['config'])
+    if ck.get('schema')!=revision['schema']:raise ValueError('Joint-interface schema/semantics mismatch')
     if ck['motion_sha256']!=hashlib.sha256(args.motion.read_bytes()).hexdigest():raise ValueError('Reference bank changed')
     if ck['physical_contract']!=physical_contract(torque_lag_enabled=False):raise ValueError('Physics contract changed')
-    shared=SharedController(hidden=tuple(ck['config']['network_hidden'])).to(args.device);shared.load_state_dict(ck['shared']);shared.eval()
+    shared=SharedController(hidden=tuple(ck['config']['network_hidden']),normalized_gelu=revision['normalized_gelu']).to(args.device);shared.load_state_dict(ck['shared']);shared.eval()
     velocity=args.interface=='velocity'
     actor=VelocityActor(shared) if velocity else MotionActor(shared)
-    kin=make_kinematics(args.device,True);motion=MotionLib(args.motion,kin,args.device);motion.reference_commands=reference_commands(motion)
-    mdp=(VelocityMDP if velocity else MotionTrackingMDP)(kin,motion,default_joint_pos(args.device),velocity_limits(args.device))
+    kin=make_kinematics(args.device,True)
+    motion=MotionLib(args.motion,kin,args.device,goal_mode=revision['goal_mode'],goal_stride=revision['goal_stride']);motion.reference_commands=reference_commands(motion)
+    mdp=(VelocityMDP if velocity else MotionTrackingMDP)(kin,motion,default_joint_pos(args.device),velocity_limits(args.device),imu_frame=revision['imu_frame'])
     default_commands=[[0,0,0],[.15,0,0],[.3,0,0],[.15,0,.15],[.15,0,-.15],[.3,0,.15],[.3,0,-.15]]
     cases=json.loads(args.commands_file.read_text()) if args.commands_file else [dict(name='case_'+str(i),command=c) for i,c in enumerate(default_commands)]
     if not isinstance(cases,list) or not cases:raise ValueError('Command cases must be a nonempty list')
+    validate_force_cases(cases,args.seconds)
     commands=torch.tensor([c['command'] for c in cases],device=args.device,dtype=torch.float32)
     if commands.shape!=(len(cases),3) or not torch.isfinite(commands).all():raise ValueError('Each command must be finite [vx,vy,yaw_rate]')
     stages=[]
@@ -34,6 +39,8 @@ def evaluate(args):
         stages.append([(round(row['at_seconds']/.02),torch.tensor(row['command'],device=args.device,dtype=torch.float32)) for row in rows])
     N=len(commands) if velocity else motion.num_clips
     env=TrackingSim(N,motion,mdp,args.device,seed=args.seed,eval_mode=True,auto_reset=False,randomize=False,reset_noise=False,full_body_collision=True,torque_lag_enabled=False)
+    torso_ids=env.robot.find_bodies('waist_yaw_link')[0]
+    if len(torso_ids)!=1:raise ValueError('Expected exactly one torso force application body')
     if velocity:
         # A real quiet reference pose, with physical velocities zeroed, not a moving reset.
         quiet=int(motion.root_v[:,:2].norm(dim=-1).argmin())
@@ -58,9 +65,11 @@ def evaluate(args):
     hist=mdp.obs(env.state(),env.a_prev,env.xi,env.f)[:,None].expand(-1,10,-1).clone()
     first=torch.full((N,),-1,device=args.device,dtype=torch.long)
     totals=torch.zeros(N,4,device=args.device);counts=torch.zeros(N,device=args.device)
-    saved={k:[] for k in ['qpos','commands','velocity','yaw_rate','failed','contact_force_mean_n','applied_torque_peak','raw_torque_peak','proprioception','policy_action']}
+    saved={k:[] for k in ['qpos','commands','velocity','yaw_rate','failed','contact_force_mean_n','applied_torque_peak','raw_torque_peak','proprioception','policy_action','external_force_world_n']}
     started=time.monotonic()
     for t in range(steps):
+        forces=force_schedule(cases,t,args.device) if velocity else torch.zeros(N,1,3,device=args.device)
+        env.robot.write_external_wrench_to_sim(forces,torch.zeros_like(forces),body_ids=torso_ids)
         obs=mdp.obs(env.state(),env.a_prev,env.xi,env.f)
         if t:hist=torch.cat((hist[:,1:],obs[:,None]),1)
         if velocity:
@@ -71,7 +80,7 @@ def evaluate(args):
                     for begin,value in rows:
                         if t>=begin:goal[i]=value
             mdp.active_command=goal
-        else:goal=motion.goal(env.f,10)
+        else:goal=motion_goal(motion,env.f,env.state())
         action=actor(hist,goal).clamp(-20,20)
         out=env.step(action);S=out['S1']
         active=torch.ones(N,dtype=torch.bool,device=args.device) if velocity else t<motion.clip_len-1
@@ -87,7 +96,7 @@ def evaluate(args):
             root=(S[0]-motion.root_p[out['f1']]).norm(dim=-1)
             values=torch.stack((joint,root,local[:,0],S[3][:,2]),-1)
         totals+=valid[:,None]*values;counts+=valid
-        fields=[torch.cat((S[0],mat_to_quat(S[1]),S[4]),-1),cmd,local,S[3][:,2],first>=0,out['contact_mean_n'],out['applied_torque_peak'],out['raw_torque_peak'],obs,action]
+        fields=[torch.cat((S[0],mat_to_quat(S[1]),S[4]),-1),cmd,local,S[3][:,2],first>=0,out['contact_mean_n'],out['applied_torque_peak'],out['raw_torque_peak'],obs,action,forces[:,0]]
         for key,value in zip(saved,fields):saved[key].append(value.cpu().numpy())
         if t%250==0:print('JOINT_EVAL',args.interface,t,steps,'alive',int((first<0).sum()),flush=True)
         if not torch.isfinite(out['s1']).all():raise RuntimeError('Nonfinite physical state')
@@ -97,6 +106,7 @@ def evaluate(args):
         item=dict(env=i,label=commands[i].cpu().tolist() if velocity else motion.clip_names[i],survived=bool(first[i]<0),
                   first_failure_seconds=None if first[i]<0 else float((first[i]+1)*.02),scored_steps=int(counts[i]))
         if velocity:
+            item['forces']=cases[i].get('forces',[])
             ranges=ck['config']['command_ranges'];command=commands[i].cpu().tolist()
             item.update(case_name=cases[i]['name'],command_category=cases[i].get('category','unspecified'),
                 within_training_random_command_range=all(lo-1e-6<=value<=hi+1e-6 for value,(lo,hi) in zip(command,ranges)),stages=cases[i].get('stages',[]))
@@ -112,10 +122,11 @@ def evaluate(args):
                     last5s_velocity_error_m_s=float(np.linalg.norm(measured[:,:2]-target[:,:2],axis=-1).mean()),last5s_yaw_error_rad_s=float(abs(yaw-target[:,2]).mean()))
         per.append(item)
     report=dict(interface=args.interface,iteration=ck['iteration'],seed=args.seed,steps=steps,seconds=steps*.02,results=per,
-                initialization=initial_description,
+                initialization=initial_description,revision=revision,
                 training_random_command_ranges=ck['config']['command_ranges'],
                 policy_dt=.02,physics_dt=.002,history=10,checkpoint_sha256=hashlib.sha256(args.checkpoint.read_bytes()).hexdigest(),
                 protocol='No failure reset; velocity starts from physical rest and steps command after 2s; motion starts at each source first frame; pre-failure scoring only',
+                disturbance_protocol='World-frame force at torso body COM; exact force samples saved; no force observation supplied to actor',
                 hardware_qualified=False,wall_seconds=time.monotonic()-started)
     (args.output/'summary.json').write_text(json.dumps(report,indent=2));np.savez_compressed(args.output/'rollout.npz',**{k:np.array(v) for k,v in saved.items()},fps=np.array(50.),case_names=np.array([c['name'] for c in cases]) if velocity else np.array(motion.clip_names))
     env.close();print(json.dumps(report,indent=2),flush=True)

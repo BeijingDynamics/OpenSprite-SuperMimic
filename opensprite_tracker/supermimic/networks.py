@@ -110,6 +110,9 @@ class WorldModel(nn.Module):
         memory_dim: int = 0,
         predict_memory: bool = True,
         memory_step: Callable | None = None,
+        dynamics_mode: str = "delta_v1",
+        dt: float = 0.02,
+        substeps: int = 10,
     ):
         super().__init__()
         if num_joints <= 0 or context_dim < 0 or memory_dim < 0:
@@ -120,11 +123,19 @@ class WorldModel(nn.Module):
         self.predict_memory = predict_memory
         self.predict_memory_dim = memory_dim if predict_memory else 0
         self.memory_step = memory_step
+        if dynamics_mode not in ("delta_v1", "acceleration_v2") or dt <= 0 or substeps < 1:
+            raise ValueError("invalid dynamics integration configuration")
+        self.dynamics_mode = dynamics_mode
+        self.dt, self.substep_coeff = dt, (substeps + 1) / (2 * substeps)
         self.state_dim = 13 + 2 * num_joints + memory_dim
         self.inv_dim = 13 + 2 * num_joints + memory_dim
         self.in_dim = self.inv_dim + self.action_dim + context_dim
-        self.out_dim = 12 + 2 * num_joints + self.predict_memory_dim
-        self.net = mlp(self.in_dim, hidden, self.out_dim, act=nn.SiLU, layer_norm=True)
+        self.physical_output_dim = (6 + num_joints if dynamics_mode == "acceleration_v2"
+                                    else 12 + 2 * num_joints)
+        self.out_dim = self.physical_output_dim + self.predict_memory_dim
+        self.net = mlp(self.in_dim, hidden, self.out_dim,
+                       act=nn.GELU if dynamics_mode == "acceleration_v2" else nn.SiLU,
+                       layer_norm=True)
         nn.init.zeros_(self.net[-1].weight)
         nn.init.zeros_(self.net[-1].bias)
         self.in_norm = RunningNorm(self.in_dim)
@@ -156,7 +167,39 @@ class WorldModel(nn.Module):
     def targets(self, S, S1):
         self._check_state(S)
         self._check_state(S1)
-        return state_delta(S, S1, include_memory=self.predict_memory)
+        if self.dynamics_mode == "delta_v1":
+            return state_delta(S, S1, include_memory=self.predict_memory)
+        Rt = S[1].transpose(-1, -2)
+        parts = [(Rt @ (S1[2] - S[2])[..., None]).squeeze(-1),
+                 (Rt @ (S1[3] - S[3])[..., None]).squeeze(-1), S1[5] - S[5]]
+        if self.predict_memory_dim:
+            parts.append(S1[6] - S[6])
+        return torch.cat(parts, -1)
+
+    def nominal_state_scale(self):
+        """Physical tolerances plus explicit normalized-memory tolerances."""
+        return self.out_norm.mean.new_tensor(
+            [0.01] * 3 + [0.02] * 3 + [0.1] * 3 + [0.3] * 3
+            + [0.1] * self.num_joints + [3.14] * self.num_joints
+            + [0.1] * self.predict_memory_dim)
+
+    def weighted_sq_error(self, predicted, truth):
+        """C. Zhang v2 physical loss, extended to Sprite's normalized memory.
+
+        Root velocities are supervised explicitly. Memory retains the recorded
+        v1 state semantics; it is not silently discarded by the smaller output.
+        """
+        self._check_state(predicted)
+        self._check_state(truth)
+        parts = [((predicted[0] - truth[0]) / 0.01).square(),
+                 ((predicted[1] - truth[1]).flatten(-2) * (0.5 ** 0.5) / 0.02).square(),
+                 ((predicted[2] - truth[2]) / 0.1).square(),
+                 ((predicted[3] - truth[3]) / 0.3).square(),
+                 ((predicted[4] - truth[4]) / 0.1).square(),
+                 ((predicted[5] - truth[5]) / 3.14).square()]
+        if self.predict_memory_dim:
+            parts.append(((predicted[6] - truth[6]) / 0.1).square())
+        return torch.cat(parts, -1)
 
     def state_error(self, S_hat, S):
         self._check_state(S_hat)
@@ -167,16 +210,19 @@ class WorldModel(nn.Module):
         y = run_mlp(self.net, self.in_norm(self.inputs(S, a, xi_n)))
         d = y * self.out_norm.std() + self.out_norm.mean
         p, R, v, w, q, qd = S[:6]
-        sizes = (3, 3, 3, 3, self.num_joints, self.num_joints)
-        dp, dth, dv, dw, dq, dqd = d[..., : 12 + 2 * self.num_joints].split(sizes, -1)
-        S1 = (
-            p + (yaw_mat(R) @ dp.unsqueeze(-1)).squeeze(-1),
-            R @ so3_exp(dth),
-            v + (R @ dv.unsqueeze(-1)).squeeze(-1),
-            w + (R @ dw.unsqueeze(-1)).squeeze(-1),
-            q + dq,
-            qd + dqd,
-        )
+        if self.dynamics_mode == "acceleration_v2":
+            dv_b, dw_b, dqd = d[..., :self.physical_output_dim].split((3, 3, self.num_joints), -1)
+            dv = (R @ dv_b[..., None]).squeeze(-1)
+            dw = (R @ dw_b[..., None]).squeeze(-1)
+            c, dt = self.substep_coeff, self.dt
+            S1 = (p + (v + c * dv) * dt, so3_exp((w + c * dw) * dt) @ R,
+                  v + dv, w + dw, q + (qd + c * dqd) * dt, qd + dqd)
+        else:
+            sizes = (3, 3, 3, 3, self.num_joints, self.num_joints)
+            dp, dth, dv, dw, dq, dqd = d[..., :self.physical_output_dim].split(sizes, -1)
+            S1 = (p + (yaw_mat(R) @ dp.unsqueeze(-1)).squeeze(-1), R @ so3_exp(dth),
+                  v + (R @ dv.unsqueeze(-1)).squeeze(-1),
+                  w + (R @ dw.unsqueeze(-1)).squeeze(-1), q + dq, qd + dqd)
         if self.memory_dim:
             if self.predict_memory:
                 if memory_next is not None:
@@ -241,9 +287,11 @@ class Policy(nn.Module):
 
 
 class Critic(nn.Module):
-    def __init__(self, in_dim, hidden=(256, 128)):
+    def __init__(self, in_dim, hidden=(256, 128), *, normalized_gelu=False):
         super().__init__()
-        self.net = mlp(in_dim, hidden, 1)
+        self.net = mlp(in_dim, hidden, 1,
+                       act=nn.GELU if normalized_gelu else nn.ELU,
+                       layer_norm=normalized_gelu)
         self.norm = RunningNorm(in_dim)
 
     def forward(self, x):

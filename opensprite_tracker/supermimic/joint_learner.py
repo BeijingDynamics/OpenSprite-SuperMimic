@@ -15,6 +15,12 @@ class VelocityLearner(Learner):
         super().__init__(*args,**kwargs)
         self.velocity_step=torch.compile(self._velocity_step) if self.args.compile else self._velocity_step
 
+    @torch.no_grad()
+    def alignment_target(self,state,frame):
+        if getattr(self.motion,'state_dependent_goal',False):
+            return self.pi.shared.motion_latent(self._motion_goal(frame,state))
+        return self.teacher_latents[frame]
+
     def _velocity_step(self,state,history,previous,frame,xi,xi_n,command):
         shared=self.pi.shared
         latent=shared.velocity_latent(history,command)
@@ -39,7 +45,8 @@ class VelocityLearner(Learner):
         states=[];rewards=[];deaths=[];frames=[];goals=[];actions=[];alignment=[]
         for _ in range(args.horizon):
             next_state,next_history,action,next_frame,reward,death,latent=self.velocity_step(state,obs_history,previous,frame,xi,xi_n,command)
-            target=self.teacher_latents[frame]
+            # Detach the entire current-state target, including its state path.
+            target=self.alignment_target(state,frame)
             alignment.append((latent-target).square().mean(-1)*source.float())
             age=age+1;resample=age>=250
             next_source=torch.where(resample,torch.rand_like(age.float())<.5,source)
@@ -51,7 +58,7 @@ class VelocityLearner(Learner):
             states.append(next_state);rewards.append(reward);deaths.append(death);frames.append(next_frame);goals.append(next_command);actions.append(action)
             state,frame,previous,command,source=next_state,next_frame,action,next_command,next_source
         rewards=torch.stack(rewards);deaths=torch.stack(deaths)
-        tail=self.critic(self.critic_input(state,frame,xi_n,command))
+        tail=self._bounded_value(self.critic(self.critic_input(state,frame,xi_n,command)))
         objective,alive_now,alive_next=actor_return(rewards,deaths,tail,args.gamma)
         # Weight 0.1; no gradient into the motion encoder or shared decoder weights.
         objective=objective-.1*torch.stack(alignment).mean(0)
@@ -74,9 +81,10 @@ def joint_policy_update(motion_learner,velocity_learner,shared):
     frozen=[motion_learner.wm,motion_learner.critic,velocity_learner.critic]
     # Exact cache: teacher depends only on recorded reference frame and the
     # current pre-update encoder. It is never reused across optimizer steps.
-    with torch.no_grad():
-        frames=torch.arange(motion_learner.motion.num_frames,device=next(shared.parameters()).device)
-        velocity_learner.teacher_latents=shared.motion_latent(motion_learner.motion.goal(frames,10))
+    if not getattr(motion_learner.motion,'state_dependent_goal',False):
+        with torch.no_grad():
+            frames=torch.arange(motion_learner.motion.num_frames,device=next(shared.parameters()).device)
+            velocity_learner.teacher_latents=shared.motion_latent(motion_learner.motion.goal(frames,10))
     for module in frozen:set_grad(module,False)
     critic_batches=[];metrics={}
     try:

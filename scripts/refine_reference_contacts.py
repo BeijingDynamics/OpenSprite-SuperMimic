@@ -54,6 +54,13 @@ def source_targets(source,prior,native):
     tilt=Rotation.from_matrix(heading_rotation.transpose(0,2,1)@root_rotation).as_rotvec()
     heading=savgol_filter(heading,15,3);tilt=savgol_filter(tilt,15,3,axis=0)
     root_rotation=Rotation.from_euler('z',heading[:,None]).as_matrix()@Rotation.from_rotvec(tilt).as_matrix()
+    # Surface-only IK can settle into a wrong waist twist, especially at clip
+    # entry. Preserve the measured human torso orientation as an explicit task.
+    human_torso=Slerp(ts,Rotation.from_matrix(rotations[:,names.index('Spine3')]))(t).as_matrix()
+    torso_rotation=calibrated@C@human_torso@C.T
+    relative_torso=Rotation.from_matrix(root_rotation.transpose(0,2,1)@torso_rotation).as_rotvec()
+    relative_torso=savgol_filter(relative_torso,15,3,axis=0)
+    torso_rotation=root_rotation@Rotation.from_rotvec(relative_torso).as_matrix()
     adapted_prior=prior.copy();adapted_prior[:,:2]=scale*pelvis[:,:2]@rot+offset
     adapted_prior[:,3:7]=Rotation.from_matrix(root_rotation).as_quat()[:,[3,0,1,2]]
     adapted_prior[:,2]=np.median(prior[:,2])+scale*(pelvis[:,2]-np.median(pelvis[:,2]))
@@ -93,11 +100,43 @@ def source_targets(source,prior,native):
         targets.append((desired,yaw,contact))
     return targets,dict(human_to_robot_scale=scale,native_surface_scale=surface_scale,robot_leg_length_m=float(robot_length),human_leg_length_m=float(human_length),
                        root_orientation_source='BVH Hips SO(3), coordinate conversion and constant native world calibration',
-                       root_alignment_rotation=rot.tolist(),root_alignment_offset=offset.tolist(),root_alignment_rms_m=rms,source_contacts=report),adapted_prior
+                       root_alignment_rotation=rot.tolist(),root_alignment_offset=offset.tolist(),root_alignment_rms_m=rms,source_contacts=report,
+                       torso_orientation_source='Geno Spine3 world orientation, same calibration as Hips; 15-frame relative SO(3) smoothing',
+                       source_torso_orientation_world=torso_rotation.tolist()),adapted_prior
 
 def rot_error(target,current):return Rotation.from_matrix(target@current.T).as_rotvec()
 
-def solve_trajectory(m,d,prior,targets,geoms,qids,vids,limits,speeds,name):
+def feasible_trajectory(qpos,targets):
+    """Use the existing complete-trajectory gates, never only a plant residual."""
+    m,joints,limits,speeds=robot_contract();d=mujoco.MjData(m)
+    feet=[m.geom(side+'_foot_collision').id for side in ('left','right')]
+    positions=[];heights=[];plant=[]
+    for frame,pose in enumerate(qpos):
+        d.qpos[:]=pose;mujoco.mj_forward(m,d)
+        positions.append(d.geom_xpos[feet].copy())
+        heights.append([measured_foot(m,d,g)[0][2] for g in feet])
+        plant.extend(float(np.linalg.norm(measured_foot(m,d,g)[0]-targets[side][0][frame]))
+                     for side,g in enumerate(feet) if targets[side][2][frame])
+    heights=np.asarray(heights);positions=np.asarray(positions)
+    support=heights<.008;stable=support[:-1]&support[1:]
+    velocity=np.linalg.norm(np.diff(positions[...,:2],axis=0)*50,axis=-1)
+    slip=float(np.sqrt(np.mean(velocity[stable]**2))) if stable.any() else float('inf')
+    lift=heights>.02;events=((~lift[:-1])&lift[1:]).sum(0)
+    geometry=geometry_quality(m,qpos)
+    ratio=float((abs(kinematics(m,qpos)['joint_vel'])/speeds).max())
+    root_speed=np.abs(np.diff(qpos[:,:3],axis=0)*50).max(0)
+    root_accel=np.abs(np.diff(qpos[:,:3],n=2,axis=0)*2500).max(0)
+    moving=np.linalg.norm(np.diff(qpos[:,:2],axis=0),axis=-1).sum()>.2
+    accepted=(max(plant or [0])<=.002 and slip<=.08 and ratio<=1.01 and heights.min()>=-.002
+              and geometry['minimum_collision_z_m']>=-.002 and geometry['self_minimum_signed_distance_m']>=-.01
+              and qpos[:,2].min()>=.25 and (root_speed<=np.array([1.,1.,.5])+1e-3).all()
+              and (root_accel<=8.01).all() and (not moving or min(events)>=2)
+              and (qpos[:,7:]>=limits[:,0]-1e-6).all() and (qpos[:,7:]<=limits[:,1]+1e-6).all())
+    return bool(accepted),dict(plant_max_m=max(plant or [0]),stance_slip_m_s=slip,
+                               velocity_ratio=ratio,lift_events=events.tolist(),geometry=geometry)
+
+
+def solve_trajectory(m,d,prior,targets,geoms,qids,vids,limits,speeds,name,stop_when_feasible=False,torso_rotations=None):
     """Optimize the complete clip so swing preparation can precede touchdown.
 
     Frame-by-frame IK with a previous-frame velocity bound cannot anticipate a
@@ -117,6 +156,8 @@ def solve_trajectory(m,d,prior,targets,geoms,qids,vids,limits,speeds,name):
             value+=3*np.square(pose[qids]-prior[frame,qids]).sum()+100*np.square(pose[:3]-prior[frame,:3]).sum()
             target_root=Rotation.from_quat(prior[frame,[4,5,6,3]]).as_matrix()
             value+=5*np.square(rot_error(target_root,d.xmat[m.body('pelvis_link').id].reshape(3,3))).sum()
+            if torso_rotations is not None:
+                value+=1000*np.square(rot_error(torso_rotations[frame],d.xmat[m.body('waist_yaw_link').id].reshape(3,3))).sum()
             for side,g in enumerate(geoms):
                 desired,yaw,contact=targets[side];measured,_=measured_foot(m,d,g);error=desired[frame]-measured
                 value+=1e7*np.square(error).sum() if contact[frame] else 1000*np.square(error[:2]).sum()+1e5*error[2]**2
@@ -141,6 +182,10 @@ def solve_trajectory(m,d,prior,targets,geoms,qids,vids,limits,speeds,name):
             jp=np.zeros((3,V));jr=np.zeros_like(jp);mujoco.mj_jacBody(m,d,jp,jr,m.body('pelvis_link').id)
             target_root=Rotation.from_quat(prior[frame,[4,5,6,3]]).as_matrix()
             cost(jr,rot_error(target_root,d.xmat[m.body('pelvis_link').id].reshape(3,3)),5.)
+            if torso_rotations is not None:
+                jp=np.zeros((3,V));jr=np.zeros_like(jp);body=m.body('waist_yaw_link').id
+                mujoco.mj_jacBody(m,d,jp,jr,body)
+                cost(jr,rot_error(torso_rotations[frame],d.xmat[body].reshape(3,3)),1000.)
             for side,g in enumerate(geoms):
                 desired,yaw,contact=targets[side]
                 jp=np.zeros((3,V));jr=np.zeros_like(jp);mujoco.mj_jacGeom(m,d,jp,jr,g)
@@ -207,10 +252,25 @@ def solve_trajectory(m,d,prior,targets,geoms,qids,vids,limits,speeds,name):
             d.qpos[:]=current[frame];mujoco.mj_forward(m,d)
             plant.extend([float(np.linalg.norm(measured_foot(m,d,g)[0]-targets[side][0][frame])) for side,g in enumerate(geoms) if targets[side][2][frame]])
         print('TRAJECTORY_SQP',iteration,'delta_max',float(abs(delta).max()),'plant_max',max(plant or [0]),'objective',current_objective,'alpha',alpha,flush=True)
+        if stop_when_feasible and iteration>=10 and iteration%5==0:
+            accepted,quality=feasible_trajectory(current,targets)
+            if torso_rotations is not None:
+                errors=[]
+                for frame,pose in enumerate(current):
+                    d.qpos[:]=pose;mujoco.mj_forward(m,d)
+                    actual=d.xmat[m.body('waist_yaw_link').id].reshape(3,3)
+                    error=np.arctan2(actual[1,0],actual[0,0])-np.arctan2(torso_rotations[frame,1,0],torso_rotations[frame,0,0])
+                    errors.append(abs(np.arctan2(np.sin(error),np.cos(error))))
+                quality['source_torso_yaw_max_error_deg']=float(np.rad2deg(max(errors)))
+                accepted=accepted and max(errors)<np.deg2rad(5)
+            print('TRAJECTORY_FEASIBILITY',iteration,json.dumps(quality),flush=True)
+            if accepted:
+                print('STOP_AT_FEASIBLE_ITERATE: independent bank QA and visual review still required',flush=True)
+                break
         if abs(delta).max()<5e-5:break
     return current,iteration+1
 
-def refine_clip(name,input_dir,native_dir,output_dir,recover_report=False):
+def refine_clip(name,input_dir,native_dir,output_dir,recover_report=False,stop_when_feasible=False,source_torso=False):
     src=input_dir/(name+'.npz')
     with np.load(src,allow_pickle=False) as data:payload={k:data[k] for k in data.files}
     prior=np.asarray(payload['qpos'],float)
@@ -228,7 +288,11 @@ def refine_clip(name,input_dir,native_dir,output_dir,recover_report=False):
             if str(solved['postprocess'])!='source_contact_constrained_trajectory_sqp_v9':raise ValueError('Wrong saved solver version')
             result=solved['qpos'].copy()
         count=60
-    else:result,count=solve_trajectory(m,d,prior,targets,geoms,qids,vids,limits,speeds,name)
+    else:result,count=solve_trajectory(m,d,prior,targets,geoms,qids,vids,limits,speeds,name,stop_when_feasible,
+                                     np.asarray(provenance['source_torso_orientation_world']) if source_torso else None)
+    provenance['source_torso_task_enabled']=source_torso
+    provenance['optimizer_stop_mode']='complete_trajectory_feasibility_or_solver_stop' if stop_when_feasible else 'solver_stop'
+    provenance['optimizer_convergence_required']=False
     plant_errors=[]
     for frame,pose in enumerate(result):
         d.qpos[:]=pose;mujoco.mj_forward(m,d)
@@ -242,15 +306,20 @@ def write_result(name,src,source,output_dir,plain,result,payload,limits,provenan
     qpos=np.array(result);qpos[:,7:]=strict_float32_angles(qpos[:,7:],limits)
     quality=geometry_quality(plain,qpos)
     if quality['minimum_collision_z_m']<-.002 or quality['self_minimum_signed_distance_m']<-.01:raise RuntimeError('Final contact refinement geometry failed')
-    payload.update(kinematics(plain,qpos),qpos=qpos,postprocess=np.array('source_contact_constrained_trajectory_sqp_v9'))
+    method='source_contact_constrained_trajectory_sqp_v9'+(';source_torso_v1' if provenance.get('source_torso_task_enabled') else '')
+    payload.update(kinematics(plain,qpos),qpos=qpos,postprocess=np.array(method))
     output_dir.mkdir(parents=True,exist_ok=True);out=output_dir/(name+'.npz');np.savez_compressed(out,**payload)
-    report=dict(motion=name,final_geometry=quality,postprocess='source_contact_constrained_trajectory_sqp_v9',
+    report=dict(motion=name,final_geometry=quality,postprocess=method,
                 refiner_sha256=hashlib.sha256(Path(__file__).read_bytes()).hexdigest(),
                 source_sha256=hashlib.sha256(source.read_bytes()).hexdigest(),native_input_sha256=hashlib.sha256(src.read_bytes()).hexdigest(),
                 maximum_plant_error_m=max_plant_error,sqp_iterations=iteration_count,**provenance)
-    out.with_suffix('.json').write_text(json.dumps(report,indent=2));print(json.dumps(report),flush=True)
+    out.with_suffix('.json').write_text(json.dumps(report,indent=2))
+    summary={key:value for key,value in report.items() if key!='source_torso_orientation_world'}
+    summary['source_torso_orientation_frames']=len(report.get('source_torso_orientation_world',[]))
+    print(json.dumps(summary),flush=True)
 
 if __name__=='__main__':
     p=argparse.ArgumentParser();p.add_argument('--name',required=True);p.add_argument('--input-dir',type=Path,required=True)
-    p.add_argument('--native-dir',type=Path,required=True);p.add_argument('--output-dir',type=Path,required=True);p.add_argument('--recover-report',action='store_true');a=p.parse_args()
-    refine_clip(a.name,a.input_dir,a.native_dir,a.output_dir,a.recover_report)
+    p.add_argument('--native-dir',type=Path,required=True);p.add_argument('--output-dir',type=Path,required=True);p.add_argument('--recover-report',action='store_true')
+    p.add_argument('--stop-when-feasible',action='store_true');p.add_argument('--source-torso',action='store_true');a=p.parse_args()
+    refine_clip(a.name,a.input_dir,a.native_dir,a.output_dir,a.recover_report,a.stop_when_feasible,a.source_torso)

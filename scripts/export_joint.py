@@ -9,6 +9,7 @@ ROOT=Path(__file__).resolve().parents[1];sys.path.insert(0,str(ROOT));sys.path.i
 from opensprite_tracker.supermimic.joint_interfaces import SharedController
 from opensprite_tracker.supermimic.robot import physical_contract
 from opensprite_tracker.robot import BODY_JOINT_NAMES,JOINT_CONTROL,URDF,ROBOT_XML,ASSET_REVISION,CONTROL_PROFILE_SHA256
+from opensprite_tracker.supermimic.revisions import revision_contract,V2_SCHEMA
 
 class RuntimeActor(torch.nn.Module):
     def __init__(self,shared):super().__init__();self.shared=shared
@@ -26,9 +27,10 @@ class RuntimeActor(torch.nn.Module):
 def export(args):
     import onnxruntime as ort
     ck=torch.load(args.checkpoint,map_location='cpu',weights_only=False)
-    if ck.get('schema')!='sprite_v5_joint_supermimic_v1':raise ValueError('Not a joint-interface checkpoint')
+    revision=revision_contract(ck['config'])
+    if ck.get('schema')!=revision['schema']:raise ValueError('Joint-interface schema/semantics mismatch')
     if ck['physical_contract']!=physical_contract(torque_lag_enabled=False):raise ValueError('Physics contract changed')
-    shared=SharedController(hidden=tuple(ck['config']['network_hidden']));shared.load_state_dict(ck['shared'])
+    shared=SharedController(hidden=tuple(ck['config']['network_hidden']),normalized_gelu=revision['normalized_gelu']);shared.load_state_dict(ck['shared'])
     actor=RuntimeActor(shared).eval();args.output.mkdir(parents=True,exist_ok=False)
     sample=torch.randn(64,993)*.1
     sample[:,990:]=torch.tensor([.15,0,.1])
@@ -63,6 +65,14 @@ def export(args):
                   deployment_handoff_seconds=2.,deployment_handoff_mode='smoothstep_from_pose_equivalent_action',deployment_initial_velocity_mode='zero',
                   limitations='ONNX parity is not hardware admission. Runtime hardware validator must reject until differential/motor contract is qualified.',
                   parity_max_abs_error=float(np.abs(actual-reference).max()))
+    if revision['schema']==V2_SCHEMA:
+        contract.update(schema='sprite_supermimic_joint_velocity_v2',training_revision=revision,
+                        training_run=ck['config']['experiment_id'],
+                        base_ang_vel_frame='imu_site_local' if revision['imu_frame']=='imu_site' else 'root_link_local',
+                        projected_gravity_definition='R_world_to_sensor @ [0, 0, -1]',
+                        previous_action_definition='Previous clamped policy output, before target saturation; never a measured position',
+                        deployment_handoff_seconds=0.,deployment_handoff_mode='reset_history_at_direct_takeover',
+                        limitations='New observation semantics require explicit runtime validation. Export does not grant hardware admission.')
     (args.output/'contract.json').write_text(json.dumps(contract,indent=2))
     print(json.dumps({'onnx':str(target),'parity_max_abs_error':contract['parity_max_abs_error'],'hardware_qualified':False}))
 if __name__=='__main__':

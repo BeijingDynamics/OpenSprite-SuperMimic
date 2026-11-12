@@ -1,0 +1,908 @@
+[
+  {
+    "name": "clean_0.0",
+    "category": "nominal",
+    "command": [
+      0.0,
+      0,
+      0
+    ]
+  },
+  {
+    "name": "push_forward_5.0_0.0",
+    "category": "disturbance",
+    "command": [
+      0.0,
+      0,
+      0
+    ],
+    "forces": [
+      {
+        "at_seconds": 6.0,
+        "duration_seconds": 0.2,
+        "force_world_n": [
+          5.0,
+          0.0,
+          0.0
+        ]
+      }
+    ]
+  },
+  {
+    "name": "push_forward_10.0_0.0",
+    "category": "disturbance",
+    "command": [
+      0.0,
+      0,
+      0
+    ],
+    "forces": [
+      {
+        "at_seconds": 6.0,
+        "duration_seconds": 0.2,
+        "force_world_n": [
+          10.0,
+          0.0,
+          0.0
+        ]
+      }
+    ]
+  },
+  {
+    "name": "pull_forward_5.0_0.0",
+    "category": "disturbance",
+    "command": [
+      0.0,
+      0,
+      0
+    ],
+    "forces": [
+      {
+        "at_seconds": 6.0,
+        "duration_seconds": 1.0,
+        "force_world_n": [
+          5.0,
+          0.0,
+          0.0
+        ]
+      }
+    ]
+  },
+  {
+    "name": "push_backward_5.0_0.0",
+    "category": "disturbance",
+    "command": [
+      0.0,
+      0,
+      0
+    ],
+    "forces": [
+      {
+        "at_seconds": 6.0,
+        "duration_seconds": 0.2,
+        "force_world_n": [
+          -5.0,
+          0.0,
+          0.0
+        ]
+      }
+    ]
+  },
+  {
+    "name": "push_backward_10.0_0.0",
+    "category": "disturbance",
+    "command": [
+      0.0,
+      0,
+      0
+    ],
+    "forces": [
+      {
+        "at_seconds": 6.0,
+        "duration_seconds": 0.2,
+        "force_world_n": [
+          -10.0,
+          0.0,
+          0.0
+        ]
+      }
+    ]
+  },
+  {
+    "name": "pull_backward_5.0_0.0",
+    "category": "disturbance",
+    "command": [
+      0.0,
+      0,
+      0
+    ],
+    "forces": [
+      {
+        "at_seconds": 6.0,
+        "duration_seconds": 1.0,
+        "force_world_n": [
+          -5.0,
+          0.0,
+          0.0
+        ]
+      }
+    ]
+  },
+  {
+    "name": "push_left_5.0_0.0",
+    "category": "disturbance",
+    "command": [
+      0.0,
+      0,
+      0
+    ],
+    "forces": [
+      {
+        "at_seconds": 6.0,
+        "duration_seconds": 0.2,
+        "force_world_n": [
+          0.0,
+          5.0,
+          0.0
+        ]
+      }
+    ]
+  },
+  {
+    "name": "push_left_10.0_0.0",
+    "category": "disturbance",
+    "command": [
+      0.0,
+      0,
+      0
+    ],
+    "forces": [
+      {
+        "at_seconds": 6.0,
+        "duration_seconds": 0.2,
+        "force_world_n": [
+          0.0,
+          10.0,
+          0.0
+        ]
+      }
+    ]
+  },
+  {
+    "name": "pull_left_5.0_0.0",
+    "category": "disturbance",
+    "command": [
+      0.0,
+      0,
+      0
+    ],
+    "forces": [
+      {
+        "at_seconds": 6.0,
+        "duration_seconds": 1.0,
+        "force_world_n": [
+          0.0,
+          5.0,
+          0.0
+        ]
+      }
+    ]
+  },
+  {
+    "name": "push_right_5.0_0.0",
+    "category": "disturbance",
+    "command": [
+      0.0,
+      0,
+      0
+    ],
+    "forces": [
+      {
+        "at_seconds": 6.0,
+        "duration_seconds": 0.2,
+        "force_world_n": [
+          0.0,
+          -5.0,
+          0.0
+        ]
+      }
+    ]
+  },
+  {
+    "name": "push_right_10.0_0.0",
+    "category": "disturbance",
+    "command": [
+      0.0,
+      0,
+      0
+    ],
+    "forces": [
+      {
+        "at_seconds": 6.0,
+        "duration_seconds": 0.2,
+        "force_world_n": [
+          0.0,
+          -10.0,
+          0.0
+        ]
+      }
+    ]
+  },
+  {
+    "name": "pull_right_5.0_0.0",
+    "category": "disturbance",
+    "command": [
+      0.0,
+      0,
+      0
+    ],
+    "forces": [
+      {
+        "at_seconds": 6.0,
+        "duration_seconds": 1.0,
+        "force_world_n": [
+          0.0,
+          -5.0,
+          0.0
+        ]
+      }
+    ]
+  },
+  {
+    "name": "clean_0.25",
+    "category": "nominal",
+    "command": [
+      0.25,
+      0,
+      0
+    ]
+  },
+  {
+    "name": "push_forward_5.0_0.25",
+    "category": "disturbance",
+    "command": [
+      0.25,
+      0,
+      0
+    ],
+    "forces": [
+      {
+        "at_seconds": 6.0,
+        "duration_seconds": 0.2,
+        "force_world_n": [
+          5.0,
+          0.0,
+          0.0
+        ]
+      }
+    ]
+  },
+  {
+    "name": "push_forward_10.0_0.25",
+    "category": "disturbance",
+    "command": [
+      0.25,
+      0,
+      0
+    ],
+    "forces": [
+      {
+        "at_seconds": 6.0,
+        "duration_seconds": 0.2,
+        "force_world_n": [
+          10.0,
+          0.0,
+          0.0
+        ]
+      }
+    ]
+  },
+  {
+    "name": "pull_forward_5.0_0.25",
+    "category": "disturbance",
+    "command": [
+      0.25,
+      0,
+      0
+    ],
+    "forces": [
+      {
+        "at_seconds": 6.0,
+        "duration_seconds": 1.0,
+        "force_world_n": [
+          5.0,
+          0.0,
+          0.0
+        ]
+      }
+    ]
+  },
+  {
+    "name": "push_backward_5.0_0.25",
+    "category": "disturbance",
+    "command": [
+      0.25,
+      0,
+      0
+    ],
+    "forces": [
+      {
+        "at_seconds": 6.0,
+        "duration_seconds": 0.2,
+        "force_world_n": [
+          -5.0,
+          0.0,
+          0.0
+        ]
+      }
+    ]
+  },
+  {
+    "name": "push_backward_10.0_0.25",
+    "category": "disturbance",
+    "command": [
+      0.25,
+      0,
+      0
+    ],
+    "forces": [
+      {
+        "at_seconds": 6.0,
+        "duration_seconds": 0.2,
+        "force_world_n": [
+          -10.0,
+          0.0,
+          0.0
+        ]
+      }
+    ]
+  },
+  {
+    "name": "pull_backward_5.0_0.25",
+    "category": "disturbance",
+    "command": [
+      0.25,
+      0,
+      0
+    ],
+    "forces": [
+      {
+        "at_seconds": 6.0,
+        "duration_seconds": 1.0,
+        "force_world_n": [
+          -5.0,
+          0.0,
+          0.0
+        ]
+      }
+    ]
+  },
+  {
+    "name": "push_left_5.0_0.25",
+    "category": "disturbance",
+    "command": [
+      0.25,
+      0,
+      0
+    ],
+    "forces": [
+      {
+        "at_seconds": 6.0,
+        "duration_seconds": 0.2,
+        "force_world_n": [
+          0.0,
+          5.0,
+          0.0
+        ]
+      }
+    ]
+  },
+  {
+    "name": "push_left_10.0_0.25",
+    "category": "disturbance",
+    "command": [
+      0.25,
+      0,
+      0
+    ],
+    "forces": [
+      {
+        "at_seconds": 6.0,
+        "duration_seconds": 0.2,
+        "force_world_n": [
+          0.0,
+          10.0,
+          0.0
+        ]
+      }
+    ]
+  },
+  {
+    "name": "pull_left_5.0_0.25",
+    "category": "disturbance",
+    "command": [
+      0.25,
+      0,
+      0
+    ],
+    "forces": [
+      {
+        "at_seconds": 6.0,
+        "duration_seconds": 1.0,
+        "force_world_n": [
+          0.0,
+          5.0,
+          0.0
+        ]
+      }
+    ]
+  },
+  {
+    "name": "push_right_5.0_0.25",
+    "category": "disturbance",
+    "command": [
+      0.25,
+      0,
+      0
+    ],
+    "forces": [
+      {
+        "at_seconds": 6.0,
+        "duration_seconds": 0.2,
+        "force_world_n": [
+          0.0,
+          -5.0,
+          0.0
+        ]
+      }
+    ]
+  },
+  {
+    "name": "push_right_10.0_0.25",
+    "category": "disturbance",
+    "command": [
+      0.25,
+      0,
+      0
+    ],
+    "forces": [
+      {
+        "at_seconds": 6.0,
+        "duration_seconds": 0.2,
+        "force_world_n": [
+          0.0,
+          -10.0,
+          0.0
+        ]
+      }
+    ]
+  },
+  {
+    "name": "pull_right_5.0_0.25",
+    "category": "disturbance",
+    "command": [
+      0.25,
+      0,
+      0
+    ],
+    "forces": [
+      {
+        "at_seconds": 6.0,
+        "duration_seconds": 1.0,
+        "force_world_n": [
+          0.0,
+          -5.0,
+          0.0
+        ]
+      }
+    ]
+  },
+  {
+    "name": "left",
+    "category": "command",
+    "command": [
+      0.2,
+      0,
+      0.3
+    ]
+  },
+  {
+    "name": "right",
+    "category": "command",
+    "command": [
+      0.2,
+      0,
+      -0.3
+    ]
+  },
+  {
+    "name": "reverse",
+    "category": "command",
+    "command": [
+      -0.15,
+      0,
+      0
+    ]
+  },
+  {
+    "name": "lateral_left",
+    "category": "command",
+    "command": [
+      0,
+      0.1,
+      0
+    ]
+  },
+  {
+    "name": "lateral_right",
+    "category": "command",
+    "command": [
+      0,
+      -0.1,
+      0
+    ]
+  },
+  {
+    "name": "start_stop",
+    "category": "transition",
+    "command": [
+      0,
+      0,
+      0
+    ],
+    "stages": [
+      {
+        "at_seconds": 2,
+        "command": [
+          0.25,
+          0,
+          0
+        ]
+      },
+      {
+        "at_seconds": 8,
+        "command": [
+          0,
+          0,
+          0
+        ]
+      },
+      {
+        "at_seconds": 12,
+        "command": [
+          0.2,
+          0,
+          0.2
+        ]
+      },
+      {
+        "at_seconds": 17,
+        "command": [
+          0,
+          0,
+          0
+        ]
+      }
+    ]
+  },
+  {
+    "name": "push_forward_20.0_0.0",
+    "category": "stress_disturbance",
+    "command": [
+      0.0,
+      0,
+      0
+    ],
+    "forces": [
+      {
+        "at_seconds": 6.0,
+        "duration_seconds": 0.2,
+        "force_world_n": [
+          20.0,
+          0.0,
+          0.0
+        ]
+      }
+    ]
+  },
+  {
+    "name": "pull_forward_10.0_0.0",
+    "category": "stress_disturbance",
+    "command": [
+      0.0,
+      0,
+      0
+    ],
+    "forces": [
+      {
+        "at_seconds": 6.0,
+        "duration_seconds": 1.0,
+        "force_world_n": [
+          10.0,
+          0.0,
+          0.0
+        ]
+      }
+    ]
+  },
+  {
+    "name": "push_backward_20.0_0.0",
+    "category": "stress_disturbance",
+    "command": [
+      0.0,
+      0,
+      0
+    ],
+    "forces": [
+      {
+        "at_seconds": 6.0,
+        "duration_seconds": 0.2,
+        "force_world_n": [
+          -20.0,
+          0.0,
+          0.0
+        ]
+      }
+    ]
+  },
+  {
+    "name": "pull_backward_10.0_0.0",
+    "category": "stress_disturbance",
+    "command": [
+      0.0,
+      0,
+      0
+    ],
+    "forces": [
+      {
+        "at_seconds": 6.0,
+        "duration_seconds": 1.0,
+        "force_world_n": [
+          -10.0,
+          0.0,
+          0.0
+        ]
+      }
+    ]
+  },
+  {
+    "name": "push_left_20.0_0.0",
+    "category": "stress_disturbance",
+    "command": [
+      0.0,
+      0,
+      0
+    ],
+    "forces": [
+      {
+        "at_seconds": 6.0,
+        "duration_seconds": 0.2,
+        "force_world_n": [
+          0.0,
+          20.0,
+          0.0
+        ]
+      }
+    ]
+  },
+  {
+    "name": "pull_left_10.0_0.0",
+    "category": "stress_disturbance",
+    "command": [
+      0.0,
+      0,
+      0
+    ],
+    "forces": [
+      {
+        "at_seconds": 6.0,
+        "duration_seconds": 1.0,
+        "force_world_n": [
+          0.0,
+          10.0,
+          0.0
+        ]
+      }
+    ]
+  },
+  {
+    "name": "push_right_20.0_0.0",
+    "category": "stress_disturbance",
+    "command": [
+      0.0,
+      0,
+      0
+    ],
+    "forces": [
+      {
+        "at_seconds": 6.0,
+        "duration_seconds": 0.2,
+        "force_world_n": [
+          0.0,
+          -20.0,
+          0.0
+        ]
+      }
+    ]
+  },
+  {
+    "name": "pull_right_10.0_0.0",
+    "category": "stress_disturbance",
+    "command": [
+      0.0,
+      0,
+      0
+    ],
+    "forces": [
+      {
+        "at_seconds": 6.0,
+        "duration_seconds": 1.0,
+        "force_world_n": [
+          0.0,
+          -10.0,
+          0.0
+        ]
+      }
+    ]
+  },
+  {
+    "name": "push_forward_20.0_0.25",
+    "category": "stress_disturbance",
+    "command": [
+      0.25,
+      0,
+      0
+    ],
+    "forces": [
+      {
+        "at_seconds": 6.0,
+        "duration_seconds": 0.2,
+        "force_world_n": [
+          20.0,
+          0.0,
+          0.0
+        ]
+      }
+    ]
+  },
+  {
+    "name": "pull_forward_10.0_0.25",
+    "category": "stress_disturbance",
+    "command": [
+      0.25,
+      0,
+      0
+    ],
+    "forces": [
+      {
+        "at_seconds": 6.0,
+        "duration_seconds": 1.0,
+        "force_world_n": [
+          10.0,
+          0.0,
+          0.0
+        ]
+      }
+    ]
+  },
+  {
+    "name": "push_backward_20.0_0.25",
+    "category": "stress_disturbance",
+    "command": [
+      0.25,
+      0,
+      0
+    ],
+    "forces": [
+      {
+        "at_seconds": 6.0,
+        "duration_seconds": 0.2,
+        "force_world_n": [
+          -20.0,
+          0.0,
+          0.0
+        ]
+      }
+    ]
+  },
+  {
+    "name": "pull_backward_10.0_0.25",
+    "category": "stress_disturbance",
+    "command": [
+      0.25,
+      0,
+      0
+    ],
+    "forces": [
+      {
+        "at_seconds": 6.0,
+        "duration_seconds": 1.0,
+        "force_world_n": [
+          -10.0,
+          0.0,
+          0.0
+        ]
+      }
+    ]
+  },
+  {
+    "name": "push_left_20.0_0.25",
+    "category": "stress_disturbance",
+    "command": [
+      0.25,
+      0,
+      0
+    ],
+    "forces": [
+      {
+        "at_seconds": 6.0,
+        "duration_seconds": 0.2,
+        "force_world_n": [
+          0.0,
+          20.0,
+          0.0
+        ]
+      }
+    ]
+  },
+  {
+    "name": "pull_left_10.0_0.25",
+    "category": "stress_disturbance",
+    "command": [
+      0.25,
+      0,
+      0
+    ],
+    "forces": [
+      {
+        "at_seconds": 6.0,
+        "duration_seconds": 1.0,
+        "force_world_n": [
+          0.0,
+          10.0,
+          0.0
+        ]
+      }
+    ]
+  },
+  {
+    "name": "push_right_20.0_0.25",
+    "category": "stress_disturbance",
+    "command": [
+      0.25,
+      0,
+      0
+    ],
+    "forces": [
+      {
+        "at_seconds": 6.0,
+        "duration_seconds": 0.2,
+        "force_world_n": [
+          0.0,
+          -20.0,
+          0.0
+        ]
+      }
+    ]
+  },
+  {
+    "name": "pull_right_10.0_0.25",
+    "category": "stress_disturbance",
+    "command": [
+      0.25,
+      0,
+      0
+    ],
+    "forces": [
+      {
+        "at_seconds": 6.0,
+        "duration_seconds": 1.0,
+        "force_world_n": [
+          0.0,
+          -10.0,
+          0.0
+        ]
+      }
+    ]
+  }
+]

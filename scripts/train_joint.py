@@ -17,6 +17,8 @@ from opensprite_tracker.supermimic.joint_learner import VelocityLearner,joint_po
 from opensprite_tracker.supermimic.state import unflatten_state
 from opensprite_tracker.supermimic.rotations import yaw_mat
 from opensprite_tracker.supermimic.sampling import ReturnSampler
+from opensprite_tracker.supermimic.recovery import RecoveryImpulses
+from opensprite_tracker.supermimic.revisions import revision_contract,motion_goal
 
 class MixedReplay:
     def __init__(self,a,b):self.buffers=[a,b]
@@ -36,6 +38,14 @@ def reference_commands(motion):
 
 def train(cli):
     cfg=json.loads(cli.config.read_text())
+    production_shape_smoke=getattr(cli,'smoke_production_shapes',False)
+    if production_shape_smoke and not cli.smoke:
+        raise ValueError('Production-shape benchmarking requires --smoke; it is not production training')
+    if cfg.get('software_smoke_test') and not cli.smoke:
+        raise ValueError('A software-smoke configuration is not a production recipe')
+    revision=revision_contract(cfg)
+    if revision['schema'].endswith('_v2') and not cli.smoke and cfg.get('imu_frame_verified') is not True:
+        raise ValueError('Long v2 training requires verified physical IMU mounting semantics')
     if cfg['training_pd_hz']!=500 or cfg['physics_dt']!=.002 or cfg['policy_dt']!=.02 or cfg['decimation']!=10:
         raise ValueError('Run002 requires explicit500Hz PD/50Hz policy/10substeps')
     from opensprite_tracker.robot import CONTROL_PROFILE_SHA256,ASSET_REVISION
@@ -43,7 +53,15 @@ def train(cli):
         raise ValueError('Run002 asset/control profile changed')
     if cfg['velocity_fall_height_m']!=VelocityMDP.fall_height:raise ValueError('Velocity fall-height configuration/implementation mismatch')
     if cfg['velocity_reward_revision']!=VelocityMDP.reward_revision:raise ValueError('Velocity reward revision mismatch')
-    if cli.smoke:cfg.update(num_envs=64,wm_batch=64,wm_microbatch=64,pi_batch_total=64,pi_microbatch=32,iterations=3,compile=False,warmup_steps=32,max_wall_seconds=600)
+    if cli.smoke:
+        if production_shape_smoke:
+            cfg.update(iterations=30,compile=True,max_wall_seconds=1800,log_every=1)
+        else:
+            cfg.update(num_envs=64,wm_batch=64,wm_microbatch=64,pi_batch_total=64,pi_microbatch=32,iterations=3,compile=getattr(cli,'smoke_compile',False),warmup_steps=32,max_wall_seconds=600)
+    cfg['software_smoke_test']=bool(cli.smoke)
+    cfg['production_shape_benchmark']=production_shape_smoke
+    cfg['effective_wm_validation_envs_per_interface']=min(cfg.get('wm_validation_envs_per_interface',0),cfg['num_envs']//16) if cli.smoke else cfg.get('wm_validation_envs_per_interface',0)
+    cfg['effective_wm_warmup_iterations']=1 if cli.smoke and revision['wm_warmup_iterations'] else revision['wm_warmup_iterations']
     report=json.loads(cli.quality.read_text())
     if report.get('accepted_for_training') is not True:raise ValueError('Reference motion QA has not accepted the bank')
     if not cli.smoke and report.get('visual_review_passed') is not True:
@@ -55,42 +73,64 @@ def train(cli):
     (cli.output/'config.json').write_text(json.dumps(cfg,indent=2))
     (cli.output/'reference_qa.json').write_text(json.dumps(report,indent=2))
     torch.set_num_threads(4);torch.manual_seed(cfg['seed']);np.random.seed(cfg['seed']);random.seed(cfg['seed'])
-    torch.set_float32_matmul_precision('highest');torch.backends.cuda.matmul.allow_tf32=False
+    precision=cfg.get('matmul_precision','highest');tf32=cfg.get('tf32',False)
+    if precision not in ('highest','high') or tf32!=(precision=='high'):
+        raise ValueError('Expected explicit FP32/highest or TF32/high precision configuration')
+    torch.set_float32_matmul_precision(precision);torch.backends.cuda.matmul.allow_tf32=tf32
+    from opensprite_tracker.supermimic import networks
+    mlp_precision=cfg.get('mlp_precision','float32')
+    if mlp_precision not in ('float32','bfloat16'):
+        raise ValueError('Unsupported MLP precision')
+    networks.AMP_DTYPE=torch.bfloat16 if mlp_precision=='bfloat16' else None
     device=cli.device;N=cfg['num_envs']//2
     args=SimpleNamespace(**{k:v for k,v in cfg.items() if k not in ('pi_batch_total',)})
     args.pi_batch=cfg['pi_batch_total']//2;args.memory_dim=MEM_DIM;args.critic_storage='cuda';args.failure_replay_fraction=0.;args.wm_loss_scale=1.
-    kin=make_kinematics(device,True);motion=MotionLib(cli.motion,kin,device)
+    kin=make_kinematics(device,True)
+    motion=MotionLib(cli.motion,kin,device,goal_mode=revision['goal_mode'],goal_stride=revision['goal_stride'])
     if max(v['max_abs'] for k,v in motion.source_fk_error.items() if k in ('body_p','body_R'))>1e-4:raise ValueError('Source v5 FK geometry mismatch')
     motion.reference_commands=reference_commands(motion)
-    mdps=[MotionTrackingMDP(kin,motion,default_joint_pos(device),velocity_limits(device)),VelocityMDP(kin,motion,default_joint_pos(device),velocity_limits(device))]
+    mdps=[cls(kin,motion,default_joint_pos(device),velocity_limits(device),imu_frame=revision['imu_frame']) for cls in (MotionTrackingMDP,VelocityMDP)]
     envs=[TrackingSim(N,motion,mdps[i],device,seed=cfg['seed']+i,randomize=True,reset_noise=True,full_body_collision=True,torque_lag_enabled=False) for i in range(2)]
     samplers=[ReturnSampler(motion,args.gamma,reward_scale=m.reward_scale) for m in mdps]
     for env,sampler in zip(envs,samplers):env.frame_sampler=sampler;env.clip_sampler=None
-    shared=SharedController(hidden=tuple(cfg['network_hidden'])).to(device)
+    shared=SharedController(hidden=tuple(cfg['network_hidden']),normalized_gelu=revision['normalized_gelu']).to(device)
     actors=[MotionActor(shared),VelocityActor(shared)]
-    world=WorldModel(hidden=(cfg['wm_width'],)*3,context_dim=CONTEXT_DIM,memory_dim=MEM_DIM).to(device)
+    world=WorldModel(hidden=(cfg['wm_width'],)*3,context_dim=CONTEXT_DIM,memory_dim=MEM_DIM,
+                     dynamics_mode=revision['dynamics_mode'],dt=cfg['policy_dt'],substeps=cfg['decimation']).to(device)
     buffers=[];learners=[]
     for i in range(2):
-        extras={'command':(3,torch.float32),'reference_command':((),torch.bool),'command_age':((),torch.int32)} if i else None
-        buf=ReplayBuffer(cfg['buffer_steps'],N,device,state_dim=75+MEM_DIM,context_dim=CONTEXT_DIM,extra_fields=extras,storage_device='cuda')
+        extras={'command':(3,torch.float32),'reference_command':((),torch.bool),'command_age':((),torch.int32)} if i else {}
+        if cfg.get('recovery_impulses',{}).get('enabled'):
+            extras.update(wm_discontinuity=((),torch.bool),recovery_impulse=(6,torch.float32))
+        buf=ReplayBuffer(cfg['buffer_steps'],N,device,state_dim=75+MEM_DIM,context_dim=CONTEXT_DIM,extra_fields=extras,storage_device='cuda',
+                         validation_envs=cfg['effective_wm_validation_envs_per_interface'])
         buffers.append(buf)
-        goal=motion.goal(envs[i].f,10) if not i else motion.reference_commands[envs[i].f]
+        goal=motion_goal(motion,envs[i].f,envs[i].state()) if not i else motion.reference_commands[envs[i].f]
         dim=mdps[i].critic_features(envs[i].state(),envs[i].f,envs[i].normalized_xi).shape[-1]+goal.shape[-1]
-        critic=Critic(dim).to(device)
+        if not i and revision['critic_relative_positions']:dim+=3*cfg['goal_frames']
+        critic=Critic(dim,normalized_gelu=revision['normalized_gelu']).to(device)
         cls=Learner if not i else VelocityLearner
         learners.append(cls(world,actors[i],critic,mdps[i],motion,buf,envs[i].normalize_xi,args))
     mixed=MixedReplay(*buffers)
+    recovery=[RecoveryImpulses(N,device,cfg['recovery_impulses'],cfg['seed']+571+i) for i in range(2)] if cfg.get('recovery_impulses',{}).get('enabled') else None
     start_iteration=0;wall_offset=0.;sim_steps=0
     if cli.resume is not None:
         old=torch.load(cli.resume,map_location=device,weights_only=False)
-        if old.get('schema')!='sprite_v5_joint_supermimic_v1' or old['motion_sha256']!=digest:
+        if old.get('schema')!=revision['schema'] or old['motion_sha256']!=digest:
             raise ValueError('Resume checkpoint method/reference mismatch')
+        if old['config'].get('software_smoke_test',False)!=bool(cli.smoke):
+            raise ValueError('Smoke/production resume boundary is not interchangeable')
+        if revision_contract(old['config'])!=revision:raise ValueError('Resume interface semantics changed')
         if old['config'].get('velocity_reward_revision','a6_root_legacy_v1')!=cfg['velocity_reward_revision']:
             raise ValueError('Reward changed; ordinary resume is invalid. Use a separately documented transfer experiment.')
         if old['physical_contract']!=physical_contract(torque_lag_enabled=False):
             raise ValueError('Resume robot or actuator contract changed')
         for key in ['num_envs','hist','goal_frames','horizon','wm_width','network_hidden','command_ranges']:
             if cfg[key]!=old['config'][key]:raise ValueError('Resume configuration changed: '+key)
+        if cfg['effective_wm_validation_envs_per_interface']!=old['config'].get('effective_wm_validation_envs_per_interface',0):
+            raise ValueError('Resume world-model holdout changed')
+        if cfg.get('recovery_impulses')!=old['config'].get('recovery_impulses'):
+            raise ValueError('Resume recovery curriculum changed')
         shared.load_state_dict(old['shared']);world.load_state_dict(old['wm'])
         learners[0].opt_wm.load_state_dict(old['opt_wm'])
         learners[0].opt_pi.load_state_dict(old['opt_motion']);learners[1].opt_pi.load_state_dict(old['opt_velocity'])
@@ -104,12 +144,14 @@ def train(cli):
     command=torch.zeros(N,3,device=device);source=torch.zeros(N,dtype=torch.bool,device=device);age=torch.zeros(N,dtype=torch.int32,device=device)
     mdps[1].active_command=command
     stats={}
+    collection_iteration=start_iteration
     def metric(key,x):stats.setdefault(key,[]).append(float(x))
     @torch.no_grad()
     def collect(count):
         nonlocal sim_steps,command,source,age
         for _ in range(count):
             for i,(env,mdp,actor,buf,sampler) in enumerate(zip(envs,mdps,actors,buffers,samplers)):
+                impulse=recovery[i].apply(env,collection_iteration) if recovery is not None else None
                 obs=mdp.add_noise(mdp.obs(env.state(),env.a_prev,env.xi,env.f))
                 histories[i]=torch.where((env.ep_step==0)[:,None,None],obs[:,None].expand_as(histories[i]),torch.cat((histories[i][:,1:],obs[:,None]),1))
                 shared.obs_norm.update(obs)
@@ -121,14 +163,19 @@ def train(cli):
                     command.copy_(torch.where(source[:,None],motion.reference_commands[env.f],command))
                     age.copy_(torch.where(resample,torch.zeros_like(age),age))
                     goal=command;shared.command_norm.update(goal);mdp.active_command=command
-                else:goal=motion.goal(env.f,10);shared.motion_norm.update(goal)
+                else:goal=motion_goal(motion,env.f,env.state());shared.motion_norm.update(goal)
                 action=(actor(histories[i],goal)+cfg['action_noise']*torch.randn_like(env.a_prev)).clamp(-20,20)
                 out=env.step(action)
+                if impulse is not None:
+                    out.update(wm_discontinuity=impulse.abs().sum(-1)>0,recovery_impulse=impulse)
+                    metric(('velocity' if i else 'motion')+'/impulse_events',out['wm_discontinuity'].sum())
+                    metric(('velocity' if i else 'motion')+'/impulse_max_linear_m_s',impulse[:,:3].norm(dim=-1).max())
                 if i:out.update(command=command.clone(),reference_command=source.clone(),command_age=age.clone());age+=1
                 sampler.update(out);buf.add(out)
                 before,after=unflatten_state(out['s']),unflatten_state(out['s1'])
-                world.in_norm.update(world.inputs(before,out['a'],env.normalize_xi(out['xi'])))
-                world.out_norm.update(world.targets(before,after));sim_steps+=N
+                fit=slice(0,N-buf.validation_envs)
+                world.in_norm.update(world.inputs(tuple(x[fit] for x in before),out['a'][fit],env.normalize_xi(out['xi'][fit])))
+                world.out_norm.update(world.targets(tuple(x[fit] for x in before),tuple(x[fit] for x in after)));sim_steps+=N
                 label='velocity' if i else 'motion'
                 metric(label+'/reward',out['r'].mean()/mdp.reward_scale)
                 metric(label+'/terminated',out['term'].float().mean())
@@ -143,9 +190,9 @@ def train(cli):
     (cli.output/'interface.json').write_text(json.dumps(dict(history=10,proprioception=99,velocity_actor_input=993,motion_goal=770,latent=32,
         split_envs=[N,N],split_imagined_batch=[args.pi_batch,args.pi_batch],shared_world_model=True,shared_decoder=True,
         velocity_decoder_weight_gradient=False,reference_latent_alignment_weight=.1,physics=physical_contract(torque_lag_enabled=False),
-        reference_commands='centered 25-frame mean, per clip',reference_sha256=digest,hardware_qualified=False),indent=2))
+        reference_commands='centered 25-frame mean, per clip',reference_sha256=digest,revision=revision,hardware_qualified=False),indent=2))
     def save(iteration):
-        payload=dict(schema='sprite_v5_joint_supermimic_v1',config=cfg,iteration=iteration,sim_steps=sim_steps,wall_seconds=time.monotonic()-started+wall_offset,
+        payload=dict(schema=revision['schema'],config=cfg,iteration=iteration,sim_steps=sim_steps,wall_seconds=time.monotonic()-started+wall_offset,
                      shared=shared.state_dict(),wm=world.state_dict(),critics=[x.critic.state_dict() for x in learners],
                      opt_wm=learners[0].opt_wm.state_dict(),opt_motion=learners[0].opt_pi.state_dict(),opt_velocity=learners[1].opt_pi.state_dict(),
                      opt_critics=[x.opt_v.state_dict() for x in learners],sampling=[dict(returns=x.returns,past=x.past) for x in samplers],
@@ -157,18 +204,40 @@ def train(cli):
         # recent checkpoints plus the first; hourly audits retain best policies.
         checkpoints=sorted(cli.output.glob('model_*.pt'))
         for obsolete in checkpoints[1:-4]:obsolete.unlink()
+    validation_generators=[torch.Generator(device=b.storage_device).manual_seed(cfg['seed']+991+i) for i,b in enumerate(buffers)]
+    def validate_world(iteration):
+        if not cfg['effective_wm_validation_envs_per_interface'] or min(b.size for b in buffers)<32:return
+        for i,learner in enumerate(learners):
+            window=buffers[i].sample_windows(cfg.get('wm_validation_batch',256),32,split='validation',generator=validation_generators[i])
+            values=learner.wm_diagnostics(window,horizons=(1,8,32))
+            record=dict(iteration=iteration,interface='velocity' if i else 'motion',
+                        split='WM fitting and normalization holdout; policy collects all environments',
+                        metrics={k:float(v) if torch.isfinite(v) else None for k,v in values.items()})
+            with (cli.output/'wm_validation.jsonl').open('a') as stream:stream.write(json.dumps(record)+'\n')
     with (cli.output/'metrics.jsonl').open('a',buffering=1) as log:
         for it in range(start_iteration,cfg['iterations']):
+            collection_iteration=it
             lr=args.lr*(.03+.97*.5*(1+math.cos(math.pi*min(it,250000)/250000)))
             for opt in [learners[0].opt_wm,learners[0].opt_pi,learners[1].opt_pi,*[x.opt_v for x in learners]]:
                 for group in opt.param_groups:group['lr']=lr
+            if production_shape_smoke:torch.cuda.synchronize();phase_started=time.monotonic()
             step_acc+=1/args.utd;count=int(step_acc);step_acc-=count;collect(count)
+            if production_shape_smoke:
+                torch.cuda.synchronize();metric('timing/collect_seconds',time.monotonic()-phase_started);phase_started=time.monotonic()
             old=learners[0].buffer;learners[0].buffer=mixed
             try:
                 for _ in range(args.wm_batches):
                     loss,error=learners[0].wm_update();metric('wm/loss',loss);metric('wm/error_last',error)
             finally:learners[0].buffer=old
-            for key,value in joint_policy_update(*learners,shared).items():metric(key,value)
+            if production_shape_smoke:
+                torch.cuda.synchronize();metric('timing/world_model_seconds',time.monotonic()-phase_started);phase_started=time.monotonic()
+            warmup_iterations=cfg['effective_wm_warmup_iterations']
+            if it>=warmup_iterations:
+                for key,value in joint_policy_update(*learners,shared).items():metric(key,value)
+            if production_shape_smoke:
+                torch.cuda.synchronize();metric('timing/joint_policy_critic_seconds',time.monotonic()-phase_started)
+                metric('memory/reserved_gpu_gib',torch.cuda.max_memory_reserved()/2**30)
+            metric('wm_only_warmup',float(it<warmup_iterations))
             now=time.monotonic();finished=(it+1==cfg['iterations']) or stop or now-started+wall_offset>=cfg['max_wall_seconds']
             if it==0 or (it+1)%cfg['log_every']==0 or finished:
                 row={k:sum(v)/len(v) for k,v in stats.items()};stats.clear()
@@ -178,7 +247,8 @@ def train(cli):
                     (cli.output/'numerical_failure.json').write_text(json.dumps(dict(iteration=it+1,nonfinite=bad),indent=2))
                     raise FloatingPointError('Nonfinite training telemetry: '+str(bad))
                 log.write(json.dumps(row)+'\n');print('JOINT_UPDATE',json.dumps(row),flush=True);last_log=now;last_it=it+1
-            if it==0 or now-last_save>=cfg['save_seconds'] or finished:save(it+1);last_save=now
+            if it==0 or now-last_save>=cfg['save_seconds'] or finished:
+                save(it+1);validate_world(it+1);last_save=time.monotonic()
             if finished:break
     for env in envs:env.close()
     print('JOINT_TRAINING_COMPLETE',it+1,flush=True)
@@ -186,4 +256,6 @@ def train(cli):
 if __name__=='__main__':
     p=argparse.ArgumentParser();p.add_argument('--config',type=Path,default=ROOT/'configs/joint-paper.json');p.add_argument('--motion',type=Path,required=True)
     p.add_argument('--quality',type=Path,required=True);p.add_argument('--output',type=Path,required=True);p.add_argument('--device',default='cuda:0');p.add_argument('--smoke',action='store_true');p.add_argument('--resume',type=Path)
+    p.add_argument('--smoke-compile',action='store_true',help='Exercise compiled kernels in the bounded software smoke test')
+    p.add_argument('--smoke-production-shapes',action='store_true',help='Benchmark configured training shapes for at most 30 smoke updates; never production-qualified')
     train(p.parse_args())

@@ -105,9 +105,24 @@ class Learner:
             torch.stack([s[i] for s in predictions], 1) for i in range(len(state))
         )
 
+    def _state_error_scale(self):
+        if getattr(self.wm, 'dynamics_mode', 'delta_v1') == 'acceleration_v2':
+            return self.wm.nominal_state_scale()
+        return torch.maximum(self.wm.out_norm.std(), self.error_floor)
+
+    def _motion_goal(self, frame, state):
+        if getattr(self.motion, 'state_dependent_goal', False):
+            return self.motion.goal(frame, self.args.goal_frames, state=state)
+        return self.motion.goal(frame, self.args.goal_frames)
+
+    def _bounded_value(self, value):
+        if getattr(self.args, 'critic_upper_bound', False):
+            return value.clamp_max(self.mdp.reward_scale / (1 - self.args.gamma))
+        return value
+
     @torch.no_grad()
-    def wm_diagnostics(self, window):
-        """Read-only held-out 1/8-step errors, eagerly unrolling logged actions.
+    def wm_diagnostics(self, window, horizons=(1,8)):
+        """Read-only held-out errors, eagerly unrolling recorded actions.
 
         The caller owns the validation split. `mask` includes the physical
         terminal transition and excludes post-reset successors. Errors never
@@ -116,10 +131,12 @@ class Learner:
         radians, velocities, or the actuator memory's own normalized units.
         """
         batch, available = window["a"].shape[:2]
-        if batch < 1 or available < 8 or window["mask"].shape[:2] != (batch, available):
-            raise ValueError("WM diagnostics require a nonempty batch of eight-step windows")
+        if not horizons or any(not isinstance(h,int) or h<1 for h in horizons):
+            raise ValueError('Diagnostic horizons must be positive integers')
+        if batch < 1 or available < max(horizons) or window["mask"].shape[:2] != (batch, available):
+            raise ValueError("WM diagnostics require nonempty windows covering every requested horizon")
         state = unflatten_state(window["s"][:, 0])
-        scale = torch.maximum(self.wm.out_norm.std(), self.error_floor)
+        scale = self._state_error_scale()
         joints = self.wm.num_joints
         groups = {
             "root_position": slice(0, 3),
@@ -133,10 +150,10 @@ class Learner:
             groups["memory"] = slice(12 + 2 * joints, scale.numel())
         first_clip = self.motion.clip_id[window["f"][:, 0]]
         result = {}
-        for step in range(8):
+        for step in range(max(horizons)):
             # Explicit eager path: no compiled fitting function, no updates.
             state = self.wm.step(state, window["a"][:, step], self.normalize_xi(window["xi"][:, step]))
-            if step not in (0, 7):
+            if step+1 not in horizons:
                 continue
             truth = unflatten_state(window["s1"][:, step])
             error = self.wm.state_error(state, truth)
@@ -199,19 +216,20 @@ class Learner:
         audit = getattr(self, "coverage_audit", None)
         if audit is not None:
             audit.wm(window)
-        scale = torch.maximum(self.wm.out_norm.std(), self.error_floor)
+        scale = self._state_error_scale()
+        acceleration = getattr(self.wm, 'dynamics_mode', 'delta_v1') == 'acceleration_v2'
+        denominator = window['mask'].sum().clamp_min(1) if acceleration else batch
         self.opt_wm.zero_grad(set_to_none=True)
         loss_sum = scale.new_zeros(())
         valid_error, valid_count, last_error, last_count = [scale.new_zeros(()) for _ in range(4)]
         for chunk in self._chunks(batch, getattr(self.args, "wm_microbatch", 0)):
             part = {key: value[chunk] for key, value in window.items()}
             prediction = self.wm_rollout(part["s"], part["a"], part["xi"])
-            error = (
-                (self.wm.state_error(prediction, unflatten_state(part["s1"])) / scale)
-                .square().mean(-1)
-            )
+            truth = unflatten_state(part['s1'])
+            error = (self.wm.weighted_sq_error(prediction, truth).mean(-1) if acceleration
+                     else (self.wm.state_error(prediction, truth) / scale).square().mean(-1))
             mask = part["mask"]
-            loss = (error * mask).sum() / batch
+            loss = (error * mask).sum() / denominator
             (loss * getattr(self.args, "wm_loss_scale", 1.0)).backward()
             loss_sum += loss.detach()
             valid_error += (error.detach() * mask).sum()
@@ -231,7 +249,7 @@ class Learner:
             # their bootstrap membership and per-head valid-count denominator are
             # therefore drawn/computed once, not independently per microbatch.
             self._transition_update(window)
-        return loss_sum / self.args.wm_window, last_error / last_count.clamp_min(1)
+        return loss_sum / (1 if acceleration else self.args.wm_window), last_error / last_count.clamp_min(1)
 
     def _transition_update(self, window):
         """Actual substep measurements supervise both independent small heads.
@@ -271,7 +289,7 @@ class Learner:
             action,
             history,
             next_frame,
-            self.motion.goal(next_frame, self.args.goal_frames),
+            self._motion_goal(next_frame, next_state),
         )
 
     def _reward_term(self, state, frame, action, previous_action):
@@ -324,7 +342,10 @@ class Learner:
         return reward, self.mdp.soft_termination(state, frame)
 
     def _critic_input(self, state, frame, xi_n, goal):
-        return torch.cat((self.mdp.critic_features(state, frame, xi_n), goal), -1)
+        parts = [self.mdp.critic_features(state, frame, xi_n), goal]
+        if getattr(self.args, 'critic_relative_positions', False) and goal.shape[-1] != 3:
+            parts.append(self.motion.relative_positions(frame, self.args.goal_frames, state))
+        return torch.cat(parts, -1)
 
     def _failure_replay_starts(self):
         """Keep the requested mixture AFTER the existing source-H rejection.
@@ -406,7 +427,7 @@ class Learner:
                 self.mdp.obs(unflatten_state(history["s"]), history["a_prev"],
                              history["xi"], history["f"])
             )
-        goal = initial_goal = self.motion.goal(frame, args.goal_frames)
+        goal = initial_goal = self._motion_goal(frame, state)
         states, actions, previous_actions, frames, goals, pre_states = [], [], [], [], [], []
         for _ in range(args.horizon):
             pre_states.append(state)
@@ -440,7 +461,7 @@ class Learner:
         rollout_frames = torch.stack(frames)
         source_end = self.motion.clip_end[self.motion.clip_id[rollout_frames]]
         deaths = torch.where(rollout_frames >= source_end, torch.ones_like(deaths), deaths)
-        tail = self.critic(self.critic_input(state, frame, xi_n, goal))
+        tail = self._bounded_value(self.critic(self.critic_input(state, frame, xi_n, goal)))
         objective, alive_now, alive_next = actor_return(rewards, deaths, tail, args.gamma)
         # Construct critic features from these SAME trajectories before freeing
         # this partition's graph. The full logical batch norm is updated later.
@@ -491,8 +512,8 @@ class Learner:
             flat = X.flatten(0, 1)
             values = torch.empty(X.shape[:2], device=X.device, dtype=X.dtype)
             for chunk in self._chunks(len(flat), getattr(args, "critic_microbatch", 0)):
-                values.view(-1)[chunk] = self.critic(flat[chunk].to(device)).to(X.device)
-            targets = lambda_returns(rewards, deaths, values, args.gamma, args.lam)
+                values.view(-1)[chunk] = self._bounded_value(self.critic(flat[chunk].to(device))).to(X.device)
+            targets = self._bounded_value(lambda_returns(rewards, deaths, values, args.gamma, args.lam))
         Xf, Yf = X[:-1].flatten(0, 1), targets.flatten()
         critic_loss = torch.zeros((), device=device)
         for _ in range(args.critic_epochs):

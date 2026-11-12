@@ -21,10 +21,17 @@ def proprioception(S,a_prev,xi,default_q):
 
 class MotionTrackingMDP(MDP):
     """Table A.2 reward and Appendix A termination, using v5 dimensions."""
-    def __init__(self,kin,motion,default_q,velocity_limits):
+    def __init__(self,kin,motion,default_q,velocity_limits,imu_frame='root'):
         super().__init__(kin,motion,default_q,velocity_limits,RewardCfg(term_height=.25,term_tilt=.8))
+        if imu_frame not in ('root','imu_site'):
+            raise ValueError('IMU frame must be explicit: root or imu_site')
+        self.imu_frame=imu_frame
         self.obs_noise=torch.tensor([.01]*31+[.5]*31+[.2]*3+[.05]*3+[0.]*31,device=default_q.device)
-    def obs(self,S,a_prev,xi,f):return proprioception(S,a_prev,xi,self.default_q)
+    def obs(self,S,a_prev,xi,f):
+        if self.imu_frame=='root':return proprioception(S,a_prev,xi,self.default_q)
+        _,gyro,gravity=self.kin.imu(*S[:6])
+        return torch.cat((S[4]-self.default_q+xi[...,CONTEXT_SLICES['encoder_bias']],
+                          S[5],gyro,gravity,a_prev),-1)
     def reward(self,S,f,a,a_prev,terms=False):
         p,R,_,_,q,_=S[:6]
         bp,bR,bv,bw,tp,tR=self._bodies_and_target(S,f)
@@ -86,12 +93,13 @@ class VelocityMDP(MotionTrackingMDP):
     def critic_features(self,S,f,xi_normalized):return torch.cat((invariant_features(S),xi_normalized),-1)
 
 class SharedController(nn.Module):
-    def __init__(self,goal_dim=770,hidden=(2048,1024,512,256)):
+    def __init__(self,goal_dim=770,hidden=(2048,1024,512,256),normalized_gelu=False):
         super().__init__()
-        self.motion_encoder=mlp(goal_dim,hidden,32)
+        architecture=dict(act=nn.GELU,layer_norm=True) if normalized_gelu else {}
+        self.motion_encoder=mlp(goal_dim,hidden,32,**architecture)
         # The history feature is the complete normalized ten-frame stack.
-        self.velocity_encoder=mlp(3+HISTORY*OBS_DIM,(256,256),32)
-        self.decoder=mlp(32+HISTORY*OBS_DIM,hidden,31)
+        self.velocity_encoder=mlp(3+HISTORY*OBS_DIM,(256,256),32,**architecture)
+        self.decoder=mlp(32+HISTORY*OBS_DIM,hidden,31,**architecture)
         self.obs_norm=RunningNorm(OBS_DIM)
         self.motion_norm=RunningNorm(goal_dim)
         self.command_norm=RunningNorm(3)
