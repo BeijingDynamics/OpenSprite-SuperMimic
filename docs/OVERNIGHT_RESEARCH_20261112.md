@@ -113,3 +113,18 @@ evaluation still rejects changed references. Final validation banks are
 evaluation-only, and training explicitly rejects the validation split even
 for a software smoke. This changes research evaluation, not actor inputs,
 gains, dynamics or active PM01 runs.
+
+The final corrected-reference checkpoint also survives all 48 seed-101 cases
+from both the controller default pose and the URDF zero pose, with physical
+velocities zeroed and no failure reset. Forward 0.25 m/s cases measure
+0.215 and 0.214 m/s respectively. This is broader simulated startup evidence,
+not a live motor-space or supported-handoff test.
+
+Its 993-input ONNX candidate passes replay parity on 512 recorded inputs
+covering all 48 command/disturbance environments. Reconstructed ten-frame
+histories include the previous raw clipped action; both PyTorch and ONNX
+match the recorded actions within 1.91e-6 maximum absolute action error.
+The exported contract remains hardware-unqualified. A one-thread CPU test
+on the rented host's Xeon Platinum 8480+ measures approximately 0.67 ms median;
+this is explicitly not Jetson latency, IPC latency or CAN timing. The replay
+verifier is reusable for the eventual selected checkpoint.
