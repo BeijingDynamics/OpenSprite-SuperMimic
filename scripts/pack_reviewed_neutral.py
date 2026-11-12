@@ -66,7 +66,8 @@ def main():
     from validate_reference_bank import validate
     bank=args.output_dir/'neutral_locomotion.npz';pack(clips,bank);validate(bank,manifest)
     qa_path=bank.with_suffix('.qa.json');qa=json.loads(qa_path.read_text())
-    qa.update(visual_review_passed=True,qualification='Reviewed kinematic research library; no physical or hardware qualification',
+    qa.update(visual_review_passed=True,accepted_for_training=args.split=='candidate_training',accepted_for_evaluation=True,
+              qualification='Reviewed kinematic research library; no physical or hardware qualification',
               split=args.split,reviewed_candidates=evidence,reserved_manifest_sha256=sha(args.reserved_manifest),
               dataset_license='100STYLE motion: CC-BY-4.0; Geno FBX mesh is excluded and retains its separate license')
     qa_path.write_text(json.dumps(qa,indent=2)+'\n')

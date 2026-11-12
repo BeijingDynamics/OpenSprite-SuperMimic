@@ -65,6 +65,7 @@ def train(cli):
     cfg['effective_wm_validation_envs_per_interface']=min(cfg.get('wm_validation_envs_per_interface',0),cfg['num_envs']//16) if cli.smoke else cfg.get('wm_validation_envs_per_interface',0)
     cfg['effective_wm_warmup_iterations']=1 if cli.smoke and revision['wm_warmup_iterations'] else revision['wm_warmup_iterations']
     report=json.loads(cli.quality.read_text())
+    if report.get('split')=='validation':raise ValueError('Held-out validation references cannot be used for training, including smoke training')
     if report.get('accepted_for_training') is not True:raise ValueError('Reference motion QA has not accepted the bank')
     if not cli.smoke and report.get('visual_review_passed') is not True:
         raise ValueError('Long training requires rendered reference review in addition to numeric QA')

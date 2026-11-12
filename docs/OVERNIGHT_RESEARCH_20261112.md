@@ -97,3 +97,19 @@ tests cover retention, delayed polling, final draining and invalid inputs.
 Recorded rollout rendering optionally uses a brighter floor and closer camera.
 The physical rollout and telemetry remain unchanged; these are playback views,
 not newly simulated trajectories or reference animation substituted for policy.
+
+The audit path now supports packed multi-clip libraries. It reads the named
+pelvis instead of requiring an unpacked `qpos` field, measures each reference
+without crossing clip boundaries, and scores each motion environment only
+until its own clip ends. A quiet first clip can no longer stand in for the
+entire walking library. Two regression tests and real two-clip software
+rollouts exercise these cases; software-smoke gait quality is not reported as
+a training result.
+
+Held-out motion evaluation requires an explicit original training-bank path,
+checkpoint/reference identity, both numeric and rendered qualifications, and
+hash-bound source manifests with a one-second cross-split gap. Ordinary
+evaluation still rejects changed references. Final validation banks are
+evaluation-only, and training explicitly rejects the validation split even
+for a software smoke. This changes research evaluation, not actor inputs,
+gains, dynamics or active PM01 runs.

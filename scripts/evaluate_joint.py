@@ -18,7 +18,14 @@ def evaluate(args):
     ck=torch.load(args.checkpoint,map_location=args.device,weights_only=False)
     revision=revision_contract(ck['config'])
     if ck.get('schema')!=revision['schema']:raise ValueError('Joint-interface schema/semantics mismatch')
-    if ck['motion_sha256']!=hashlib.sha256(args.motion.read_bytes()).hexdigest():raise ValueError('Reference bank changed')
+    reference_review=dict(mode='training_reference',evaluation_sha256=hashlib.sha256(args.motion.read_bytes()).hexdigest())
+    heldout_training=getattr(args,'heldout_training_bank',None)
+    if heldout_training is not None:
+        if args.interface!='motion':raise ValueError('Held-out reference evaluation is limited to the motion interface')
+        from verify_heldout_reference import verify_heldout_reference
+        from opensprite_tracker.robot import ASSET_REVISION
+        reference_review=verify_heldout_reference(heldout_training,args.motion,ck['motion_sha256'],ASSET_REVISION)
+    elif ck['motion_sha256']!=reference_review['evaluation_sha256']:raise ValueError('Reference bank changed')
     if ck['physical_contract']!=physical_contract(torque_lag_enabled=False):raise ValueError('Physics contract changed')
     shared=SharedController(hidden=tuple(ck['config']['network_hidden']),normalized_gelu=revision['normalized_gelu']).to(args.device);shared.load_state_dict(ck['shared']);shared.eval()
     velocity=args.interface=='velocity'
@@ -122,7 +129,7 @@ def evaluate(args):
                     last5s_velocity_error_m_s=float(np.linalg.norm(measured[:,:2]-target[:,:2],axis=-1).mean()),last5s_yaw_error_rad_s=float(abs(yaw-target[:,2]).mean()))
         per.append(item)
     report=dict(interface=args.interface,iteration=ck['iteration'],seed=args.seed,steps=steps,seconds=steps*.02,results=per,
-                initialization=initial_description,revision=revision,
+                initialization=initial_description,revision=revision,reference_review=reference_review,
                 training_random_command_ranges=ck['config']['command_ranges'],
                 policy_dt=.02,physics_dt=.002,history=10,checkpoint_sha256=hashlib.sha256(args.checkpoint.read_bytes()).hexdigest(),
                 protocol='No failure reset; velocity starts from physical rest and steps command after 2s; motion starts at each source first frame; pre-failure scoring only',
@@ -135,4 +142,5 @@ if __name__=='__main__':
     p.add_argument('--interface',choices=['motion','velocity'],required=True);p.add_argument('--output',type=Path,required=True)
     p.add_argument('--seconds',type=float,default=30);p.add_argument('--seed',type=int,default=101);p.add_argument('--device',default='cuda:0')
     p.add_argument('--initial-pose',choices=['reference-quiet','urdf-zero','controller-default'],default='reference-quiet')
+    p.add_argument('--heldout-training-bank',type=Path,help='Explicit held-out motion review; both banks require hash-bound QA and sibling source-manifest.json with disjoint train/validation intervals')
     p.add_argument('--commands-file',type=Path);evaluate(p.parse_args())

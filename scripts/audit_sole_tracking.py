@@ -23,6 +23,18 @@ def load(path):
         return {key: archive[key] for key in archive.files}
 
 
+def reference_poses(ref):
+    """Read either native clips or packed banks without assuming body order."""
+    names = ref['joint_names'].astype(str).tolist()
+    joint = ref['joint_pos'][:, [names.index(name) for name in BODY_JOINT_NAMES]]
+    if 'qpos' in ref:
+        root = ref['qpos'][:, :7]
+    else:
+        pelvis = ref['body_names'].astype(str).tolist().index('pelvis_link')
+        root = np.concatenate((ref['body_pos_w'][:, pelvis], ref['body_quat_w'][:, pelvis]), axis=-1)
+    return np.concatenate((root, joint), axis=-1)
+
+
 def geometry(poses):
     model = mujoco.MjModel.from_xml_path(str(ROBOT_XML))
     data = mujoco.MjData(model)
@@ -71,22 +83,27 @@ def measure(points, fps, forces=None, clearance_m=.005, floor_band_m=.002):
     return output
 
 
-def physical_trace(path, env, start_seconds):
+def physical_trace(path, env, start_seconds, active_steps=None):
     trace = load(path)
     fps = float(trace['fps'])
     failed = np.flatnonzero(trace['failed'][:, env])
     end = int(failed[0]) if len(failed) else len(trace['qpos'])
+    if active_steps is not None:
+        end = min(end, active_steps)
     start = round(start_seconds * fps)
     if end <= start + 1:
-        return dict(source=str(path), env=env, failed_before_scoring=True)
+        return dict(source=str(path), env=env, scoring_window_empty=True,
+                    failed_before_scoring=bool(len(failed) and failed[0] <= start),
+                    active_steps=active_steps)
     result = measure(geometry(trace['qpos'][start:end, env]), fps,
                      trace['contact_force_mean_n'][start:end, env])
     result.update(source=str(path), env=env, scoring_start_seconds=start / fps,
-                  scoring_end_seconds=end / fps, survived=not len(failed))
+                  scoring_end_seconds=end / fps,
+                  survived=not any(failed < (active_steps if active_steps is not None else len(trace['qpos']))))
     return result
 
 
-def tracking_reward_diagnostic(motion_path, rollout_path):
+def tracking_reward_diagnostic(motion_path, rollout_path, env=0):
     """Reconstruct arrived-at states from the next recorded proprioception.
 
     The last state is excluded because its next observation was not recorded.
@@ -103,20 +120,27 @@ def tracking_reward_diagnostic(motion_path, rollout_path):
     motion = MotionLib(motion_path, kin, 'cpu')
     mdp = MotionTrackingMDP(kin, motion, default_joint_pos(), velocity_limits())
     z = load(rollout_path)
+    start, length = int(motion.clip_start[env]), int(motion.clip_len[env])
+    # An environment stops being a motion-tracking case at its own clip end,
+    # even if other, longer clips keep the shared rollout running.
+    count = min(len(z['qpos']) - 1, length - 1)
+    if count < 1:
+        return dict(valid_samples=0)
     tensor = lambda x: torch.tensor(x, dtype=torch.float32)
-    qpos = tensor(z['qpos'][:-1, 0])
-    obs_next = tensor(z['proprioception'][1:, 0])
+    qpos = tensor(z['qpos'][:count, env])
+    obs_next = tensor(z['proprioception'][1:count + 1, env])
     if not torch.allclose(obs_next[:, :31] + default_joint_pos(), qpos[:, 7:], atol=1e-5, rtol=0):
         raise ValueError('The next observation does not describe the logged arrived-at joint state')
-    if not np.allclose(z['proprioception'][1:, 0, 68:99], z['policy_action'][:-1, 0], atol=1e-6, rtol=0):
+    if not np.allclose(z['proprioception'][1:count + 1, env, 68:99], z['policy_action'][:count, env], atol=1e-6, rtol=0):
         raise ValueError('Previous-action history is not aligned with the logged raw policy action')
     rotation = quat_to_mat(qpos[:, 3:7])
-    velocity = (yaw_mat(rotation) @ tensor(z['velocity'][:-1, 0])[..., None]).squeeze(-1)
+    velocity = (yaw_mat(rotation) @ tensor(z['velocity'][:count, env])[..., None]).squeeze(-1)
     omega = (rotation @ obs_next[:, 62:65, None]).squeeze(-1)
     state = (qpos[:, :3], rotation, velocity, omega, qpos[:, 7:], obs_next[:, 31:62])
-    frame = torch.arange(1, len(qpos) + 1)
-    actions = tensor(z['policy_action'][:-1, 0])
-    previous = tensor(z['proprioception'][:-1, 0, 68:99])
+    elapsed = torch.arange(1, count + 1)
+    frame = start + elapsed
+    actions = tensor(z['policy_action'][:count, env])
+    previous = tensor(z['proprioception'][:count, env, 68:99])
     reward, terms = mdp.reward(state, frame, actions, previous, terms=True)
     bp, bR, _, _, tp, tR = mdp._bodies_and_target(state, frame)
     actual_z = kin.sole_bottom_z(bp[:, mdp.feet], bR[:, mdp.feet])
@@ -124,7 +148,7 @@ def tracking_reward_diagnostic(motion_path, rollout_path):
     epos = (tp - bp).square().sum(-1).mean(-1)
     foot_z_part = (tp[:, mdp.feet, 2] - bp[:, mdp.feet, 2]).square().sum(-1) / bp.shape[1]
     benefit = torch.exp(-(epos - foot_z_part) / .3 ** 2) - torch.exp(-epos / .3 ** 2)
-    valid = (~tensor(z['failed'][:-1, 0]).bool()) & (frame >= 150)
+    valid = (~tensor(z['failed'][:count, env]).bool()) & (elapsed >= 150)
     if not valid.any():
         return dict(valid_samples=0)
     return dict(valid_samples=int(valid.sum()),
@@ -147,18 +171,30 @@ def main():
     parser.add_argument('--output', type=Path, required=True)
     args = parser.parse_args()
     ref = load(args.motion)
-    # qpos in the motion archive is in native model order, unlike policy logs.
-    names = ref['joint_names'].astype(str).tolist()
-    joint = ref['joint_pos'][:, [names.index(name) for name in BODY_JOINT_NAMES]]
-    poses = np.concatenate((ref['qpos'][:, :7], joint), axis=-1)
-    report = dict(reference=measure(geometry(poses), float(ref['fps'])),
-                  motion_tracking=physical_trace(args.motion_rollout, 0, 3.),
+    poses = reference_poses(ref)
+    from opensprite_tracker.supermimic.motion import _clip_ranges
+    ranges = _clip_ranges(ref, len(poses))
+    clip_names = ref.get('clip_names', ref.get('motion_names', np.array([f'clip_{i}' for i in range(len(ranges))]))).astype(str).tolist()
+    if len(clip_names) != len(ranges):
+        raise ValueError('Reference clip names and boundaries differ')
+    rollout = load(args.motion_rollout)
+    if rollout['qpos'].shape[1] != len(ranges):
+        raise ValueError('Motion rollout must contain one environment per reference clip')
+    clips = []
+    for env, ((start, length), name) in enumerate(zip(ranges, clip_names)):
+        clips.append(dict(name=name, env=env, reference_start=start, reference_length=length,
+                          reference=measure(geometry(poses[start:start + length]), float(ref['fps'])),
+                          motion_tracking=physical_trace(args.motion_rollout, env, 3., active_steps=length - 1),
+                          tracking_reward=tracking_reward_diagnostic(args.motion, args.motion_rollout, env)))
+    report = dict(schema='sole_tracking_per_clip_v2', clips=clips,
                   velocity_tracking=physical_trace(args.velocity_rollout, args.velocity_env, 3.),
-                  tracking_reward=tracking_reward_diagnostic(args.motion, args.motion_rollout),
                   hashes={str(p): hashlib.sha256(p.read_bytes()).hexdigest() for p in
                           (args.motion, args.motion_rollout, args.velocity_rollout)},
                   physical_contact_metric='Mean vertical force >5N at both endpoints; identical box material corner <=2mm above floor at both endpoints. Rolling and 50Hz sampling remain limitations.',
                   assessment='Low-clearance evidence; not a hardware admission or a trained repair.')
+    if len(clips) == 1:
+        # Preserve the established single-reference report fields.
+        report.update({key: clips[0][key] for key in ('reference', 'motion_tracking', 'tracking_reward')})
     args.output.parent.mkdir(parents=True, exist_ok=True)
     with args.output.open('x') as stream:
         json.dump(report, stream, indent=2)
