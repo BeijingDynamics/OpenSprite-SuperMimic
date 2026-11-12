@@ -158,6 +158,14 @@ class Learner:
             truth = unflatten_state(window["s1"][:, step])
             error = self.wm.state_error(state, truth)
             valid = window["mask"][:, step].bool()
+            foot_prediction = foot_truth = None
+            kin = getattr(self.mdp, "kin", None)
+            if kin is not None and hasattr(kin, "sole_bottom_z") and hasattr(self.mdp, "feet"):
+                predicted_pos, predicted_rot, _, _ = kin.forward(*state[:6])
+                true_pos, true_rot, _, _ = kin.forward(*truth[:6])
+                feet = self.mdp.feet
+                foot_prediction = kin.sole_bottom_z(predicted_pos[..., feet, :], predicted_rot[..., feet, :, :])
+                foot_truth = kin.sole_bottom_z(true_pos[..., feet, :], true_rot[..., feet, :, :])
             predicted_failure = true_failure = None
             if callable(getattr(self.mdp, "termination", None)):
                 # Reproduce the simulator's f1=min(f+1,inclusive_clip_end).
@@ -177,6 +185,21 @@ class Learner:
                 result[f"{tag}/valid_count"] = count
                 result[f"{tag}/sample_count"] = selected.sum()
                 result[f"{tag}/valid_fraction"] = count.float() / selected.sum().clamp_min(1)
+                if foot_prediction is not None:
+                    for side, index in (("left", 0), ("right", 1)):
+                        pred_z = foot_prediction[used, index]
+                        true_z = foot_truth[used, index]
+                        result[f"{tag}/{side}_sole_height_rmse_m"] = (pred_z-true_z).square().mean().sqrt()
+                        swing = true_z > .005
+                        low = true_z <= .002
+                        result[f"{tag}/{side}_geometric_swing_count"] = swing.sum()
+                        result[f"{tag}/{side}_geometric_low_count"] = low.sum()
+                        missing = error.new_full((), torch.nan)
+                        # Geometric discrimination only, not force/contact prediction.
+                        result[f"{tag}/{side}_missed_swing_fraction"] = torch.where(
+                            swing.any(), ((pred_z <= .002) & swing).sum()/swing.sum().clamp_min(1), missing)
+                        result[f"{tag}/{side}_false_swing_fraction"] = torch.where(
+                            low.any(), ((pred_z > .005) & low).sum()/low.sum().clamp_min(1), missing)
                 if true_failure is not None:
                     failures = (true_failure & used).sum()
                     predicted = (predicted_failure & used).sum()

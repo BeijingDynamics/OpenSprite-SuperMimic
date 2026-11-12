@@ -245,6 +245,43 @@ def test_diagnostics_separate_normalized_actuator_memory_from_physical_errors():
         torch.testing.assert_close(values[f"step{step}/root_position_physical"], torch.tensor(0.))
 
 
+def test_sole_diagnostics_distinguish_missing_swing_and_mask_invalid_truth(monkeypatch):
+    learner = make_learner(True)
+
+    class Geometry:
+        def forward(self, p, rotation, v, w, q, qd):
+            positions = torch.zeros(len(p), 2, 3)
+            positions[..., 2] = q[:, :2]
+            return positions, rotation[:, None].expand(-1, 2, -1, -1), None, None
+
+        def sole_bottom_z(self, positions, rotations):
+            return positions[..., 2]
+
+    learner.mdp.kin = Geometry()
+    learner.mdp.feet = [0, 1]
+    base = flat_state(3)
+    # State q starts at flat-state index 13. The model misses a true left
+    # swing and invents a right swing, independently of good root prediction.
+    base[:, 13:15] = torch.tensor([0., .020])
+    truth = base.clone()
+    truth[:, 13:15] = torch.tensor([.025, 0.])
+    window = dict(s=base[:, None], s1=truth[:, None], a=torch.zeros(3, 1, 31),
+                  xi=torch.zeros(3, 1, 2), f=torch.zeros(3, 1, dtype=torch.long),
+                  mask=torch.tensor([[1.], [1.], [0.]]))
+    window['s1'][2] = torch.nan
+    monkeypatch.setattr(learner.wm, 'step', lambda state, action, xi: state)
+    values = learner.wm_diagnostics(window, horizons=(1,))
+    assert values['step1/valid_count'] == 2
+    assert values['step1/left_geometric_swing_count'] == 2
+    assert values['step1/right_geometric_swing_count'] == 0
+    assert values['step1/left_missed_swing_fraction'] == 1
+    assert values['step1/right_false_swing_fraction'] == 1
+    assert torch.isnan(values['step1/right_missed_swing_fraction'])
+    assert float(values['step1/left_sole_height_rmse_m']) == pytest.approx(.025)
+    assert float(values['step1/right_sole_height_rmse_m']) == pytest.approx(.020)
+    assert learner.steps == {'wm': 0, 'pi': 0, 'v': 0}
+
+
 def test_diagnostics_count_only_valid_physical_false_alive_at_arrival_frames(monkeypatch):
     learner = make_learner(True)
     learner.motion.clip_id = torch.cat((torch.zeros(32, dtype=torch.long),

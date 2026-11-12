@@ -24,6 +24,11 @@ def main():
     spec.worldbody.add_geom(name='review_floor',type=mujoco.mjtGeom.mjGEOM_PLANE,size=[0,0,.1],rgba=[.35,.39,.43,1])
     spec.worldbody.add_light(pos=[0,0,3],dir=[0,0,-1],type=mujoco.mjtLightType.mjLIGHT_DIRECTIONAL)
     model=spec.compile();model.vis.global_.offwidth=512;model.vis.global_.offheight=480
+    # Cover the entire translated reference with the directional shadow map.
+    # Otherwise later frames can look airborne after leaving its initial bounds.
+    travel=float(np.linalg.norm(poses[:,:2]-poses[0,:2],axis=-1).max())
+    model.stat.extent=max(float(model.stat.extent),travel+1.5)
+    model.vis.quality.shadowsize=4096
     model.vis.headlight.ambient[:]=.45;state=mujoco.MjData(model)
     state.qpos[:]=poses[0];mujoco.mj_forward(model,state)
     R=state.xmat[model.body('pelvis_link').id].reshape(3,3)
