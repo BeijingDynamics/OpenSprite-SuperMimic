@@ -26,3 +26,21 @@
 
 本项目的 31 自由度 Sprite、控制频率、执行器映射和速度范围与论文 G1 实验不同。
 所有性能结论以本仓库实际配置与记录为准，没有声称获得论文原机器人基准成绩。
+
+## 100STYLE Neutral research candidate
+
+[100STYLE](https://www.ianxmason.com/100style/) is licensed under CC BY 4.0.
+Credit **The 100STYLE Dataset - Ian Mason**, and cite Mason, Starke and Komura,
+*Real-Time Style Modelling of Human Locomotion via Feature-Wise Transformations
+and Local Motion Phases* (2022), DOI 10.1145/3522618.
+The author-linked [Geno conversion](https://github.com/orangeduck/100style-retarget)
+by Daniel Holden retains the motion data's CC BY 4.0 terms. The Geno character
+mesh has a separate non-commercial research restriction; motion and character
+licenses must not be conflated.
+
+The November 12 Neutral investigation is separate from the PM01 reference-only
+training comparison. Download and screening scripts record source identities,
+archive CRCs, SHA-256 hashes, official trims and any further crop boundaries.
+Screened human data and native UMR outputs are not automatically qualified for
+robot training. Generic source BVHs remain outside Git and local result backups.
+Derived references retain attribution and a description of their changes.
