@@ -5,7 +5,7 @@ import numpy as np
 import pytest
 
 sys.path.insert(0,str(Path(__file__).resolve().parents[1]/'scripts'))
-from refine_neutral_contacts import stabilize_support_yaw,continuous_rigid_sole_swing,unit_direction_and_jacobian,retime_source_tasks,pelvis_height_from_leg_geometry
+from refine_neutral_contacts import stabilize_support_yaw,continuous_rigid_sole_swing,unit_direction_and_jacobian,retime_source_tasks,pelvis_height_from_leg_geometry,source_to_robot_bone_offset
 
 
 def test_projected_toe_spin_does_not_create_a_full_robot_foot_turn():
@@ -62,6 +62,7 @@ def test_source_time_scaling_preserves_original_tasks_and_contacts():
     provenance=dict(source_torso_orientation_world=np.tile(np.eye(3),(n,1,1)).tolist(),
                     source_head_orientation_world=np.tile(np.eye(3),(n,1,1)).tolist(),
                     source_upper_body_vectors=[dict(start_body='a',end_body='b',directions=np.tile([0.,0.,-1.],(n,1)).tolist())],
+                    source_arm_orientations=[dict(body='arm',rotations=np.tile(np.eye(3),(n,1,1)).tolist())],
                     source_contacts=[dict(side='Left'),dict(side='Right')])
     retimed,tasks,metadata,times=retime_source_tasks(prior,targets,provenance,.5,None)
     assert len(retimed)==2*n-1
@@ -70,6 +71,7 @@ def test_source_time_scaling_preserves_original_tasks_and_contacts():
     np.testing.assert_allclose(tasks[0][0][::2],points,atol=1e-12)
     np.testing.assert_array_equal(tasks[0][2][::2],contact)
     assert len(metadata['source_head_orientation_world'])==len(retimed)
+    np.testing.assert_allclose(metadata['source_arm_orientations'][0]['rotations'][::2],provenance['source_arm_orientations'][0]['rotations'],atol=1e-12)
 
 
 def test_source_root_height_preserves_vertical_motion_and_robot_offsets():
@@ -81,3 +83,14 @@ def test_source_root_height_preserves_vertical_motion_and_robot_offsets():
     np.testing.assert_allclose(robot_hip-.039,(source_hips-.09)*.5675,atol=1e-12)
     shifted=pelvis_height_from_leg_geometry(source_hips+1,1.09,.5675,.039,offset,rotation)
     np.testing.assert_allclose(shifted,result,atol=1e-12)
+
+
+def test_arm_axis_mapping_uses_actual_bind_rotation_and_preserves_world_motion():
+    from scipy.spatial.transform import Rotation
+    from audit_geno_source_frame import NATIVE_Y_UP_TO_Z_UP as U
+    source=Rotation.from_euler('xyz',[.2,-.3,1.5]).as_matrix()
+    robot=Rotation.from_euler('xyz',[-.1,.6,-1.4]).as_matrix()
+    offset=source_to_robot_bone_offset(source,robot)
+    np.testing.assert_allclose(U@source@offset,robot,atol=1e-12)
+    world_delta=Rotation.from_rotvec([.1,-.2,.3]).as_matrix()
+    np.testing.assert_allclose(U@(world_delta@source)@offset,(U@world_delta@U.T)@robot,atol=1e-12)

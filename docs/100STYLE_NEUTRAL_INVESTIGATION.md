@@ -193,3 +193,46 @@ the torso, hand and stance-foot style checks, preserve held-out intervals, and
 use declared 0.5 source timing before optimization. One native conversion was
 rejected because it required 35 mm ground correction, above the existing 30 mm
 cap. Failed conversion and refinement records are retained.
+
+### Axial arm rotation is also an admission concern
+
+A later joint-space audit found that several otherwise plausible candidates
+hold shoulder yaw near +/-100 degrees, with large wrist rotations. Limb
+directions and sparse rendered frames do not reveal rotation about an almost
+straight arm. The earlier position-only visual reviews remain historical
+evidence; an explicit admission-withheld record prevents treating them as
+approved training data.
+
+The twelfth investigation maps source upper-arm and hand orientations using the
+actual FBX bind rotations and a virtual robot T-pose. BVH zero channel rotations
+are not the Geno FBX bind pose; assuming identity here produced a roughly
+90-degree frame error and was rejected before reference generation. The virtual
+T-pose defines an axis offset only and is not a motion frame or hardware target.
+Forearm axial orientation is not independently imposed because Sprite lacks a
+human forearm pronation joint; the hand orientation and elbow-wrist direction
+remain explicit tasks.
+
+Reference IK uses the natural elbow-flexion branch and a weak default arm pose
+prior for otherwise underconstrained degrees of freedom, while retaining the
+measured limb directions and new orientation targets. It does not fix the arms
+in the runtime. Additional upper-arm/hand orientation checks require p95 below
+10 degrees and maxima below 20 degrees. Eight focused tests pass, including
+actual-bind rotation mapping and common-world rotation equivariance. The idle
+prototype passes numerically; walking and lateral review remain pending.
+
+The thirteenth candidate also corrects the anatomical shoulder origin used for
+the upper-arm direction: `shoulder_roll_link` is the shoulder center, whereas
+`shoulder_pitch_link` is approximately 36 mm inboard. Combining the latter
+direction with a correctly calibrated upper-arm orientation introduced a
+systematic mismatch. Bind-direction consistency is now checked explicitly.
+The short forward result passes the unchanged direction/orientation gates;
+shoulder yaw spans roughly +21..+36 degrees on the left and -47..-34 degrees on
+the right, rather than staying at +/-100 degrees. The natural elbow branch is
+also checked in the final output. Thirteen focused geometry/split tests pass.
+
+`pack_reviewed_neutral.py` requires hash-bound visual evidence, independent
+candidate validation, source-frame and full arm-orientation checks, and an
+explicit requested split. It rejects overlapping retarget/time-scaled
+alternatives and reserves a one-second source-time margin against the opposite
+split. An admission-withheld record takes precedence over earlier visual notes.
+Packing does not claim dynamic feasibility or hardware readiness.

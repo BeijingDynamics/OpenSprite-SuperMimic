@@ -10,11 +10,14 @@ def render(args):
     with np.load(args.rollout,allow_pickle=False) as archive:
         data={key:archive[key] for key in ['qpos','commands','failed','velocity','yaw_rate','case_names','external_force_world_n'] if key in archive}
     spec=mujoco.MjSpec.from_file(str(ROBOT_XML))
-    spec.worldbody.add_geom(name='floor',type=mujoco.mjtGeom.mjGEOM_PLANE,size=[0,0,.05],rgba=[.28,.3,.32,1])
+    bright=getattr(args,'bright',False)
+    spec.worldbody.add_geom(name='floor',type=mujoco.mjtGeom.mjGEOM_PLANE,size=[0,0,.05],rgba=[.55,.57,.6,1] if bright else [.28,.3,.32,1])
     model=spec.compile();state=mujoco.MjData(model)
+    if bright:
+        model.vis.headlight.active=1;model.vis.headlight.ambient[:]=.45;model.vis.headlight.diffuse[:]=.8
     ids=[model.joint(n).qposadr[0] for n in BODY_JOINT_NAMES]
     renderer=mujoco.Renderer(model,height=360,width=480)
-    camera=mujoco.MjvCamera();camera.distance=2.2;camera.azimuth=135;camera.elevation=-20
+    camera=mujoco.MjvCamera();camera.distance=getattr(args,'camera_distance',2.2);camera.azimuth=getattr(args,'camera_azimuth',135);camera.elevation=-20
     selected=args.envs;args.output.parent.mkdir(parents=True,exist_ok=True)
     writer=imageio.get_writer(str(args.output),fps=50,codec='libx264',quality=7,macro_block_size=1)
     try:
@@ -53,7 +56,10 @@ def render(args):
                 panels.append(np.asarray(image))
             writer.append_data(np.concatenate((np.concatenate(panels[:2],1),np.concatenate(panels[2:],1)),0))
     finally:writer.close();renderer.close()
-    print(json.dumps({'video':str(args.output),'frames':frames,'fps':50,'env_indices':selected}))
+    print(json.dumps({'video':str(args.output),'frames':frames,'fps':50,'env_indices':selected,'bright':bright,'camera_distance':camera.distance,'camera_azimuth':camera.azimuth}))
 if __name__=='__main__':
     p=argparse.ArgumentParser();p.add_argument('--rollout',type=Path,required=True);p.add_argument('--output',type=Path,required=True)
-    p.add_argument('--envs',type=int,nargs=4,default=[0,1,3,4]);p.add_argument('--seconds',type=float);render(p.parse_args())
+    p.add_argument('--envs',type=int,nargs=4,default=[0,1,3,4]);p.add_argument('--seconds',type=float)
+    p.add_argument('--bright',action='store_true',help='Improve recorded-trajectory visibility; does not change physics')
+    p.add_argument('--camera-distance',type=float,default=2.2);p.add_argument('--camera-azimuth',type=float,default=135)
+    render(p.parse_args())

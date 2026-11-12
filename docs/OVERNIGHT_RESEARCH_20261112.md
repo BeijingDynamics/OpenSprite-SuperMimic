@@ -8,8 +8,8 @@ part of this overnight investigation.
 | Experiment | Reference | Motion reward | State |
 | --- | --- | --- | --- |
 | Original PM01 baseline | Original G71 | Existing v2 reward | Preserved through update 10,209; update 6,030 is the equal-budget comparator |
-| Reference-only comparison | Reviewed 25 mm PM01 clearance correction | Existing v2 reward | Fresh seed 43, running to update 6,030 |
-| Sole-height comparison | Same exact corrected PM01 bank | Bounded opt-in sole term | Separate worktree; tests and three-update smoke passed; not launched |
+| Reference-only comparison | Reviewed 25 mm PM01 clearance correction | Existing v2 reward | Completed update 6,030; final physical audit and local backup complete |
+| Sole-height comparison | Same exact corrected PM01 bank | Bounded opt-in sole term | Started November 12 at 21:13 China time after final reference-only review |
 | Neutral library | Source-preserving screened 100STYLE clips | Not selected yet | Retargeting and independent source/geometry review; excluded from active runs |
 
 The original and reference-only jobs live on the rented host under
@@ -33,6 +33,34 @@ forward at 0.279 m/s and reverse also moves forward. Forward gait improvement
 does not qualify command control. Final equal-budget review must decide whether
 residual clearance or missing standing/backward/lateral reference coverage is
 the next experimental priority.
+
+The final update-6,030 result improves substantially over the earlier snapshot.
+At the same update count and evaluation seed 101:
+
+| Physical measurement | Original PM01 | Corrected reference only |
+| --- | ---: | ---: |
+| Forward command / measured speed | 0.25 / 0.216 m/s | 0.25 / 0.217 m/s |
+| Forward left/right sole maximum | 0.20 / 2.11 mm | 14.91 / 8.08 mm |
+| Sustained bilateral events above 5 mm | 0 / 0 | 21 / 19 |
+| Loaded near-floor material-point slip | 0.248 / 0.186 m/s | 0.012 / 0.032 m/s |
+| Zero-command mean forward drift | 0.067 m/s | 0.0048 m/s |
+| Reverse command / measured forward speed | -0.15 / +0.061 m/s | -0.15 / -0.185 m/s |
+
+Both survive all 48 seed-101 cases, illustrating why survival alone misses
+dragging. The final corrected-reference run stops almost completely in the last
+five seconds of the zero-command case. Reverse has residual yaw error, right
+turns and lateral movement remain imperfect, and the forward right-foot event
+median is only 7.1 mm. The corrected data helps; it does not yet meet the desired
+gait quality. This is one training seed, not a replicated statistical result.
+
+The isolated sole-height experiment starts fresh from the same seed and exact
+reference bytes, targeting 6,030 updates. Its activation review binds the final
+physical metrics and sampled command-video frames by hash. Source commit is
+`3f3667e51ce2a5f19406b3930f415b00bac219fa`; source snapshot SHA-256 is
+`8e33d6cbb415e84cd6306587763228e5544b6789f13c0d7a16e1fc9a47277fd9`.
+The run is under `supermimic_sole_experiment/outputs/pm01-clearance-sole-height-20261112-125806`
+on the rented host. Bounded hourly local backups use
+`outputs/retrain-20261112/pm01-sole-height-training`.
 
 At update 3,319, held-out world-model replay diagnostics improved to roughly
 0.9--1.6 mm sole-height RMSE at 32 steps, depending on side/interface. These

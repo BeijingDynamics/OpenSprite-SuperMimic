@@ -13,7 +13,7 @@ from retarget.processing import robot_contract,kinematics,geometry_quality,stric
 from audit_geno_source_frame import verify_source_frame,NATIVE_Y_UP_TO_Z_UP
 from retarget.bvh_tools.motion_postprocess import process_motion
 
-ARM_SEGMENTS=(('Arm','ForeArm','shoulder_pitch_link','elbow_link'),
+ARM_SEGMENTS=(('Arm','ForeArm','shoulder_roll_link','elbow_link'),
               ('ForeArm','Hand','elbow_link','wrist_roll_link'))
 
 
@@ -24,6 +24,40 @@ def pelvis_height_from_leg_geometry(human_hip_height,ankle_support_height,scale,
     return scale*(np.asarray(human_hip_height)-ankle_support_height)+robot_ankle_clearance-hip_offset
 
 
+def source_to_robot_bone_offset(source_bind_rotation,robot_bind_rotation):
+    """Map actual FBX bind axes to robot body axes in the same world frame."""
+    return (NATIVE_Y_UP_TO_Z_UP@source_bind_rotation).T@robot_bind_rotation
+
+
+def source_arm_orientation_tasks(names,rotations,ts,t,model):
+    """Use actual FBX bind rotations, not an assumed identity BVH T-pose."""
+    import nr_source
+    asset=nr_source.load_fbx_asset(ROOT/'assets/geno/Geno.fbx')
+    asset_names=asset['bone_match_names'].tolist();rest=asset['bone_rest_world_matrices']
+    def bind(name):
+        matrix=rest[asset_names.index(name),:3,:3].astype(float)
+        return Rotation.from_matrix(matrix/np.linalg.norm(matrix,axis=0,keepdims=True)).as_matrix()
+    state=mujoco.MjData(model);state.qpos[7:]=0
+    state.qpos[3:7]=Rotation.from_matrix(NATIVE_Y_UP_TO_Z_UP@bind('Hips')@C.T).as_quat()[[3,0,1,2]]
+    for side,sign in [('left',1),('right',-1)]:
+        state.qpos[model.joint(side+'_shoulder_roll_joint').qposadr[0]]=sign*np.pi/2
+    mujoco.mj_forward(model,state);tasks=[]
+    for side in ['left','right']:
+        # The pitch joint is inboard of the anatomical shoulder center. Its
+        # 36 mm lateral offset must not be mistaken for upper-arm direction.
+        source_vector=NATIVE_Y_UP_TO_Z_UP@(rest[asset_names.index(side.title()+'ForeArm'),:3,3]-rest[asset_names.index(side.title()+'Arm'),:3,3])
+        robot_vector=state.xpos[model.body(side+'_elbow_link').id]-state.xpos[model.body(side+'_shoulder_roll_link').id]
+        bind_direction_error=float(np.rad2deg(np.arccos(np.clip(source_vector@robot_vector/(np.linalg.norm(source_vector)*np.linalg.norm(robot_vector)),-1,1))))
+        if bind_direction_error>10:raise ValueError('Upper-arm bind direction mapping is inconsistent')
+        for bone,body in [('Arm','shoulder_yaw_link'),('Hand','wrist_roll_link')]:
+            name=side.title()+bone;body=side+'_'+body
+            offset=source_to_robot_bone_offset(bind(name),state.xmat[model.body(body).id].reshape(3,3))
+            source_rotation=Slerp(ts,Rotation.from_matrix(rotations[:,names.index(name)]))(t).as_matrix()
+            desired=NATIVE_Y_UP_TO_Z_UP@source_rotation@offset
+            tasks.append(dict(source_bone=name,body=body,rotations=desired.tolist(),bone_axis_offset=offset.tolist(),upper_arm_bind_direction_error_deg=bind_direction_error))
+    return tasks
+
+
 def unit_direction_and_jacobian(vector,jacobian):
     """Differentiate a direction without introducing a robot/human length target."""
     length=np.linalg.norm(vector)
@@ -32,18 +66,24 @@ def unit_direction_and_jacobian(vector,jacobian):
     return direction,(np.eye(3)-np.outer(direction,direction))@jacobian/length
 
 
-def source_upper_body_error(model,data,poses,upper_body,head_rotations):
+def source_upper_body_error(model,data,poses,upper_body,head_rotations,arm_orientations=None):
     tasks=[(model.body(row['start_body']).id,model.body(row['end_body']).id,np.asarray(row['directions'])) for row in upper_body]
-    arm=[];head=[];head_id=model.body('head_yaw_link').id
+    arm=[];head=[];orientation=[];head_id=model.body('head_yaw_link').id
+    orientation_tasks=[(model.body(row['body']).id,np.asarray(row['rotations'])) for row in (arm_orientations or [])]
     for i,pose in enumerate(poses):
         data.qpos[:]=pose;mujoco.mj_forward(model,data)
         for a,b,target in tasks:
             actual=data.xpos[b]-data.xpos[a];actual/=np.linalg.norm(actual)
             arm.append(np.rad2deg(np.arccos(np.clip(actual@target[i],-1,1))))
         head.append(np.rad2deg(np.linalg.norm(rot_error(head_rotations[i],data.xmat[head_id].reshape(3,3)))))
+        for body,target in orientation_tasks:
+            orientation.append(np.rad2deg(np.linalg.norm(rot_error(target[i],data.xmat[body].reshape(3,3)))))
     report=dict(arm_direction_p95_deg=float(np.quantile(arm,.95)),arm_direction_max_deg=float(max(arm)),
                 head_rotation_p95_deg=float(np.quantile(head,.95)),head_rotation_max_deg=float(max(head)))
     report['passed']=all(report[k]<=v for k,v in [('arm_direction_p95_deg',10),('arm_direction_max_deg',20),('head_rotation_p95_deg',10),('head_rotation_max_deg',20)])
+    if orientation:
+        report.update(arm_orientation_p95_deg=float(np.quantile(orientation,.95)),arm_orientation_max_deg=float(max(orientation)))
+        report['passed']=report['passed'] and report['arm_orientation_p95_deg']<=10 and report['arm_orientation_max_deg']<=20
     return report
 
 def stabilize_support_yaw(yaw,contact):
@@ -125,6 +165,7 @@ def source_targets_neutral(source,prior,native):
     head_rotation=calibrated@C@Slerp(ts,Rotation.from_matrix(rotations[:,names.index('Head')]))(t).as_matrix()@C.T
     relative_head=Rotation.from_matrix(torso_rotation.transpose(0,2,1)@head_rotation).as_rotvec()
     head_rotation=torso_rotation@Rotation.from_rotvec(savgol_filter(relative_head,15,3,axis=0)).as_matrix()
+    arm_orientations=source_arm_orientation_tasks(names,rotations,ts,t,model)
     adapted_prior=prior.copy();adapted_prior[:,:2]=scale*pelvis[:,:2]@rot+offset
     adapted_prior[:,3:7]=Rotation.from_matrix(root_rotation).as_quat()[:,[3,0,1,2]]
     source_hip_height=.5*(p[:,names.index('LeftUpLeg'),2]+p[:,names.index('RightUpLeg'),2])
@@ -186,7 +227,8 @@ def source_targets_neutral(source,prior,native):
                        native_root_fit_note='Retained diagnostic, never used to infer or admit the known source coordinate transform.',source_contacts=report,
                        torso_orientation_source='Geno Spine3 world orientation, same calibration as Hips; 15-frame relative SO(3) smoothing',
                        source_torso_orientation_world=torso_rotation.tolist(),
-                       source_upper_body_vectors=upper_body,source_head_orientation_world=head_rotation.tolist()),adapted_prior
+                       source_upper_body_vectors=upper_body,source_head_orientation_world=head_rotation.tolist(),
+                       source_arm_orientations=arm_orientations),adapted_prior
 
 
 def retime_source_tasks(prior,targets,provenance,speed,model):
@@ -204,32 +246,37 @@ def retime_source_tasks(prior,targets,provenance,speed,model):
     for row in provenance['source_upper_body_vectors']:
         direction=linear(row['directions']);direction/=np.linalg.norm(direction,axis=-1,keepdims=True)
         updated['source_upper_body_vectors'].append(dict(row,directions=direction.tolist()))
+    updated['source_arm_orientations']=[dict(row,rotations=Slerp(original_time,Rotation.from_matrix(np.asarray(row['rotations'])))(sample).as_matrix().tolist()) for row in provenance.get('source_arm_orientations',[])]
     updated['source_contacts']=[dict(provenance['source_contacts'][i],contact_fraction=float(c.mean()),plant_intervals=intervals(c)) for i,(_,_,c) in enumerate(result)]
     updated.update(source_speed=speed,source_retiming=metadata,source_timing_note='Explicit time scaling before constrained trajectory optimization; reference commands are recomputed from the final trajectory.')
     return retimed,result,updated,times
 
 
-def solve_trajectory(m,d,prior,targets,geoms,qids,vids,limits,speeds,name,stop_when_feasible=False,torso_rotations=None,upper_body=None,head_rotations=None):
+def solve_trajectory(m,d,prior,targets,geoms,qids,vids,limits,speeds,name,stop_when_feasible=False,torso_rotations=None,upper_body=None,head_rotations=None,arm_orientations=None):
     """Optimize the complete clip so swing preparation can precede touchdown.
 
     Frame-by-frame IK with a previous-frame velocity bound cannot anticipate a
     planted foot; the trajectory QP enforces the same limits across all frames.
     """
-    T,V=len(prior),m.nv;eye=np.eye(V);current=prior.copy()
+    T,V=len(prior),m.nv;eye=np.eye(V);current=prior.copy();joint_prior=prior.copy()
     neutral=json.loads((ROOT/'data/command_default_pose.json').read_text())
     for j in range(1,m.njnt):
         joint=m.joint(j).name
         if joint.startswith(('left_hip','right_hip','left_knee','right_knee','left_ankle','right_ankle')):
             current[:,int(m.jnt_qposadr[j])]=neutral[joint]
+        if any(part in joint for part in ['shoulder','elbow','wrist']):
+            current[:,int(m.jnt_qposadr[j])]=neutral[joint]
+            joint_prior[:,int(m.jnt_qposadr[j])]=neutral[joint]
     debug=ROOT/'outputs/refinement-debug';debug.mkdir(exist_ok=True)
     arm_tasks=[(m.body(row['start_body']).id,m.body(row['end_body']).id,np.asarray(row['directions'])) for row in (upper_body or [])]
+    orientation_tasks=[(m.body(row['body']).id,np.asarray(row['rotations'])) for row in (arm_orientations or [])]
     head=m.body('head_yaw_link').id
     def objective(poses):
         value=.05*np.square((np.diff(poses[:,:3],n=2,axis=0)-np.diff(prior[:,:3],n=2,axis=0))*2500).sum()
         value+=1e-4*np.square(np.diff(poses[:,qids],n=2,axis=0)*2500).sum()
         for frame,pose in enumerate(poses):
             d.qpos[:]=pose;mujoco.mj_forward(m,d)
-            value+=3*np.square(pose[qids]-prior[frame,qids]).sum()+100*np.square(pose[:3]-prior[frame,:3]).sum()
+            value+=3*np.square(pose[qids]-joint_prior[frame,qids]).sum()+100*np.square(pose[:3]-prior[frame,:3]).sum()
             target_root=Rotation.from_quat(prior[frame,[4,5,6,3]]).as_matrix()
             value+=5*np.square(rot_error(target_root,d.xmat[m.body('pelvis_link').id].reshape(3,3))).sum()
             if torso_rotations is not None:
@@ -239,6 +286,8 @@ def solve_trajectory(m,d,prior,targets,geoms,qids,vids,limits,speeds,name,stop_w
                 value+=1000*np.square(arm_targets[frame]-actual).sum()
             if head_rotations is not None:
                 value+=1000*np.square(rot_error(head_rotations[frame],d.xmat[head].reshape(3,3))).sum()
+            for body,orientation_targets in orientation_tasks:
+                value+=200*np.square(rot_error(orientation_targets[frame],d.xmat[body].reshape(3,3))).sum()
             for side,g in enumerate(geoms):
                 desired,yaw,contact=targets[side];measured,_=measured_foot(m,d,g);error=desired[frame]-measured
                 value+=1e7*np.square(error).sum() if contact[frame] else 1e5*np.square(error[:2]).sum()+1e5*error[2]**2
@@ -259,7 +308,7 @@ def solve_trajectory(m,d,prior,targets,geoms,qids,vids,limits,speeds,name,stop_w
             d.qpos[:]=current[frame];mujoco.mj_forward(m,d)
             rows=[];errors=[];constraints=[];lo=[];hi=[]
             def cost(jac,error,weight):rows.append(np.sqrt(weight)*jac);errors.append(np.sqrt(weight)*error)
-            cost(eye[vids],prior[frame,qids]-current[frame,qids],3.)
+            cost(eye[vids],joint_prior[frame,qids]-current[frame,qids],3.)
             cost(eye[:3],prior[frame,:3]-current[frame,:3],100.)
             jp=np.zeros((3,V));jr=np.zeros_like(jp);mujoco.mj_jacBody(m,d,jp,jr,m.body('pelvis_link').id)
             target_root=Rotation.from_quat(prior[frame,[4,5,6,3]]).as_matrix()
@@ -276,6 +325,9 @@ def solve_trajectory(m,d,prior,targets,geoms,qids,vids,limits,speeds,name,stop_w
             if head_rotations is not None:
                 jp=np.zeros((3,V));jr=np.zeros_like(jp);mujoco.mj_jacBody(m,d,jp,jr,head)
                 cost(jr,rot_error(head_rotations[frame],d.xmat[head].reshape(3,3)),1000.)
+            for body,orientation_targets in orientation_tasks:
+                jp=np.zeros((3,V));jr=np.zeros_like(jp);mujoco.mj_jacBody(m,d,jp,jr,body)
+                cost(jr,rot_error(orientation_targets[frame],d.xmat[body].reshape(3,3)),200.)
             for side,g in enumerate(geoms):
                 desired,yaw,contact=targets[side]
                 jp=np.zeros((3,V));jr=np.zeros_like(jp);mujoco.mj_jacGeom(m,d,jp,jr,g)
@@ -354,7 +406,7 @@ def solve_trajectory(m,d,prior,targets,geoms,qids,vids,limits,speeds,name,stop_w
         if stop_when_feasible and iteration>=10 and iteration%5==0:
             accepted,quality=feasible_trajectory(current,targets)
             if upper_body is not None and head_rotations is not None:
-                quality['source_upper_body']=source_upper_body_error(m,d,current,upper_body,head_rotations)
+                quality['source_upper_body']=source_upper_body_error(m,d,current,upper_body,head_rotations,arm_orientations)
                 accepted=accepted and quality['source_upper_body']['passed']
             if torso_rotations is not None:
                 errors=[]
@@ -398,9 +450,11 @@ def main():
     optimization_limits=limits.copy()
     optimization_limits[joints.index('left_knee_joint'),0]=.02
     optimization_limits[joints.index('right_knee_joint'),1]=-.02
+    optimization_limits[joints.index('left_elbow_joint'),1]=-.02
+    optimization_limits[joints.index('right_elbow_joint'),0]=.02
     result,count=solve_trajectory(model,data,prior,targets,feet,qids,vids,optimization_limits,speeds,name+'-smooth',True,
                                   np.asarray(provenance['source_torso_orientation_world']),
-                                  provenance['source_upper_body_vectors'],np.asarray(provenance['source_head_orientation_world']))
+                                  provenance['source_upper_body_vectors'],np.asarray(provenance['source_head_orientation_world']),provenance['source_arm_orientations'])
     result[:,7:]=strict_float32_angles(result[:,7:],limits)
     accepted,metrics=feasible_trajectory(result,targets)
     deviation=np.abs(result[:,:3]-prior[:,:3]).max(0)
@@ -409,9 +463,12 @@ def main():
     knee_branch=(result[:,qids[joints.index('left_knee_joint')]].min()>=.02-1e-6 and
                  result[:,qids[joints.index('right_knee_joint')]].max()<=-.02+1e-6)
     accepted=accepted and bool(knee_branch)
-    upper_quality=source_upper_body_error(model,data,result,provenance['source_upper_body_vectors'],np.asarray(provenance['source_head_orientation_world']))
+    elbow_branch=(result[:,qids[joints.index('left_elbow_joint')]].max()<=-.02+1e-6 and
+                  result[:,qids[joints.index('right_elbow_joint')]].min()>=.02-1e-6)
+    accepted=accepted and bool(elbow_branch)
+    upper_quality=source_upper_body_error(model,data,result,provenance['source_upper_body_vectors'],np.asarray(provenance['source_head_orientation_world']),provenance['source_arm_orientations'])
     accepted=accepted and upper_quality['passed']
-    method='neutral_source_leg_geometry_contact_sqp_v11'
+    method='neutral_anatomical_arm_frames_contact_sqp_v13'
     payload.update(kinematics(plain,result),qpos=result,time=times,source_name=np.array(name),source_speed=np.array(a.source_speed),parent_source_name=np.array(a.name),postprocess=np.array(method),dataset_revision=np.array('100style-neutral-v5-research-20261112'))
     a.output_dir.mkdir(parents=True,exist_ok=False);out=a.output_dir/(name+'.npz');np.savez_compressed(out,**payload)
     report=dict(motion=name,parent_source_name=a.name,final_geometry=geometry_quality(plain,result),postprocess=method,
@@ -424,12 +481,12 @@ def main():
                 swing_height_note='Complete source swing intervals use C2 source-peak clearance with horizontal travel in the middle80percent; partial boundary swings retain their source path. No constant swing-height floor.',
                 joint_acceleration_weight=1e-4,
                 source_upper_body_quality=upper_quality,
-                upper_body_note='Source shoulder-elbow and elbow-wrist unit directions plus source head orientation; all official joint limits retained.',
+                upper_body_note='Source limb directions, head orientation, and upper-arm/hand orientations mapped with actual FBX bind axes. Reference-only natural elbow branch and weak default-pose null-space prior; hardware limits unchanged.',
                 swing_yaw_note='Measured planted headings with quintic interpolation through toe-off projection singularities.',
                 knee_branch_note='Reference IK stays on the natural flexion branch; physical model and hardware bounds are unchanged.',
-                knee_branch_passed=bool(knee_branch),metrics=metrics,**provenance)
+                knee_branch_passed=bool(knee_branch),elbow_branch_passed=bool(elbow_branch),metrics=metrics,**provenance)
     out.with_suffix('.json').write_text(json.dumps(report,indent=2)+'\n')
-    print(json.dumps({k:v for k,v in report.items() if k not in ('source_torso_orientation_world','source_upper_body_vectors','source_head_orientation_world')}),flush=True)
+    print(json.dumps({k:v for k,v in report.items() if k not in ('source_torso_orientation_world','source_upper_body_vectors','source_head_orientation_world','source_arm_orientations')}),flush=True)
 
 
 if __name__=='__main__':main()
