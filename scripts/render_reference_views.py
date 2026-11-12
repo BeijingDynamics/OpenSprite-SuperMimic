@@ -17,6 +17,7 @@ def main():
     parser.add_argument('--motion',type=Path,required=True)
     parser.add_argument('--output',type=Path,required=True)
     parser.add_argument('--speed',type=float,default=1.)
+    parser.add_argument('--follow-heading',action='store_true',help='Keep both review cameras aligned with the current pelvis heading')
     args=parser.parse_args()
     if not 0<args.speed<=2:parser.error('Playback speed must be in (0,2]')
     with np.load(args.motion,allow_pickle=False) as data:poses=data['qpos'];fps=float(data['fps'])
@@ -45,6 +46,9 @@ def main():
                 state.qpos[:]=poses[frame];mujoco.mj_forward(model,state)
                 composite=Image.new('RGB',(1024,520),'#151b24')
                 for index,camera in enumerate(cameras):
+                    if args.follow_heading:
+                        rotation=state.xmat[model.body('pelvis_link').id].reshape(3,3)
+                        camera.azimuth=np.rad2deg(np.arctan2(rotation[1,0],rotation[0,0]))+90*index
                     camera.lookat[:]=[*state.qpos[:2],.40]
                     renderer.update_scene(state,camera=camera)
                     composite.paste(Image.fromarray(renderer.render()),(512*index,40))

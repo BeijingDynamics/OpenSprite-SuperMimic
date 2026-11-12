@@ -5,7 +5,7 @@ import numpy as np
 import pytest
 
 sys.path.insert(0,str(Path(__file__).resolve().parents[1]/'scripts'))
-from refine_neutral_contacts import stabilize_support_yaw,continuous_rigid_sole_swing
+from refine_neutral_contacts import stabilize_support_yaw,continuous_rigid_sole_swing,unit_direction_and_jacobian,retime_source_tasks
 
 
 def test_projected_toe_spin_does_not_create_a_full_robot_foot_turn():
@@ -39,3 +39,34 @@ def test_partial_boundary_swings_and_standing_are_not_reinvented():
     contact=np.r_[np.zeros(4,bool),np.ones(7,bool),np.zeros(4,bool)]
     assert np.array_equal(continuous_rigid_sole_swing(path,contact),path)
     assert np.array_equal(continuous_rigid_sole_swing(path,np.ones(15,bool)),path)
+
+
+def test_limb_direction_derivative_and_length_invariance():
+    vector=np.array([.1,.2,-.3]);jacobian=np.array([[.4,.2],[-.1,.5],[.8,-.2]])
+    direction,analytic=unit_direction_and_jacobian(vector,jacobian)
+    eps=1e-6
+    for j in range(2):
+        plus=vector+eps*jacobian[:,j];minus=vector-eps*jacobian[:,j]
+        numerical=(plus/np.linalg.norm(plus)-minus/np.linalg.norm(minus))/(2*eps)
+        np.testing.assert_allclose(analytic[:,j],numerical,atol=1e-9)
+    np.testing.assert_allclose(unit_direction_and_jacobian(vector*2,jacobian*2)[0],direction)
+    with pytest.raises(ValueError,match='Degenerate'):
+        unit_direction_and_jacobian(np.zeros(3),jacobian)
+
+
+def test_source_time_scaling_preserves_original_tasks_and_contacts():
+    n=12;prior=np.zeros((n,38));prior[:,3]=1;prior[:,0]=np.arange(n)/50
+    contact=np.r_[np.ones(4,bool),np.zeros(4,bool),np.ones(4,bool)]
+    points=np.c_[np.arange(n)*.01,np.zeros(n),np.full(n,.02)]
+    targets=[(points,np.zeros(n),contact)]*2
+    provenance=dict(source_torso_orientation_world=np.tile(np.eye(3),(n,1,1)).tolist(),
+                    source_head_orientation_world=np.tile(np.eye(3),(n,1,1)).tolist(),
+                    source_upper_body_vectors=[dict(start_body='a',end_body='b',directions=np.tile([0.,0.,-1.],(n,1)).tolist())],
+                    source_contacts=[dict(side='Left'),dict(side='Right')])
+    retimed,tasks,metadata,times=retime_source_tasks(prior,targets,provenance,.5,None)
+    assert len(retimed)==2*n-1
+    np.testing.assert_allclose(retimed[::2],prior,atol=1e-12)
+    np.testing.assert_allclose(retimed[:,0],times*.5,atol=1e-12)
+    np.testing.assert_allclose(tasks[0][0][::2],points,atol=1e-12)
+    np.testing.assert_array_equal(tasks[0][2][::2],contact)
+    assert len(metadata['source_head_orientation_world'])==len(retimed)

@@ -109,3 +109,55 @@ Local research artifacts live under `outputs/retrain-20261112/`; public source
 BVH files remain on the rented host and are reproducible with the downloader.
 Derived motion remains outside Git. Candidate reports preserve source, native
 input and refiner hashes. No candidate is approved for hardware use.
+
+### Upper-body audit supersedes the preliminary visual impression
+
+The seventh candidate must not be admitted based on its foot-only numerical
+pass. Direct comparison with source shoulder-elbow and elbow-wrist directions
+found large arm errors: the short clip reached approximately 58 degrees, and
+the long path approximately 81 degrees. Native surface retargeting plus a
+corrected pelvis/torso did not preserve the human's arm style sufficiently.
+
+The ninth candidate therefore adds source unit-limb-direction tasks and source
+head orientation. Limb directions avoid imposing human bone lengths on Sprite.
+The direction Jacobian is checked against finite differences; all five focused
+preprocessing tests pass. New candidate admission also requires arm/head
+95th-percentile errors below 10 degrees and maxima below 20 degrees. Existing
+foot, joint, root and collision checks remain in place. The first short result
+has arm error 6.24 degrees at the 95th percentile and 7.98 degrees maximum,
+with head error below 0.08 degrees. Long-path review remains separate.
+
+The two rejected long native paths are also being investigated as independent
+five-second solves to reduce sequential native-root drift. This preserves source
+time and ordering; it does not synthesize new motion. Only child clips, never a
+duplicate parent, may enter a bank. All children of source frames 1587..2787
+are held out together; children of 3507..4707 are training candidates. A split
+does not turn one actor into independent subjects or remove the need for QA.
+
+### Verified source frame and retiming before optimization
+
+The tenth candidate replaces alignment inferred from the optimized native robot
+root with the actual, known Geno source transform. The native retargeter maps
+Y-up coordinates to Z-up as `(x, -z, y)`. `audit_geno_source_frame.py` compares
+every source frame against the native FBX bone-transform path before robot IK.
+It checks root translation and orientation and reports the small non-root bind
+offset differences. A drifting surface-IK robot root is not a calibration
+reference. The previous best-fit RMS is retained as a diagnostic, but it is no
+longer an admission gate for this independently verified coordinate transform.
+This deliberately corrects a data-calibration heuristic; robot/control limits
+are unchanged.
+
+Time scaling is explicit and happens before constrained trajectory optimization.
+Current candidates use 0.75 source speed for forward/backward paths, 0.5 for
+sideways paths, and unchanged timing for idle. Source contact phases, pelvis,
+torso, head and arm tasks are resampled together. Commands must be recomputed
+from the final robot trajectory. Six focused preprocessing tests pass, including
+source-task/contact preservation under time scaling.
+
+A post-hoc 0.75-speed resampling experiment failed the unchanged 2 mm support
+target check at 2.30 mm and remains rejected. Slower interpolation does not
+automatically preserve nonlinear foot geometry. The first pre-optimization
+retimed forward candidate passes with 1.51 mm maximum support residual and
+6.42/7.95 degree arm direction p95/maximum errors. This is still a reference
+candidate, not evidence of learned policy performance. Other command categories
+remain under independent numerical and visual review.
