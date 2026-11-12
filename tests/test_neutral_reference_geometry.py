@@ -5,7 +5,7 @@ import numpy as np
 import pytest
 
 sys.path.insert(0,str(Path(__file__).resolve().parents[1]/'scripts'))
-from refine_neutral_contacts import stabilize_support_yaw,continuous_rigid_sole_swing,unit_direction_and_jacobian,retime_source_tasks
+from refine_neutral_contacts import stabilize_support_yaw,continuous_rigid_sole_swing,unit_direction_and_jacobian,retime_source_tasks,pelvis_height_from_leg_geometry
 
 
 def test_projected_toe_spin_does_not_create_a_full_robot_foot_turn():
@@ -70,3 +70,14 @@ def test_source_time_scaling_preserves_original_tasks_and_contacts():
     np.testing.assert_allclose(tasks[0][0][::2],points,atol=1e-12)
     np.testing.assert_array_equal(tasks[0][2][::2],contact)
     assert len(metadata['source_head_orientation_world'])==len(retimed)
+
+
+def test_source_root_height_preserves_vertical_motion_and_robot_offsets():
+    from scipy.spatial.transform import Rotation
+    rotation=Rotation.from_euler('y',np.array([0.,.1,-.1])[:,None]).as_matrix()
+    source_hips=np.array([.85,.86,.84]);offset=np.array([.01,0,.014])
+    result=pelvis_height_from_leg_geometry(source_hips,.09,.5675,.039,offset,rotation)
+    robot_hip=result+np.einsum('tij,j->ti',rotation,offset)[:,2]
+    np.testing.assert_allclose(robot_hip-.039,(source_hips-.09)*.5675,atol=1e-12)
+    shifted=pelvis_height_from_leg_geometry(source_hips+1,1.09,.5675,.039,offset,rotation)
+    np.testing.assert_allclose(shifted,result,atol=1e-12)

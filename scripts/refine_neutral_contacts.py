@@ -17,6 +17,13 @@ ARM_SEGMENTS=(('Arm','ForeArm','shoulder_pitch_link','elbow_link'),
               ('ForeArm','Hand','elbow_link','wrist_roll_link'))
 
 
+def pelvis_height_from_leg_geometry(human_hip_height,ankle_support_height,scale,
+                                    robot_ankle_clearance,pelvis_to_hip,root_rotations):
+    """Transfer hip-to-support height without inheriting surface-IK root drift."""
+    hip_offset=np.einsum('tij,j->ti',root_rotations,pelvis_to_hip)[:,2]
+    return scale*(np.asarray(human_hip_height)-ankle_support_height)+robot_ankle_clearance-hip_offset
+
+
 def unit_direction_and_jacobian(vector,jacobian):
     """Differentiate a direction without introducing a robot/human length target."""
     length=np.linalg.norm(vector)
@@ -120,7 +127,18 @@ def source_targets_neutral(source,prior,native):
     head_rotation=torso_rotation@Rotation.from_rotvec(savgol_filter(relative_head,15,3,axis=0)).as_matrix()
     adapted_prior=prior.copy();adapted_prior[:,:2]=scale*pelvis[:,:2]@rot+offset
     adapted_prior[:,3:7]=Rotation.from_matrix(root_rotation).as_quat()[:,[3,0,1,2]]
-    adapted_prior[:,2]=np.median(prior[:,2])+scale*(pelvis[:,2]-np.median(pelvis[:,2]))
+    source_hip_height=.5*(p[:,names.index('LeftUpLeg'),2]+p[:,names.index('RightUpLeg'),2])
+    ankle_support_height=np.mean([np.quantile(p[:,names.index(side+'Foot'),2],.05) for side in ['Left','Right']])
+    pelvis_id=model.body('pelvis_link').id
+    robot_hip=.5*(state.xpos[model.body('left_hip_pitch_link').id]+state.xpos[model.body('right_hip_pitch_link').id])
+    pelvis_to_hip=state.xmat[pelvis_id].reshape(3,3).T@(robot_hip-state.xpos[pelvis_id])
+    ankle_clearances=[]
+    for side in ['left','right']:
+        geom=model.geom(side+'_foot_collision').id
+        bottom=min((state.geom_xpos[geom]+state.geom_xmat[geom].reshape(3,3)@(model.geom_size[geom]*np.array([x,y,-1])))[2] for x in [-1,1] for y in [-1,1])
+        ankle_clearances.append(state.xpos[model.body(side+'_ankle_pitch_link').id,2]-bottom)
+    ankle_clearance=float(np.mean(ankle_clearances))
+    adapted_prior[:,2]=pelvis_height_from_leg_geometry(source_hip_height,ankle_support_height,scale,ankle_clearance,pelvis_to_hip,root_rotation)
     targets=[];report=[]
     for side in ['Left','Right']:
         ankle=p[:,names.index(side+'Foot')]
@@ -161,6 +179,9 @@ def source_targets_neutral(source,prior,native):
                        root_orientation_source='BVH Hips SO(3), independently verified native Geno source frame',
                        source_frame_audit=frame_audit,source_frame_revision='native_geno_y_up_to_z_up_v1',
                        source_frame_verifier_sha256=hashlib.sha256((ROOT/'scripts/audit_geno_source_frame.py').read_bytes()).hexdigest(),
+                       root_height_source='Scaled source hip-center to support-ankle height, corrected for robot sole clearance and pelvis-to-hip offset; native root height is diagnostic only.',
+                       source_ankle_support_height_m=float(ankle_support_height),robot_ankle_clearance_m=ankle_clearance,
+                       robot_pelvis_to_hip_offset_m=pelvis_to_hip.tolist(),native_root_height_median_m=float(np.median(prior[:,2])),
                        root_alignment_rotation=rot.tolist(),root_alignment_offset=offset.tolist(),native_root_fit_rms_diagnostic_m=rms,
                        native_root_fit_note='Retained diagnostic, never used to infer or admit the known source coordinate transform.',source_contacts=report,
                        torso_orientation_source='Geno Spine3 world orientation, same calibration as Hips; 15-frame relative SO(3) smoothing',
@@ -390,7 +411,7 @@ def main():
     accepted=accepted and bool(knee_branch)
     upper_quality=source_upper_body_error(model,data,result,provenance['source_upper_body_vectors'],np.asarray(provenance['source_head_orientation_world']))
     accepted=accepted and upper_quality['passed']
-    method='neutral_verified_source_frame_contact_sqp_v10'
+    method='neutral_source_leg_geometry_contact_sqp_v11'
     payload.update(kinematics(plain,result),qpos=result,time=times,source_name=np.array(name),source_speed=np.array(a.source_speed),parent_source_name=np.array(a.name),postprocess=np.array(method),dataset_revision=np.array('100style-neutral-v5-research-20261112'))
     a.output_dir.mkdir(parents=True,exist_ok=False);out=a.output_dir/(name+'.npz');np.savez_compressed(out,**payload)
     report=dict(motion=name,parent_source_name=a.name,final_geometry=geometry_quality(plain,result),postprocess=method,

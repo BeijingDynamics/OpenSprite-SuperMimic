@@ -161,3 +161,35 @@ retimed forward candidate passes with 1.51 mm maximum support residual and
 6.42/7.95 degree arm direction p95/maximum errors. This is still a reference
 candidate, not evidence of learned policy performance. Other command categories
 remain under independent numerical and visual review.
+
+### Root-height diagnosis and the eleventh candidate
+
+The backward candidate's initial QP certificate identified a geometric
+initialization problem: the native surface solve's median pelvis height was
+about 0.405 m. Applying the standard initial leg pose at that height placed
+some sole corners about 78 mm below the floor. The optimizer's local step and
+bounded root displacement could not remove that penetration in one step.
+Increasing motor limits or accepting penetrating output would not fix this
+source conversion error.
+
+Root height now comes from source hip-center height above the inferred support
+ankle, scaled by the robot/human leg-length ratio, plus the robot's actual
+ankle-to-sole height and minus its rotated pelvis-to-hip offset. Native root
+height is retained only as a diagnostic. Source vertical motion is preserved;
+the final root remains within the existing 20/20/40 mm XYZ displacement bounds
+around this source-derived prior. Seven focused tests pass, including vertical
+translation invariance and reconstruction of the robot hip height.
+
+The backward solve now converges geometrically, but the short candidate still
+fails the required repeated bilateral lift check. It remains rejected. A
+rightward candidate passes the numerical gates, while a leftward candidate
+fails support residual and arm-direction checks. A numerically successful
+source-height correction therefore does not automatically admit an entire
+motion family.
+
+Longer backward research candidates explicitly include measured heading
+changes rather than claiming straight, constant-heading walking. They retain
+the torso, hand and stance-foot style checks, preserve held-out intervals, and
+use declared 0.5 source timing before optimization. One native conversion was
+rejected because it required 35 mm ground correction, above the existing 30 mm
+cap. Failed conversion and refinement records are retained.
