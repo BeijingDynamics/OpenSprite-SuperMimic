@@ -1,0 +1,169 @@
+[
+  {
+    "name": "zero",
+    "command": [
+      0,
+      0,
+      0
+    ],
+    "category": "nominal"
+  },
+  {
+    "name": "forward025",
+    "command": [
+      0.25,
+      0,
+      0
+    ],
+    "category": "nominal"
+  },
+  {
+    "name": "forward040",
+    "command": [
+      0.4,
+      0,
+      0
+    ],
+    "category": "nominal"
+  },
+  {
+    "name": "backward",
+    "command": [
+      -0.15,
+      0,
+      0
+    ],
+    "category": "nominal"
+  },
+  {
+    "name": "lateral_left",
+    "command": [
+      0,
+      0.15,
+      0
+    ],
+    "category": "nominal"
+  },
+  {
+    "name": "lateral_right",
+    "command": [
+      0,
+      -0.15,
+      0
+    ],
+    "category": "nominal"
+  },
+  {
+    "name": "turn_left",
+    "command": [
+      0.2,
+      0,
+      0.3
+    ],
+    "category": "nominal"
+  },
+  {
+    "name": "turn_right",
+    "command": [
+      0.2,
+      0,
+      -0.3
+    ],
+    "category": "nominal"
+  },
+  {
+    "name": "push_forward",
+    "command": [
+      0.25,
+      0,
+      0
+    ],
+    "category": "disturbance",
+    "forces": [
+      {
+        "at_seconds": 6,
+        "duration_seconds": 0.2,
+        "force_world_n": [
+          15,
+          0,
+          0
+        ]
+      }
+    ]
+  },
+  {
+    "name": "push_side",
+    "command": [
+      0.25,
+      0,
+      0
+    ],
+    "category": "disturbance",
+    "forces": [
+      {
+        "at_seconds": 6,
+        "duration_seconds": 0.2,
+        "force_world_n": [
+          0,
+          15,
+          0
+        ]
+      }
+    ]
+  },
+  {
+    "name": "pull_side",
+    "command": [
+      0.25,
+      0,
+      0
+    ],
+    "category": "disturbance",
+    "forces": [
+      {
+        "at_seconds": 6,
+        "duration_seconds": 1.0,
+        "force_world_n": [
+          0,
+          -5,
+          0
+        ]
+      }
+    ]
+  },
+  {
+    "name": "start_stop_restart",
+    "command": [
+      0.25,
+      0,
+      0
+    ],
+    "category": "transition",
+    "stages": [
+      {
+        "at_seconds": 2,
+        "command": [
+          0.25,
+          0,
+          0
+        ]
+      },
+      {
+        "at_seconds": 8,
+        "command": [
+          0,
+          0,
+          0
+        ]
+      },
+      {
+        "at_seconds": 14,
+        "command": [
+          0.25,
+          0,
+          0
+        ]
+      }
+    ]
+  }
+]

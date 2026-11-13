@@ -1,5 +1,10 @@
 # November 12 controlled locomotion investigation
 
+Follow-up: the authorized mixed-reference run launched November 13 at 12:49
+China time, after both PM01 comparisons completed. See
+[the new run record](MIXED_REFERENCE_RUN_20261113.md). Earlier progress entries
+below retain their dated experimental context.
+
 This record separates completed evidence from running work. All experiments
 use the pinned Sprite v5 model, full published joint gains, 500 Hz PD, 50 Hz
 policy, and the verified pelvis IMU convention. No Jetson or motor operation is
@@ -128,3 +133,46 @@ The exported contract remains hardware-unqualified. A one-thread CPU test
 on the rented host's Xeon Platinum 8480+ measures approximately 0.67 ms median;
 this is explicitly not Jetson latency, IPC latency or CAN timing. The replay
 verifier is reusable for the eventual selected checkpoint.
+
+## Verified status on November 13, approximately 12:10 China time
+
+Both PM01 comparisons completed 6,030 updates. Reference-only training took
+approximately 8,029 seconds; the isolated sole-height reward comparison took
+8,609 seconds. No GPU training process was active at the status check.
+Neutral long training has not been launched. Do not report the completed
+PM01 runs as Neutral training or imply continuous training through the night.
+
+The final sole-height comparison passes survival in all 48 cases for each
+evaluation seed 101, 202 and 303. These are evaluation repeats of one trained
+checkpoint, not three independent training seeds. For seed 101:
+
+| Metric | Reference only | Additional motion-branch sole tracking |
+| --- | ---: | ---: |
+| Forward speed for 0.25 m/s command | 0.2169 m/s | 0.2129 m/s |
+| Maximum lowest-sole-corner height, left/right | 14.9 / 8.1 mm | 16.5 / 18.1 mm |
+| Loaded near-floor corner RMS slip, left/right | 0.0124 / 0.0320 m/s | 0.0141 / 0.0094 m/s |
+| Reverse speed for -0.15 m/s command | -0.1851 m/s | -0.1510 m/s |
+
+The added term improves forward clearance symmetry and right-foot slip in this
+comparison. It is not a complete solution: lateral commands remain poor and
+the final five seconds of the zero-command case show approximately -0.077 to
+-0.078 m/s lateral velocity across evaluation seeds. Survival alone must not
+be reported as successful station keeping or full command coverage.
+
+The reviewed Neutral candidate training bank contains five clips totaling
+53.18 seconds after retiming, with separate held-out evaluation clips. Its
+command audit exposes substantial directional imbalance: 55.37% of samples
+have yaw rate above +0.1 rad/s, 12.5% below -0.1 rad/s; rightward samples are
+16.67%, leftward 0.90%, and backward samples 0% at the 0.1 m/s thresholds.
+Kinematic/visual qualification does not establish balanced locomotion coverage.
+The bank is not the paper's LAFAN1/BONES-SEED locomotion library.
+
+The reviewed bank, provenance, derived videos and rejected-candidate evidence
+are saved locally under `outputs/retrain-20261112/neutral-research`.
+The final sole-height checkpoint and final three-seed audits were pulled to
+`outputs/retrain-20261112/pm01-sole-height-training`; the final backup transferred
+54 changed files in a 926,545,969-byte archive. Public BVH/FBX source assets were
+excluded. No Jetson or motor operation took place during this audit.
+
+See `ACTUATOR_MODEL_AUDIT_20261113.md` for the newly verified gap between the
+current ideal-PD approximation and a motor-specific identified actuator model.
