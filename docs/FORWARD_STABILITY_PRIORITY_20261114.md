@@ -11,6 +11,25 @@ recorded in `outputs/retrain-20261113/pm01-sole-resume/selected-candidate.json`.
 This prioritization does not change hardware protections or establish hardware
 qualification. No runtime change or motor operation is part of this decision.
 
+### Clarified disturbance objective
+
+The user explicitly confirmed that a disturbance may change the robot's world
+heading. Returning to the original heading, world position or walking line is
+not required. Recovery means regaining balance and responding to forward,
+lateral and yaw-rate commands in the robot's current horizontal heading frame.
+In the implementation this is `yaw_mat(root_R).T @ root_velocity`, not a fixed
+world-frame velocity target. A zero yaw-rate command is not a heading lock.
+
+Accumulated world-heading and path differences remain descriptive evidence,
+not rejection criteria. A settled 35-degree heading change alone is not a
+failure. Continued uncommanded rotation, sustained command error, unstable
+posture or falls are different and remain relevant. Foot headings and waist
+rotation relative to the pelvis still describe internal gait alignment; the
+permission to change world heading does not waive those checks.
+
+The current command-matched recovery calculation already compares velocity,
+yaw rate and tilt without a world-heading-return gate. Keep that behavior.
+
 Keep the previously reviewed Neutral lateral clip as a possible future source
 of lateral stepping structure. Its lateral excursion was rejected as too large;
 reusing it requires separate step-width/foot-placement retargeting and review.
@@ -30,8 +49,9 @@ failures; equally, survival cannot be read as complete recovery.
 
 Next robustness assessments should retain the original raw metrics and failure
 flags and separately compare perturbed gait with matched unperturbed gait:
-cycle-averaged velocity and heading, body tilt, bilateral swing continuity,
-loaded slip, displacement and settling after release. Do not hide sustained
+cycle-averaged velocity and yaw rate, body tilt, bilateral swing continuity,
+loaded slip and settling after release. World displacement and accumulated
+heading are descriptive only, not return-to-origin requirements. Do not hide sustained
 drift behind averaging or change hardware protection thresholds. Test sustained
 forward walking, curves, stop/restart, graded perturbations and different
 initial poses before claiming robust behavior.

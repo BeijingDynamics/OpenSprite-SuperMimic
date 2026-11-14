@@ -98,6 +98,13 @@ accumulated heading difference from the corresponding unforced run was about
 partly because undisturbed strides themselves crossed its velocity threshold.
 Both reports must remain visible; neither alone establishes robust navigation.
 
+**User clarification, November 14:** restoring the pre-disturbance world
+heading or path is not part of this teleoperation task. The 34.65-degree offset
+above is descriptive and is not evidence of failure by itself. Accept recovery
+at the new heading when balance and current-heading-frame velocity/yaw-rate
+tracking recover. The existing numerical recovery calculation already omits
+absolute-heading return; no running trainer or protection was changed.
+
 New candidates must be compared on alternating foot lift, loaded slip, foot and
 torso alignment, sustained forward motion, usable curves, quiet zero-command
 behavior and disturbance response. Survival and aggregate reward alone are
