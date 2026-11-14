@@ -1,5 +1,45 @@
 # Mixed-reference comparison and actuator sensitivity
 
+## Final review, November 13 at 16:40 China time
+
+The run completed all 6030 updates in 8108.78 seconds (about 2 h 15 min).
+Both standard and supplementary milestone audits completed. The final policy
+is rejected for hardware promotion and will not be extended unchanged.
+
+All 48 command/disturbance cases survived in each of three evaluation seeds,
+but this does not qualify walking. At the 0.25 m/s command, actual mean speed
+is 0.2082--0.2086 m/s. Both feet have zero sustained clearance events above
+5 mm across all three seeds. Seed 101 maximum sole heights are 0.56/2.03 mm,
+with loaded near-floor corner RMS slip of 0.331/0.251 m/s. Its loaded foot
+headings relative to the pelvis are -14.7/+13.2 degrees.
+
+Zero-command behavior regressed from the 3000-update checkpoint: the 60-second
+test has mean horizontal speed error 0.0744 m/s. Reverse still produces
+essentially no backward motion. Lateral response is asymmetric and includes
+sliding and unwanted forward motion. The 60-second start/stop test does settle
+after its final stop, showing that initial state/history matters; it does not
+rescue the failed standalone zero-command test.
+
+The motion interface also fails the corrected PM01 swing pattern: its final
+left/right sole peaks are only 1.04/1.07 mm, with no >5 mm clearance events.
+Some longer Neutral tracking clips improve, so failure is not uniform across
+the library. This points investigation toward multi-motion learning and its
+transfer into velocity control. A specific sampler/reward cause has not yet
+been isolated. No hardware timing or runtime change is required to reproduce
+this failure: it occurs in the nominal simulation plant.
+
+Next: retain this failed data-only comparison, inspect per-clip tracking and
+reward contributions against the preserved PM01 A/B controls, and isolate the
+next change before any longer run. Do not infer that a higher total reward or
+longer training necessarily improves clearance or station keeping.
+
+The completed checkpoint, videos and all final/held-out/long-duration audits
+are local. The 233680965-byte checkpoint SHA-256 is
+`a7ee258c8fef2539d12913b4efbde4b972a71d7b0dc363bb1586cb8b7d5efda3`,
+matching the evaluation's recorded checkpoint hash. The bounded backup worker
+completed after training and both watchers exited. No production training job
+is continuing from this checkpoint.
+
 ## Scope and frozen training run
 
 The rental is renewed through 2026-11-16 at noon, Asia/Shanghai. The new run
@@ -107,6 +147,43 @@ For example, backward clearance deteriorates under some profiles. They test
 the newly trained simulation candidate A, not the older hardware policy;
 they cannot diagnose the prior robot's failure to start by themselves.
 The remaining profiles are still running as of this entry.
+
+### Status review at 14:35--14:38 China time
+
+Training reached update 4740/6030 at 6343 wall seconds, about 0.72 updates/s.
+The 3000-update standard and supplementary audits completed. All 48 cases
+survived under each of three evaluation seeds, but this checkpoint fails the
+gait-quality criteria:
+
+- At a 0.25 m/s command, mean forward speed is 0.2264--0.2267 m/s. In seed
+  101 the maximum sole clearance is only 1.32/0.15 mm, with zero bilateral
+  events exceeding 5 mm. Loaded near-floor material-corner RMS speed is
+  0.145/0.216 m/s. This indicates substantial dragging/sliding.
+- Zero-command station keeping is stable for 60 seconds, with mean horizontal
+  speed error about 0.000069 m/s. The 60-second start/stop test also settles
+  after its final stop.
+- Left/right commanded yaw rates of +/-0.3 rad/s yield about +0.268/-0.315
+  rad/s, but turning has the same insufficient clearance problem.
+- Reverse and lateral commands produce essentially stationary behavior.
+- The reference walking clips contain roughly 25--45 mm sole peaks, while
+  their motion-interface rollouts generally have very few clearance events
+  and appreciable slip. Investigation must include motion learning and its
+  transfer to velocity control, not just the command interface.
+
+These are intermediate 3000-update findings, not the final 6030-update outcome
+or an equal-budget comparison against the completed A/B policies. Finish the
+controlled run and inspect the final audit before extending its budget.
+
+All 16 actuator comparison runs completed without harness errors, with 12/12
+surviving cases in each. This does not imply correct command response. In A,
+isolated changes did not remove the low right-foot clearance. In B, the 0.339
+Nm external friction hypothesis reduced final stationary lateral drift from
+about -0.076 m/s to -0.000095 m/s in this seed. This is evidence of sensitivity,
+not measured hardware friction or authorization to adopt that parameter.
+
+All actuator results are backed up locally. An additional immediate backup
+preserved the completed 3000-update supplementary audits and checkpoint 4737;
+the bounded hourly backup and final checkpoint watchers remain active.
 
 ## Evaluation and local preservation
 
