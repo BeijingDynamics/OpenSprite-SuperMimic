@@ -30,6 +30,15 @@ permission to change world heading does not waive those checks.
 The current command-matched recovery calculation already compares velocity,
 yaw rate and tilt without a world-heading-return gate. Keep that behavior.
 
+The user subsequently clarified that steady straight-walking yaw bias can be
+acceptable if control commands reliably correct it. Do not reject a candidate
+solely for a nonzero nominal yaw rate. Verify small-command response, a usable
+zero crossing, transient behavior and preservation of gait/balance across
+forward speeds. Keep investigating the cause. Merely demonstrating turns at
+large positive/negative commands does not establish precise small-command
+correction. No hidden runtime command offset is introduced by this acceptance
+criterion.
+
 Keep the previously reviewed Neutral lateral clip as a possible future source
 of lateral stepping structure. Its lateral excursion was rejected as too large;
 reusing it requires separate step-width/foot-placement retargeting and review.
