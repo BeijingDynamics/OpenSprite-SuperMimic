@@ -1,0 +1,24 @@
+{
+  "passed": true,
+  "archive": {
+    "bytes": 600142546,
+    "sha256": "f05f5183cbc7843f9b0ca3e55266efd3e2d234d867ef11752924d4fb8c6e8a5a"
+  },
+  "extracted": [
+    "build/sprite_can_shadow",
+    "build/sprite_supermimic_protected_ipc",
+    "bundle/policy.onnx",
+    "deployment-summary.json",
+    "disabled-04/action-tx-audit.json",
+    "disabled-04/can.json",
+    "disabled-04/commissioning.json",
+    "fault-02/action-tx-audit.json",
+    "fault-02/can.json",
+    "fault-02/commissioning.json",
+    "fixture-capacity-check/report.json",
+    "interrupt-02/interrupt-verification.json",
+    "operator-xbox.sh",
+    "previous-120s-powered/xbox-powered-20261119-165413-12501/commissioning.json",
+    "qualified-kernel-log.txt"
+  ]
+}

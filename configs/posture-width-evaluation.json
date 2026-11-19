@@ -1,0 +1,42 @@
+[
+  {
+    "name": "zero",
+    "command": [
+      0,
+      0,
+      0
+    ]
+  },
+  {
+    "name": "forward025",
+    "command": [
+      0.25,
+      0,
+      0
+    ]
+  },
+  {
+    "name": "forward015",
+    "command": [
+      0.15,
+      0,
+      0
+    ]
+  },
+  {
+    "name": "left_curve",
+    "command": [
+      0.2,
+      0,
+      0.2
+    ]
+  },
+  {
+    "name": "right_curve",
+    "command": [
+      0.2,
+      0,
+      -0.2
+    ]
+  }
+]

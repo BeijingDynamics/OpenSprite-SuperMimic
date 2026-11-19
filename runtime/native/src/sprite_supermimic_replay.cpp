@@ -20,6 +20,9 @@
 #endif
 #endif
 #include <onnxruntime_cxx_api.h>
+#include "inference_diagnostics.hpp"
+#include "inference_cpu_layout.hpp"
+#include <memory>
 #include <chrono>
 #include <cstdint>
 #include <cstring>
@@ -31,6 +34,10 @@
 #include <string>
 #include <thread>
 #include <vector>
+#ifdef SPRITE_SUPERMIMIC_PROTECTED_IPC
+#include "policy_gamepad_linux.hpp"
+#include <memory>
+#endif
 
 namespace {
 using Clock=std::chrono::steady_clock;
@@ -106,6 +113,7 @@ int main(int argc,char** argv) {
   std::vector<Record> records;
   std::vector<Timing> timings;
   std::size_t completed_frames=0;
+  std::unique_ptr<sprite_diagnostics::Probe> inference_probe;
 #ifdef SPRITE_SUPERMIMIC_PROTECTED_IPC
   std::vector<ActorCycleTiming> cycles;
   std::array<WalkCheckpoint,2> walk_checkpoints{};
@@ -113,7 +121,7 @@ int main(int argc,char** argv) {
 #endif
   try {
     if(argc<4)throw std::runtime_error("Usage: sprite_supermimic_replay MODEL FIXTURE OUTPUT [--benchmark] [--threads N] [--warmup N]");
-    bool paced=false;int threads=1,warmup=50;
+    bool paced=false,diagnose_inference=false,isolated_inference=false,no_ort_spinning=false;int threads=1,warmup=50;
 #ifdef SPRITE_SUPERMIMIC_STATE_IPC
     std::string state_socket,imu_socket,feedback_config,imu_kind="software";
 #endif
@@ -124,17 +132,24 @@ int main(int argc,char** argv) {
     bool training_full_body=false;
     bool direct_policy_start=false;
     double walk_speed=0.;
+    std::string gamepad_preview_device;
+    std::string gamepad_control_device;
     int sling_ready_fd=-1;
 #endif
     for(int i=4;i<argc;++i) {
       const std::string option=argv[i];
       if(option=="--benchmark")paced=true;
+      else if(option=="--diagnose-inference")diagnose_inference=true;
+      else if(option=="--isolated-inference")isolated_inference=true;
+      else if(option=="--no-ort-spinning")no_ort_spinning=true;
 #ifdef SPRITE_SUPERMIMIC_PROTECTED_IPC
       else if(option=="--target-config" && i+1<argc)target_config=argv[++i];
       else if(option=="--tracked-startup")tracked_startup=true;
       else if(option=="--xbox-full-leg-waist-gains")xbox_full_leg_waist_gains=true;
       else if(option=="--training-full-body")training_full_body=true;
       else if(option=="--direct-policy-start")direct_policy_start=true;
+      else if(option=="--gamepad-preview-device" && i+1<argc)gamepad_preview_device=argv[++i];
+      else if(option=="--gamepad-control-device" && i+1<argc)gamepad_control_device=argv[++i];
       else if(option=="--walk-020" || option=="--walk-025" || option=="--walk-030") {
         if(walk_speed>0.)throw std::runtime_error("only one walking profile can be selected");
         walk_speed=option=="--walk-020"?.20:option=="--walk-025"?.25:.30;
@@ -178,6 +193,22 @@ int main(int argc,char** argv) {
       throw std::runtime_error("direct policy start requires training full-body mode");
     if(walk_speed>0. && (!(xbox_full_leg_waist_gains || training_full_body) || sling_ready_fd<0))
       throw std::runtime_error("walking requires full gains and sling readiness");
+    if(!gamepad_preview_device.empty() && (!direct_policy_start || walk_speed>0.))
+      throw std::runtime_error("gamepad preview requires direct takeover without scripted walking");
+    if(!gamepad_control_device.empty() && (!gamepad_preview_device.empty() ||
+       !direct_policy_start || walk_speed>0. || sling_ready_fd<0))
+      throw std::runtime_error("gamepad control requires direct sling mode without another command source");
+    std::unique_ptr<sprite_policy::LinuxGamepad> gamepad_preview;
+    sprite_policy::GamepadControlWindow gamepad_window;
+    sprite_policy::GamepadConfig gamepad_config;
+    if(!gamepad_control_device.empty()) {
+      gamepad_config.xbox_control_040=true;
+      gamepad_config.forward=.40;
+      gamepad_config.acceleration=.10;
+    }
+    sprite_policy::GamepadCommand gamepad_command(gamepad_config);
+    if(!gamepad_preview_device.empty())gamepad_preview=std::make_unique<sprite_policy::LinuxGamepad>(gamepad_preview_device);
+    if(!gamepad_control_device.empty())gamepad_preview=std::make_unique<sprite_policy::LinuxGamepad>(gamepad_control_device);
 #endif
     const std::uint32_t endian=1;
     if(*reinterpret_cast<const char*>(&endian)!=1)throw std::runtime_error("little endian required");
@@ -190,17 +221,21 @@ int main(int argc,char** argv) {
       throw std::runtime_error("SuperMimic fixture profile dimensions/rate mismatch");
     const auto count=header[4];Core core;core.steps=header[5];
 #ifdef SPRITE_SUPERMIMIC_PROTECTED_IPC
+    std::vector<std::array<double,9>> gamepad_audit(count);
+#endif
+#ifdef SPRITE_SUPERMIMIC_PROTECTED_IPC
     std::uint64_t body_stable_frames=0;
     if(sling_ready_fd>=0) {
       const int flags=fcntl(sling_ready_fd,F_GETFL);
-      const auto duration=walk_speed>0.?sprite_policy::kWalkDurationSeconds:sprite_policy::kSlingDurationSeconds;
+      const auto duration=!gamepad_control_device.empty()?sprite_policy::kXboxDurationSeconds:
+          walk_speed>0.?sprite_policy::kWalkDurationSeconds:sprite_policy::kSlingDurationSeconds;
       if(!tracked_startup || count!=duration*50+1 ||
          flags<0 || !(flags&O_NONBLOCK) || (flags&O_ACCMODE)!=O_WRONLY)
         throw std::runtime_error("invalid protected sling actor profile");
       std::signal(SIGPIPE,SIG_IGN);
     }
 #endif
-    if(count==0 || count>10000 || core.steps>100000)throw std::runtime_error("fixture count/handoff out of bounds");
+    if(count==0 || count>16301 || core.steps>100000)throw std::runtime_error("fixture count/handoff out of bounds");
     read(in,core.defaults);read(in,core.offset);read(in,core.scale);
     for(int j=0;j<31;++j)if(!std::isfinite(core.defaults[j]) || !std::isfinite(core.offset[j]) ||
        !std::isfinite(core.scale[j]) || core.scale[j]<=1e-12)throw std::runtime_error("invalid affine configuration");
@@ -216,8 +251,15 @@ int main(int argc,char** argv) {
     const auto load_start=Clock::now();
     Ort::Env env(ORT_LOGGING_LEVEL_WARNING,"sprite-supermimic-file-only");
     Ort::SessionOptions options;options.SetIntraOpNumThreads(threads);options.SetInterOpNumThreads(1);
+    if(no_ort_spinning)options.AddConfigEntry("session.intra_op.allow_spinning","0");
     options.SetExecutionMode(ExecutionMode::ORT_SEQUENTIAL);
+    const auto before_ort_threads=(diagnose_inference||isolated_inference)?sprite_diagnostics::tids():std::vector<int>{};
     Ort::Session session(env,argv[1],options);
+    const int ort_worker_tid=isolated_inference?sprite_schedule::isolate_compute(before_ort_threads,threads):0;
+#ifdef SPRITE_SUPERMIMIC_PROTECTED_IPC
+    if(isolated_inference && gamepad_preview)gamepad_preview->pin_worker(1);
+#endif
+    if(diagnose_inference) inference_probe=std::make_unique<sprite_diagnostics::Probe>(argv[3],count,before_ort_threads);
     if(session.GetInputCount()!=1 || session.GetOutputCount()!=1)throw std::runtime_error("model IO count mismatch");
     const auto input_type=session.GetInputTypeInfo(0),output_type=session.GetOutputTypeInfo(0);
     const auto input_info=input_type.GetTensorTypeAndShapeInfo(),output_info=output_type.GetTensorTypeAndShapeInfo();
@@ -234,6 +276,9 @@ int main(int argc,char** argv) {
     const std::array<int64_t,2> shape{1,993};
     auto memory=Ort::MemoryInfo::CreateCpu(OrtArenaAllocator,OrtMemTypeDefault);
     const double load_ms=ms(Clock::now()-load_start);
+#ifndef SPRITE_SUPERMIMIC_STATE_IPC
+    if(isolated_inference)sprite_schedule::verify_and_save(argv[3],ort_worker_tid,0);
+#endif
     const auto infer=[&](std::array<float,993>& observation,std::array<float,31>& raw) {
       auto tensor=Ort::Value::CreateTensor<float>(memory,observation.data(),observation.size(),shape.data(),shape.size());
       auto values=session.Run(Ort::RunOptions{nullptr},ins,&tensor,1,outs,1);
@@ -256,6 +301,15 @@ int main(int argc,char** argv) {
     for(double v:feedback.motor_zero)if(!std::isfinite(v))throw std::runtime_error("nonfinite feedback zero");
     for(double v:feedback.motor_to_joint)if(!std::isfinite(v))throw std::runtime_error("nonfinite feedback matrix");
     sprite_policy::NativeImuClient imu(imu_socket,true,imu_kind=="icm");
+    if(isolated_inference)imu.pin_worker(1);
+    if(isolated_inference) {
+      int io_threads=1;
+#ifdef SPRITE_SUPERMIMIC_PROTECTED_IPC
+      if(gamepad_preview)++io_threads;
+#endif
+      sprite_schedule::verify_and_save(argv[3],ort_worker_tid,io_threads);
+      std::cout<<"Inference affinity verified; exact thread placement is recorded in the affinity report."<<std::endl;
+    }
     sprite_policy::ImuSnapshot sample;const auto wait_start=Clock::now();
     while(!imu.snapshot(sample)) {
       if(Clock::now()-wait_start>std::chrono::seconds(1))throw std::runtime_error("IMU startup timeout");
@@ -328,6 +382,19 @@ int main(int argc,char** argv) {
         if(state.sequence!=i+1)throw std::runtime_error("walking state sequence is not contiguous");
         inputs[i][68]=sprite_policy::walk_vx(state.sequence,walk_speed);
       }
+      if(gamepad_preview) {
+        const auto source=gamepad_preview->snapshot();
+        const auto now=sprite_policy::gamepad_now();
+        const bool allowed=gamepad_control_device.empty()?i>0:gamepad_window.allowed(i,source,now);
+        const auto command=gamepad_command.sample(source,now,allowed);
+        gamepad_audit[i]={double(i),double(source.connected),double(source.permitted),source.lt,source.forward,source.turn,command[0],command[1],command[2]};
+        std::copy(command.begin(),command.end(),inputs[i].begin()+68);
+        if(i==1 && gamepad_control_device.empty())std::cout<<"GAMEPAD_PREVIEW_READY: motors disabled by preview launcher; center sticks, press/release LT, then hold LT to test commands."<<std::endl;
+        if(!gamepad_control_device.empty() && i==sprite_policy::GamepadControlWindow::open_frame)
+          std::cout<<"XBOX_WINDOW_OPEN: 300 seconds of control. Center sticks, release LT, then hold LT to command motion. Retain fall protection."<<std::endl;
+        if(!gamepad_control_device.empty() && i==sprite_policy::GamepadControlWindow::close_frame)
+          std::cout<<"XBOX_WINDOW_CLOSED: commands decelerate to zero; automatic disable follows."<<std::endl;
+      }
 #endif
 #endif
       const auto start=Clock::now();auto& record=records[i];
@@ -335,7 +402,9 @@ int main(int argc,char** argv) {
       const bool handshake_only=direct_policy_start && i==0;
       if(direct_policy_start && i==1) { core.reset_episode(); core.steps=0; }
 #endif
-      record.obs=core.observe(inputs[i]);const auto before_infer=Clock::now();
+      record.obs=core.observe(inputs[i]);
+      if(inference_probe) inference_probe->begin(i);
+      const auto before_infer=Clock::now();
 #ifdef SPRITE_SUPERMIMIC_PROTECTED_IPC
       cycle.infer_start_ns=sprite_policy::monotonic_ns();
 #endif
@@ -348,6 +417,7 @@ int main(int argc,char** argv) {
 #ifdef SPRITE_SUPERMIMIC_PROTECTED_IPC
       cycle.infer_end_ns=sprite_policy::monotonic_ns();
 #endif
+      if(inference_probe) inference_probe->end();
 #ifdef SPRITE_SUPERMIMIC_PROTECTED_IPC
       if(handshake_only) std::copy_n(inputs[i].begin(),31,record.target.begin());
       else record.target=core.latch(record.raw,inputs[i],training_full_body);
@@ -427,6 +497,13 @@ int main(int argc,char** argv) {
 #endif
     const double wall_ms=ms(Clock::now()-anchor);
     std::ofstream out(argv[3],std::ios::binary),csv(std::string(argv[3])+".timing.csv");
+#ifdef SPRITE_SUPERMIMIC_PROTECTED_IPC
+    if(gamepad_preview) {
+      std::ofstream audit(std::string(argv[3])+".gamepad.csv");
+      audit<<"frame,connected,permitted,lt,forward_axis,turn_axis,vx,vy,wz\n";
+      for(const auto& row:gamepad_audit) {for(std::size_t j=0;j<row.size();++j)audit<<(j?",":"")<<row[j];audit<<'\n';}
+    }
+#endif
     if(!out || !csv)throw std::runtime_error("cannot open output files");
     csv<<std::setprecision(12)<<"frame,inference_ms,service_ms,wake_lateness_ms,finish_lateness_ms\n";
     std::vector<double> inference,service,wake,finish;
@@ -489,6 +566,8 @@ int main(int argc,char** argv) {
           <<",\"formal_policy_frames\":"<<(direct_policy_start?count-1:count)
           <<",\"action_history\":\""<<(training_full_body?"policy_output":"admitted_waypoint")<<"\""
           <<",\"walk_speed_m_s\":"<<walk_speed
+          <<",\"gamepad_preview\":"<<(!gamepad_preview_device.empty()?"true":"false")
+          <<",\"gamepad_control\":"<<(!gamepad_control_device.empty()?"true":"false")
           <<",\"startup_final_tracking_error_rad\":"<<(tracked?tracked->tracking_error_rad:0.)
           <<",\"startup_final_goal_error_rad\":"<<(tracked?tracked->goal_error_rad:0.)
           <<",\"startup_stable_frames\":"<<(tracked?tracked->stable_frames():0)

@@ -1,0 +1,552 @@
+{
+  "interface": "velocity",
+  "iteration": 6000,
+  "seed": 101,
+  "steps": 1200,
+  "seconds": 24.0,
+  "results": [
+    {
+      "env": 0,
+      "label": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "survived": true,
+      "first_failure_seconds": null,
+      "scored_steps": 1050,
+      "forces": [
+        {
+          "at_seconds": 8,
+          "duration_seconds": 0.2,
+          "force_world_n": [
+            -10,
+            0,
+            0
+          ]
+        }
+      ],
+      "case_name": "force_0_0_-1",
+      "command_category": "unspecified",
+      "within_training_random_command_range": true,
+      "stages": [],
+      "velocity_error_m_s": 0.0036063457373529673,
+      "yaw_error_rad_s": 0.0010124376276507974,
+      "mean_vx_m_s": -6.05355053266976e-05,
+      "mean_yaw_rad_s": -0.0003854740643873811,
+      "last5s_mean_velocity_m_s": [
+        -2.549326609369018e-06,
+        -8.675623575982172e-06,
+        7.032173471088754e-06
+      ],
+      "last5s_mean_yaw_rad_s": 4.748515948449494e-06,
+      "last5s_velocity_error_m_s": 9.046193554240745e-06,
+      "last5s_yaw_error_rad_s": 1.4214083421393298e-05
+    },
+    {
+      "env": 1,
+      "label": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "survived": true,
+      "first_failure_seconds": null,
+      "scored_steps": 1050,
+      "forces": [
+        {
+          "at_seconds": 8,
+          "duration_seconds": 0.2,
+          "force_world_n": [
+            10,
+            0,
+            0
+          ]
+        }
+      ],
+      "case_name": "force_0_0_1",
+      "command_category": "unspecified",
+      "within_training_random_command_range": true,
+      "stages": [],
+      "velocity_error_m_s": 0.00496768020093441,
+      "yaw_error_rad_s": 0.009448299184441566,
+      "mean_vx_m_s": 0.002655459102243185,
+      "mean_yaw_rad_s": 0.004288471303880215,
+      "last5s_mean_velocity_m_s": [
+        5.697956294170581e-05,
+        -5.640117888106033e-05,
+        2.1698035197914578e-05
+      ],
+      "last5s_mean_yaw_rad_s": 0.0048441034741699696,
+      "last5s_velocity_error_m_s": 8.047838491620496e-05,
+      "last5s_yaw_error_rad_s": 0.0048441034741699696
+    },
+    {
+      "env": 2,
+      "label": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "survived": true,
+      "first_failure_seconds": null,
+      "scored_steps": 1050,
+      "forces": [
+        {
+          "at_seconds": 8,
+          "duration_seconds": 0.2,
+          "force_world_n": [
+            0,
+            -10,
+            0
+          ]
+        }
+      ],
+      "case_name": "force_0_1_-1",
+      "command_category": "unspecified",
+      "within_training_random_command_range": true,
+      "stages": [],
+      "velocity_error_m_s": 0.0012714804615825415,
+      "yaw_error_rad_s": 0.0007645731093361974,
+      "mean_vx_m_s": -2.9958389859530143e-05,
+      "mean_yaw_rad_s": -0.0004928048583678901,
+      "last5s_mean_velocity_m_s": [
+        -1.861876171460608e-06,
+        -9.82249366643373e-06,
+        7.043541245366214e-06
+      ],
+      "last5s_mean_yaw_rad_s": 4.623756467481144e-05,
+      "last5s_velocity_error_m_s": 1.0010179721575696e-05,
+      "last5s_yaw_error_rad_s": 4.623756467481144e-05
+    },
+    {
+      "env": 3,
+      "label": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "survived": true,
+      "first_failure_seconds": null,
+      "scored_steps": 1050,
+      "forces": [
+        {
+          "at_seconds": 8,
+          "duration_seconds": 0.2,
+          "force_world_n": [
+            0,
+            10,
+            0
+          ]
+        }
+      ],
+      "case_name": "force_0_1_1",
+      "command_category": "unspecified",
+      "within_training_random_command_range": true,
+      "stages": [],
+      "velocity_error_m_s": 0.0011481166584417224,
+      "yaw_error_rad_s": 0.0009770793840289116,
+      "mean_vx_m_s": -3.0497096304316074e-05,
+      "mean_yaw_rad_s": -0.0005016668001189828,
+      "last5s_mean_velocity_m_s": [
+        1.3532836362628586e-07,
+        -2.158531242457684e-05,
+        7.223356078611687e-06
+      ],
+      "last5s_mean_yaw_rad_s": 0.00029421120416373014,
+      "last5s_velocity_error_m_s": 2.1595888028969057e-05,
+      "last5s_yaw_error_rad_s": 0.00029421120416373014
+    },
+    {
+      "env": 4,
+      "label": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "survived": true,
+      "first_failure_seconds": null,
+      "scored_steps": 1050,
+      "forces": [
+        {
+          "at_seconds": 8,
+          "duration_seconds": 1,
+          "force_world_n": [
+            0,
+            -5,
+            0
+          ]
+        }
+      ],
+      "case_name": "pull_0_-1",
+      "command_category": "unspecified",
+      "within_training_random_command_range": true,
+      "stages": [],
+      "velocity_error_m_s": 0.0009984381031244993,
+      "yaw_error_rad_s": 0.0008664853521622717,
+      "mean_vx_m_s": -2.7427204258856364e-05,
+      "mean_yaw_rad_s": -0.0005103775765746832,
+      "last5s_mean_velocity_m_s": [
+        -2.9753568924206775e-06,
+        -4.216376055410365e-06,
+        6.936470981599996e-06
+      ],
+      "last5s_mean_yaw_rad_s": -8.046007133089006e-05,
+      "last5s_velocity_error_m_s": 5.172388682694873e-06,
+      "last5s_yaw_error_rad_s": 8.046007133089006e-05
+    },
+    {
+      "env": 5,
+      "label": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "survived": true,
+      "first_failure_seconds": null,
+      "scored_steps": 1050,
+      "forces": [
+        {
+          "at_seconds": 8,
+          "duration_seconds": 1,
+          "force_world_n": [
+            0,
+            5,
+            0
+          ]
+        }
+      ],
+      "case_name": "pull_0_1",
+      "command_category": "unspecified",
+      "within_training_random_command_range": true,
+      "stages": [],
+      "velocity_error_m_s": 0.0007548878202214837,
+      "yaw_error_rad_s": 0.0009481405722908676,
+      "mean_vx_m_s": -3.8091289752628654e-05,
+      "mean_yaw_rad_s": -0.0004446397942956537,
+      "last5s_mean_velocity_m_s": [
+        4.565042104331951e-07,
+        -2.2705573428538628e-05,
+        7.254095635289559e-06
+      ],
+      "last5s_mean_yaw_rad_s": 0.0003373249783180654,
+      "last5s_velocity_error_m_s": 2.2716181774740107e-05,
+      "last5s_yaw_error_rad_s": 0.0003373249783180654
+    },
+    {
+      "env": 6,
+      "label": [
+        0.5,
+        0.0,
+        0.0
+      ],
+      "survived": true,
+      "first_failure_seconds": null,
+      "scored_steps": 1050,
+      "forces": [
+        {
+          "at_seconds": 8,
+          "duration_seconds": 0.2,
+          "force_world_n": [
+            -10,
+            0,
+            0
+          ]
+        }
+      ],
+      "case_name": "force_0.5_0_-1",
+      "command_category": "unspecified",
+      "within_training_random_command_range": true,
+      "stages": [],
+      "velocity_error_m_s": 0.18195104598999023,
+      "yaw_error_rad_s": 0.05934276804327965,
+      "mean_vx_m_s": 0.3266250789165497,
+      "mean_yaw_rad_s": -0.0032700730953365564,
+      "last5s_mean_velocity_m_s": [
+        0.3245001435279846,
+        0.01391653437167406,
+        0.0020421475637704134
+      ],
+      "last5s_mean_yaw_rad_s": 0.0004406144726090133,
+      "last5s_velocity_error_m_s": 0.1833622306585312,
+      "last5s_yaw_error_rad_s": 0.06120787933468819
+    },
+    {
+      "env": 7,
+      "label": [
+        0.5,
+        0.0,
+        0.0
+      ],
+      "survived": true,
+      "first_failure_seconds": null,
+      "scored_steps": 1050,
+      "forces": [
+        {
+          "at_seconds": 8,
+          "duration_seconds": 0.2,
+          "force_world_n": [
+            10,
+            0,
+            0
+          ]
+        }
+      ],
+      "case_name": "force_0.5_0_1",
+      "command_category": "unspecified",
+      "within_training_random_command_range": true,
+      "stages": [],
+      "velocity_error_m_s": 0.1795251965522766,
+      "yaw_error_rad_s": 0.058208364993333817,
+      "mean_vx_m_s": 0.3302769064903259,
+      "mean_yaw_rad_s": -0.0018925186013802886,
+      "last5s_mean_velocity_m_s": [
+        0.32398131489753723,
+        0.015298285521566868,
+        0.0005015780916437507
+      ],
+      "last5s_mean_yaw_rad_s": -0.0010364474728703499,
+      "last5s_velocity_error_m_s": 0.18394432961940765,
+      "last5s_yaw_error_rad_s": 0.060011595487594604
+    },
+    {
+      "env": 8,
+      "label": [
+        0.5,
+        0.0,
+        0.0
+      ],
+      "survived": true,
+      "first_failure_seconds": null,
+      "scored_steps": 1050,
+      "forces": [
+        {
+          "at_seconds": 8,
+          "duration_seconds": 0.2,
+          "force_world_n": [
+            0,
+            -10,
+            0
+          ]
+        }
+      ],
+      "case_name": "force_0.5_1_-1",
+      "command_category": "unspecified",
+      "within_training_random_command_range": true,
+      "stages": [],
+      "velocity_error_m_s": 0.18157193064689636,
+      "yaw_error_rad_s": 0.05919454246759415,
+      "mean_vx_m_s": 0.32920363545417786,
+      "mean_yaw_rad_s": -0.003232483984902501,
+      "last5s_mean_velocity_m_s": [
+        0.32419779896736145,
+        0.013053135015070438,
+        0.0005403160466812551
+      ],
+      "last5s_mean_yaw_rad_s": -0.002535468665882945,
+      "last5s_velocity_error_m_s": 0.18361115455627441,
+      "last5s_yaw_error_rad_s": 0.059449829161167145
+    },
+    {
+      "env": 9,
+      "label": [
+        0.5,
+        0.0,
+        0.0
+      ],
+      "survived": true,
+      "first_failure_seconds": null,
+      "scored_steps": 1050,
+      "forces": [
+        {
+          "at_seconds": 8,
+          "duration_seconds": 0.2,
+          "force_world_n": [
+            0,
+            10,
+            0
+          ]
+        }
+      ],
+      "case_name": "force_0.5_1_1",
+      "command_category": "unspecified",
+      "within_training_random_command_range": true,
+      "stages": [],
+      "velocity_error_m_s": 0.1809937208890915,
+      "yaw_error_rad_s": 0.05604468658566475,
+      "mean_vx_m_s": 0.3289985656738281,
+      "mean_yaw_rad_s": -0.004207479301840067,
+      "last5s_mean_velocity_m_s": [
+        0.3263392448425293,
+        0.013344788923859596,
+        0.0019365493208169937
+      ],
+      "last5s_mean_yaw_rad_s": -0.00451362831518054,
+      "last5s_velocity_error_m_s": 0.18161259591579437,
+      "last5s_yaw_error_rad_s": 0.05845698341727257
+    },
+    {
+      "env": 10,
+      "label": [
+        0.5,
+        0.0,
+        0.0
+      ],
+      "survived": true,
+      "first_failure_seconds": null,
+      "scored_steps": 1050,
+      "forces": [
+        {
+          "at_seconds": 8,
+          "duration_seconds": 1,
+          "force_world_n": [
+            0,
+            -5,
+            0
+          ]
+        }
+      ],
+      "case_name": "pull_0.5_-1",
+      "command_category": "unspecified",
+      "within_training_random_command_range": true,
+      "stages": [],
+      "velocity_error_m_s": 0.18180502951145172,
+      "yaw_error_rad_s": 0.061338819563388824,
+      "mean_vx_m_s": 0.33078426122665405,
+      "mean_yaw_rad_s": -0.004347579553723335,
+      "last5s_mean_velocity_m_s": [
+        0.32525634765625,
+        0.016041332855820656,
+        -0.0019636957440525293
+      ],
+      "last5s_mean_yaw_rad_s": -0.0009453615639358759,
+      "last5s_velocity_error_m_s": 0.18272212147712708,
+      "last5s_yaw_error_rad_s": 0.059280332177877426
+    },
+    {
+      "env": 11,
+      "label": [
+        0.5,
+        0.0,
+        0.0
+      ],
+      "survived": true,
+      "first_failure_seconds": null,
+      "scored_steps": 1050,
+      "forces": [
+        {
+          "at_seconds": 8,
+          "duration_seconds": 1,
+          "force_world_n": [
+            0,
+            5,
+            0
+          ]
+        }
+      ],
+      "case_name": "pull_0.5_1",
+      "command_category": "unspecified",
+      "within_training_random_command_range": true,
+      "stages": [],
+      "velocity_error_m_s": 0.18330198526382446,
+      "yaw_error_rad_s": 0.057937141507864,
+      "mean_vx_m_s": 0.3305060565471649,
+      "mean_yaw_rad_s": -0.003592431079596281,
+      "last5s_mean_velocity_m_s": [
+        0.3254666328430176,
+        0.012669894844293594,
+        0.0002346767723793164
+      ],
+      "last5s_mean_yaw_rad_s": -0.0013723692391067743,
+      "last5s_velocity_error_m_s": 0.18241986632347107,
+      "last5s_yaw_error_rad_s": 0.058471109718084335
+    }
+  ],
+  "initialization": {
+    "mode": "controller-default",
+    "reference_frame": null,
+    "root_position_m": [
+      0.0,
+      0.0,
+      0.4662967622280121
+    ],
+    "root_quaternion_wxyz": [
+      1.0,
+      0.0,
+      0.0,
+      0.0
+    ],
+    "joint_position_rad": [
+      -0.15000000596046448,
+      0.0,
+      0.0,
+      0.30000001192092896,
+      0.15000000596046448,
+      0.0,
+      0.15000000596046448,
+      0.0,
+      0.0,
+      -0.30000001192092896,
+      0.15000000596046448,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.08281613141298294,
+      0.0,
+      -0.6000000238418579,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      -0.07632176578044891,
+      0.0,
+      0.6000000238418579,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0
+    ],
+    "ground_placement": "root translated vertically until minimum active collider is1mm above flat floor"
+  },
+  "revision": {
+    "schema": "sprite_v5_joint_supermimic_v2",
+    "imu_frame": "root",
+    "dynamics_mode": "acceleration_v2",
+    "goal_mode": "robot_relative_v2",
+    "goal_stride": 5,
+    "normalized_gelu": true,
+    "critic_relative_positions": true,
+    "critic_upper_bound": true,
+    "wm_warmup_iterations": 500
+  },
+  "training_random_command_ranges": [
+    [
+      -0.3,
+      0.6
+    ],
+    [
+      -0.2,
+      0.2
+    ],
+    [
+      -0.6,
+      0.6
+    ]
+  ],
+  "motion_reward_extension": {
+    "revision": "sprite_motion_sole_height_v1",
+    "std_m": 0.015,
+    "weight": 0.25
+  },
+  "policy_dt": 0.02,
+  "physics_dt": 0.002,
+  "history": 10,
+  "checkpoint_sha256": "70cf3e70354c8b574777709f56f24f83864329d589c256cfa97d6a1236afdedd",
+  "protocol": "No failure reset; velocity starts from physical rest and steps command after 2s; motion starts at each source first frame; pre-failure scoring only",
+  "disturbance_protocol": "World-frame force at torso body COM; exact force samples saved; no force observation supplied to actor",
+  "hardware_qualified": false,
+  "wall_seconds": 59.54072232823819
+}

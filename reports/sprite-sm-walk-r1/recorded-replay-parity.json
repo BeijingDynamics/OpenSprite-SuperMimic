@@ -1,0 +1,9 @@
+{
+  "samples": 1680,
+  "max_absolute_action_error": 3.337860107421875e-06,
+  "history_length": 10,
+  "observation_dimension": 993,
+  "source": "local-artifact/rollout.npz",
+  "passed": true,
+  "hardware_qualified": false
+}

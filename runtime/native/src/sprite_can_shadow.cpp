@@ -108,6 +108,10 @@ struct Motor {
   double mechanical_peak_torque = 0.0;
   double commissioning_torque_cap = 0.0;
   double feedback_torque_cap = 0.0;
+  bool feedback_torque_observe_only = false;
+  std::size_t feedback_torque_excursions = 0, feedback_torque_full_scale_samples = 0;
+  double first_torque_excursion_position = 0., first_torque_excursion_velocity = 0.;
+  double first_torque_excursion_nm = 0.;
   double mos_temperature_limit = 0.0;
   double rotor_temperature_limit = 0.0;
   double filtered_mos_temperature_limit = 0.0;
@@ -201,6 +205,7 @@ struct Options {
   bool tracked_startup = false;
   bool direct_policy_start = false;
   bool coherent_action_send = false;
+  bool xbox_body_admission = false;
   bool supermimic_commissioning = false;
   double walk_speed = 0.0;
   int sling_ready_fd = -1, operator_status_fd = -1;
@@ -573,6 +578,7 @@ Options parse_options(int argc, char** argv) {
     else if (argument == "--tracked-startup") result.tracked_startup = true;
     else if (argument == "--direct-policy-start") result.direct_policy_start = true;
     else if (argument == "--coherent-action-send") result.coherent_action_send = true;
+    else if (argument == "--xbox-body-admission") result.xbox_body_admission = true;
     else if (argument == "--walk-020" || argument == "--walk-025" || argument == "--walk-030") {
       if (result.walk_speed > 0.0) throw std::runtime_error("only one walking profile can be selected");
       result.walk_speed = argument == "--walk-020" ? .20 : argument == "--walk-025" ? .25 : .30;
@@ -592,8 +598,9 @@ Options parse_options(int argc, char** argv) {
   if (result.config.empty() || result.output.empty()) {
     throw std::runtime_error("--config and --output are required");
   }
-  if (!(result.duration_s > 0.0 && result.duration_s <= 120.0)) {
-    throw std::runtime_error("duration must be in (0, 120]");
+  const bool xbox_long_duration = result.xbox_body_admission && result.duration_s == sprite_policy::kXboxDurationSeconds;
+  if (!(result.duration_s > 0.0 && (result.duration_s <= 120.0 || xbox_long_duration))) {
+    throw std::runtime_error("duration must be in (0, 120], except the exact 326-second Xbox profile");
   }
   if (result.measured_pose_hold && result.policy_actuation) {
     throw std::runtime_error("measured-pose hold and policy actuation are mutually exclusive");
@@ -610,7 +617,11 @@ Options parse_options(int argc, char** argv) {
   }
   const bool sling = result.sling_ready_fd >= 0 || result.operator_status_fd >= 0;
   const bool walking = result.walk_speed > 0.0;
-  const auto sling_duration = walking ? sprite_policy::kWalkDurationSeconds
+  if (result.xbox_body_admission && (!sling || walking || !result.direct_policy_start ||
+      !result.coherent_action_send || !result.supermimic_commissioning)) {
+    throw std::runtime_error("Xbox body admission requires direct coherent sling commissioning without scripted walking");
+  }
+  const auto sling_duration = result.xbox_body_admission ? sprite_policy::kXboxDurationSeconds : walking ? sprite_policy::kWalkDurationSeconds
                                              : sprite_policy::kSlingDurationSeconds;
   if (walking && !sling) throw std::runtime_error("walking requires the sling and operator channels");
   if (sling && (result.sling_ready_fd < 0 || result.operator_status_fd < 0 ||
@@ -628,7 +639,9 @@ Options parse_options(int argc, char** argv) {
        result.duration_s < 0.02 || std::abs(result.duration_s * 50 - std::round(result.duration_s * 50)) > 1.0e-9)) {
     throw std::runtime_error("SuperMimic commissioning requires strict IPC and a bounded duration");
   }
-  const std::string required_ack = walking
+  const std::string required_ack = result.xbox_body_admission
+      ? (result.policy_actuation ? "ENABLE_SUPERMIMIC_XBOX_300S_040_FAST_TORQUE_OBSERVE" : "PREVIEW_SUPERMIMIC_XBOX_300S_040_FAST_TORQUE_OBSERVE")
+      : walking
       ? std::string(result.policy_actuation ? "ENABLE_SUPERMIMIC_WALK_" : "PREVIEW_SUPERMIMIC_WALK_") +
           (result.walk_speed == .20 ? "020_10S" : result.walk_speed == .25 ? "025_10S" : "030_10S")
       : sling
@@ -689,12 +702,12 @@ Options parse_options(int argc, char** argv) {
       throw std::runtime_error(
           "protected policy actuation over 20 seconds requires the exact 40-second acknowledgement");
     }
-    if (!walking && result.duration_s > 40.0 && !acknowledged_60_seconds) {
+    if (!walking && !result.xbox_body_admission && result.duration_s > 40.0 && !acknowledged_60_seconds) {
       throw std::runtime_error(
           "protected policy actuation over 40 seconds requires the exact 60-second lower-body sim-PD acknowledgement");
     }
-    if (result.duration_s > 60.0) {
-      throw std::runtime_error("extended protected policy actuation must not exceed 60 seconds");
+    if (result.duration_s > 60.0 && !xbox_long_duration) {
+      throw std::runtime_error("extended protected policy actuation must not exceed 60 seconds outside the exact Xbox profile");
     }
   }
   const bool acknowledged_short_sim_pd_saturation =
@@ -1027,7 +1040,7 @@ void limit_pd_ankle_pair(Motor& a, Motor& b) {
 void preview_final_motor_commands(std::vector<Motor>& motors, IpcSocket& ipc,
                                   const NativeKinematics& kinematics,
                                   bool saturate_to_commissioning_cap = false,
-                                  bool pd_position_saturation = false) {
+                                  bool pd_position_saturation = false, bool refresh_all = false) {
   if (!ipc.has_target) return;
   std::array<double, kJointCount> joint_position{};
   std::array<double, kJointCount> joint_velocity{};
@@ -1060,7 +1073,7 @@ void preview_final_motor_commands(std::vector<Motor>& motors, IpcSocket& ipc,
     joint_torque[joint] = std::clamp(
         raw, -kinematics.joint_effort_limit[joint], kinematics.joint_effort_limit[joint]);
   }
-  const bool update_other_motors = ipc.motor_preview_count % 10 == 0;
+  const bool update_other_motors = refresh_all || ipc.motor_preview_count % 10 == 0;
   std::array<Motor*, 4> ankle_motors{};
   for (std::size_t motor_index = 0; motor_index < kJointCount; ++motor_index) {
     auto& motor = motors[motor_index];
@@ -1524,6 +1537,32 @@ ssize_t read_timestamped_feedback(int fd, canfd_frame& frame, std::int64_t& feed
   throw std::runtime_error("missing, stale or future kernel CAN feedback timestamp");
 }
 
+void check_dynamic_feedback(Motor& motor, double feedback_torque, unsigned raw_torque) {
+  const bool torque_excursion = std::abs(feedback_torque) > motor.feedback_torque_cap;
+  if (raw_torque == 0 || raw_torque == 4095) ++motor.feedback_torque_full_scale_samples;
+  if (torque_excursion) {
+    if (motor.feedback_torque_excursions++ == 0) {
+      motor.first_torque_excursion_position = motor.last_position;
+      motor.first_torque_excursion_velocity = motor.last_velocity;
+      motor.first_torque_excursion_nm = feedback_torque;
+    }
+  }
+  const char* reason = nullptr;
+  if (motor.last_position < motor.hard_position_min || motor.last_position > motor.hard_position_max)
+    reason = "position";
+  else if (std::abs(motor.last_velocity) > motor.deployment_velocity_max) reason = "velocity";
+  else if (torque_excursion && !motor.feedback_torque_observe_only) reason = "feedback_torque";
+  if (reason) {
+    std::ostringstream message;
+    message << "protected-policy dynamic guard failed for " << motor.name << " reason=" << reason
+            << " q=" << motor.last_position << " q_min=" << motor.hard_position_min
+            << " q_max=" << motor.hard_position_max << " qd=" << motor.last_velocity
+            << " qd_limit=" << motor.deployment_velocity_max << " tau=" << feedback_torque
+            << " tau_observation_boundary=" << motor.feedback_torque_cap;
+    throw std::runtime_error(message.str());
+  }
+}
+
 void drain_policy_feedback(
     std::vector<Socket>& sockets, std::vector<Motor>& motors,
     const std::map<std::pair<std::string, int>, std::size_t>& feedback_map,
@@ -1608,13 +1647,7 @@ void drain_policy_feedback(
         throw std::runtime_error(
             "protected-policy filtered temperature guard failed for " + motor.name);
       }
-      if (enforce_dynamic_guards &&
-          (motor.last_position < motor.hard_position_min ||
-           motor.last_position > motor.hard_position_max ||
-           std::abs(motor.last_velocity) > motor.deployment_velocity_max ||
-           std::abs(feedback_torque) > motor.feedback_torque_cap)) {
-        throw std::runtime_error("protected-policy dynamic guard failed for " + motor.name);
-      }
+      if (enforce_dynamic_guards) check_dynamic_feedback(motor, feedback_torque, raw_torque);
       ++motor.rx_count;
       motor.seen = true;
       if (expected_status == 0) {
@@ -1871,6 +1904,8 @@ int run_native_protected_policy(
   const bool pd_position_saturation = options.tracked_startup;
   const bool sling = options.sling_ready_fd >= 0;
   const bool walking = options.walk_speed > 0.0;
+  // Only the explicitly acknowledged extended Xbox profile observes instantaneous torque.
+  for (auto& motor : motors) motor.feedback_torque_observe_only = strict && options.xbox_body_admission;
   bool sling_window_opened = false;
   bool sling_blend_started = false;
   std::int64_t sling_notice_ns = 0;
@@ -2111,8 +2146,10 @@ int run_native_protected_policy(
       const bool commit = options.coherent_action_send &&
           sprite_policy::coherent_commit_due(slot, ipc.last_target_source_sequence,
                                              active_action_sequence);
-      if (slot % 4 == 0) {
-        preview_final_motor_commands(motors, ipc, kinematics, bound_command, pd_position_saturation);
+      // A new action refreshes every motor before the coherent group is sent.
+      // Periodic ankle remapping continues between policy updates.
+      if (commit || slot % 4 == 0) {
+        preview_final_motor_commands(motors, ipc, kinematics, bound_command, pd_position_saturation, commit);
       }
       // Validate the entire group before the first write. No old-action motor
       // command may be interleaved once this single-threaded commit begins.
@@ -2171,14 +2208,19 @@ int run_native_protected_policy(
           if (!sling_blend_started) throw std::runtime_error("sling policy ramp did not start");
           read_readiness(sling_readiness, sprite_policy::kSlingReadySequence);
           if (powered && !sprite_policy::sling_ready(sling_readiness, ipc.last_target_source_sequence,
-                                                    sprite_policy::kSlingReadySequence, !walking)) {
+                                                    sprite_policy::kSlingReadySequence,
+                                                    sprite_policy::sling_requires_joint_settling(walking, options.xbox_body_admission))) {
             emit_status("NOT_STABLE\n");
             throw std::runtime_error("zero-command standing not settled at sling checkpoint");
           }
-          if (walking)
+          if (options.xbox_body_admission)
+            emit_status(powered ? "XBOX_READY\n" : "DRY_XBOX_READY\n");
+          else if (walking)
             emit_status(powered ? "WALK_SLING_WINDOW_OPEN\n" : "DRY_WALK_SLING_WINDOW_OPEN\n");
           else emit_status(powered ? "SLING_WINDOW_OPEN\n" : "DRY_WINDOW_OPEN\n");
           sling_window_opened = powered;
+        } else if (options.xbox_body_admission) {
+          if (seconds == sprite_policy::kXboxEndNoticeSeconds) emit_status("XBOX_END\n");
         } else if (seconds > first && seconds < last) {
           char message[] = "COUNTDOWN_0\n";
           message[10] = static_cast<char>('0' + last - seconds);
@@ -2294,6 +2336,10 @@ int run_native_protected_policy(
     catch (const std::exception& error) { append_failure(error.what()); }
   }
 
+  // Disable verification is complete. Release the actor before writing long traces.
+  // The supervisor still requires the CAN report and all 31 disabled readbacks.
+  close_ipc(ipc);
+
   std::ostringstream report;
   report << std::fixed << std::setprecision(6)
       << "{\n  \"mode\": \"" << (powered ? "native_suspended_protected_policy_actuation"
@@ -2325,7 +2371,8 @@ int run_native_protected_policy(
       << "  \"walk_checkpoint_sequence\": " << walk_readiness.sequence << ",\n"
       << "  \"walk_checkpoint_joint_frames\": " << walk_readiness.joint_stable_frames << ",\n"
       << "  \"walk_checkpoint_body_frames\": " << walk_readiness.body_stable_frames << ",\n"
-      << "  \"walk_joint_settling_required\": " << (walking ? "false" : "true") << ",\n"
+      << "  \"xbox_body_admission\": " << (options.xbox_body_admission ? "true" : "false") << ",\n"
+      << "  \"walk_joint_settling_required\": " << (sprite_policy::sling_requires_joint_settling(walking, options.xbox_body_admission) ? "true" : "false") << ",\n"
       << "  \"walk_speed_m_s\": " << options.walk_speed << ",\n"
       << "  \"automatic_mode_switch_attempts\": 0,\n"
       << "  \"automatic_zero_reset_attempts\": 0,\n"
@@ -2336,6 +2383,12 @@ int run_native_protected_policy(
         << "\"tx\": " << active_tx[index] << ", \"rx\": " << active_rx[index]
         << ", \"commissioning_torque_cap_nm\": " << motor.commissioning_torque_cap
         << ", \"feedback_torque_cap_nm\": " << motor.feedback_torque_cap
+        << ", \"feedback_torque_observe_only\": " << (motor.feedback_torque_observe_only ? "true" : "false")
+        << ", \"feedback_torque_excursions\": " << motor.feedback_torque_excursions
+        << ", \"feedback_torque_full_scale_samples\": " << motor.feedback_torque_full_scale_samples
+        << ", \"first_torque_excursion_position_rad\": " << motor.first_torque_excursion_position
+        << ", \"first_torque_excursion_velocity_rad_s\": " << motor.first_torque_excursion_velocity
+        << ", \"first_torque_excursion_nm\": " << motor.first_torque_excursion_nm
         << ", \"rated_torque_nm\": " << motor.rated_torque
         << ", \"max_command_torque_nm\": " << motor.maximum_abs_commanded_torque
         << ", \"max_feedback_torque_nm\": " << motor.maximum_abs_feedback_torque

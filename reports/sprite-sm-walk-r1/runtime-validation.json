@@ -1,0 +1,222 @@
+{
+  "profile": "Sprite SM-Walk R1 Xbox 300 seconds",
+  "passed": true,
+  "control_window_s": 300,
+  "total_control_s": 326,
+  "live": {
+    "name": "disabled-04",
+    "passed": true,
+    "failure": null,
+    "frames_dispatched": 16300,
+    "final_disabled_count": 31,
+    "motor_enable_attempts": 0,
+    "cpu_frequency": {
+      "requested_khz": 1344000,
+      "acquired": {
+        "status": "acquired",
+        "target_khz": 1344000,
+        "before": {
+          "scaling_min_freq": "729600",
+          "scaling_max_freq": "1344000",
+          "scaling_governor": "schedutil",
+          "related_cpus": "4 5"
+        },
+        "active": {
+          "scaling_min_freq": "1344000",
+          "scaling_max_freq": "1344000",
+          "scaling_governor": "schedutil",
+          "related_cpus": "4 5"
+        },
+        "guard_sha256": "5b2b9a4c25f4f75cf6252a222874798cbe0bd5f9716fac886741be2f594a2ace"
+      },
+      "released": {
+        "status": "restored",
+        "changed": true,
+        "before": {
+          "scaling_min_freq": "729600",
+          "scaling_max_freq": "1344000",
+          "scaling_governor": "schedutil",
+          "related_cpus": "4 5"
+        },
+        "after": {
+          "scaling_min_freq": "729600",
+          "scaling_max_freq": "1344000",
+          "scaling_governor": "schedutil",
+          "related_cpus": "4 5"
+        }
+      }
+    },
+    "metrics": {
+      "inference_ms": {
+        "n": 16300,
+        "median": 2.7882125,
+        "p95": 2.90478405,
+        "p99": 3.3054122300000004,
+        "maximum": 5.789444,
+        "minimum": 2.742318
+      },
+      "feedback_to_publish_ms": {
+        "n": 16300,
+        "median": 5.807681499999999,
+        "p95": 5.83904355,
+        "p99": 5.85075601,
+        "maximum": 5.890347,
+        "minimum": 5.313542
+      },
+      "feedback_to_target_ms": {
+        "n": 16300,
+        "median": 8.718750499999999,
+        "p95": 8.83818735,
+        "p99": 9.23312695,
+        "maximum": 12.427845,
+        "minimum": 8.220145
+      },
+      "target_to_all_driver_ms": {
+        "n": 16300,
+        "median": 0.3756065,
+        "p95": 0.79598615,
+        "p99": 0.894225,
+        "maximum": 0.982931,
+        "minimum": 0.2313
+      },
+      "feedback_to_all_driver_ms": {
+        "n": 16300,
+        "median": 9.0887235,
+        "p95": 9.64593225,
+        "p99": 9.700068400000001,
+        "maximum": 13.246292,
+        "minimum": 8.682425
+      },
+      "feedback_to_all_tx_receipt_ms": {
+        "n": 16300,
+        "median": 9.838174500000001,
+        "p95": 10.3875041,
+        "p99": 10.420510069999999,
+        "maximum": 13.864416,
+        "minimum": 9.336133
+      },
+      "hip_driver_interval_ms": {
+        "n": 16299,
+        "median": 19.999674,
+        "p95": 20.5242368,
+        "p99": 20.583768499999998,
+        "maximum": 24.112606,
+        "minimum": 16.390477
+      },
+      "hip_hw_interval_ms": {
+        "n": 16299,
+        "median": 20.0,
+        "p95": 20.516,
+        "p99": 20.582,
+        "maximum": 24.104,
+        "minimum": 16.397
+      }
+    },
+    "all_inference_ms_including_rejected": {
+      "n": 16300,
+      "median": 2.7882125,
+      "p95": 2.90478405,
+      "p99": 3.3054122300000004,
+      "maximum": 5.789444,
+      "minimum": 2.742318
+    },
+    "first_sequence": 2,
+    "last_sequence": 16301,
+    "unmatched_actor_sequences": []
+  },
+  "deadline_fault_passed": true,
+  "interrupt": {
+    "passed": true,
+    "signal": "SIGINT to terminal process group",
+    "exit_code": -2,
+    "final_disabled_count": 31,
+    "motor_enable_attempts": 0,
+    "cpu_frequency": {
+      "requested_khz": 1344000,
+      "acquired": {
+        "status": "acquired",
+        "target_khz": 1344000,
+        "before": {
+          "scaling_min_freq": "729600",
+          "scaling_max_freq": "1344000",
+          "scaling_governor": "schedutil",
+          "related_cpus": "4 5"
+        },
+        "active": {
+          "scaling_min_freq": "1344000",
+          "scaling_max_freq": "1344000",
+          "scaling_governor": "schedutil",
+          "related_cpus": "4 5"
+        },
+        "guard_sha256": "5b2b9a4c25f4f75cf6252a222874798cbe0bd5f9716fac886741be2f594a2ace"
+      },
+      "released": {
+        "status": "restored",
+        "changed": true,
+        "before": {
+          "scaling_min_freq": "729600",
+          "scaling_max_freq": "1344000",
+          "scaling_governor": "schedutil",
+          "related_cpus": "4 5"
+        },
+        "after": {
+          "scaling_min_freq": "729600",
+          "scaling_max_freq": "1344000",
+          "scaling_governor": "schedutil",
+          "related_cpus": "4 5"
+        }
+      }
+    },
+    "active_control_processes": []
+  },
+  "all_packet_timestamp_coverage": {
+    "disabled-04": {
+      "total": 1593721,
+      "missing": 0,
+      "per_bus": {
+        "kcan1": 552278,
+        "kcan2": 552278,
+        "kcan3": 260888,
+        "kcan4": 228277
+      }
+    },
+    "fault-02": {
+      "total": 1529724,
+      "missing": 0,
+      "per_bus": {
+        "kcan1": 528581,
+        "kcan2": 528581,
+        "kcan3": 252033,
+        "kcan4": 220529
+      }
+    }
+  },
+  "echo_occupied_messages": 0,
+  "unchanged_fingerprints": {
+    "policy.onnx": "5695b6980746534a11d075befc29bf5f7fe0ef2a7d81e3dadf3147c50f4d6930",
+    "sprite_icm45686": "fbdc98f7b7f885023618c8111de16c33525af7d0530d46049a5148cc787a330b",
+    "motors.tsv": "20436269e374ca5671ba6dc439f1611dfee33789b93812590804cfd2cdcf21d4",
+    "kinematics.tsv": "9b47255137997ae1f0da2845be8b8548dae537c1658741469ffe9d3c6ab38cc9",
+    "joints.tsv": "850bfefb763eee4666129a269fac5d68c7be6dd23df085bb00a88ece30e6c56b",
+    "feedback.bin": "d03e9f0c34f8c7f6182474178927b9749699a54c7885a859fdbeffc82111191c",
+    "target.bin": "e1d086c8129cab2f09d3ade7911ef6aeb31f7b6da846db400158a5d571cd4653",
+    "cpu_frequency_client.py": "0e9bf869466aebcd6043a9178c459b58a3752817f349caa68b92012af8976f29",
+    "cpu_frequency_guard.py": "5b2b9a4c25f4f75cf6252a222874798cbe0bd5f9716fac886741be2f594a2ace",
+    "action_tx_audit.py": "79371a8a147b15f02c616367fa55fe5cc2c58c4ae5aebc998819602ad24e3bb8",
+    "loaded_kcan_srcversion": "404E8D65A6EFF60079EAEC1"
+  },
+  "changes": [
+    "Xbox command window increased from 120 to 300 seconds.",
+    "Bounded fixture capacity increased to 16301 policy frames.",
+    "TX trace capacity increased to 700000 events per socket.",
+    "IMU capture and post-control audit limits cover the longer recording.",
+    "IPC closes after disable readback and before trace serialization."
+  ],
+  "limitations": [
+    "No powered five-minute run was initiated during deployment.",
+    "Finite no-enable timing validation is not a hard real-time guarantee.",
+    "Two preceding no-enable trials hit the unchanged 20 ms guard after an approximately 11.5 ms actor receipt delay; root scheduler cause remains unresolved.",
+    "LT release brakes the command; Ctrl+C requests shutdown, not controlled braking.",
+    "The dormant LB+RB stop combo is not enabled in this production entry."
+  ]
+}

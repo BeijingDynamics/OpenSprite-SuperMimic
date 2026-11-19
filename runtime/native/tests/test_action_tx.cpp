@@ -3,12 +3,12 @@
 #include <iostream>
 int main() {
   using namespace sprite_policy;
-  // An arriving target must wait for at most the next 2 ms mapping boundary,
-  // not the next 20 ms low-rate cycle. No skipped sequence is admissible.
+  // An accepted action commits in the current transport slot.
+  // No skipped sequence is admissible.
   for (std::size_t arrival=0; arrival<400; ++arrival) {
     auto slot=arrival;
     while (!coherent_commit_due(slot,2,1)) ++slot;
-    assert(slot-arrival<=3);
+    assert(slot==arrival);
     assert(!coherent_commit_due(slot,2,2));
   }
   for (auto pending : {0u,3u}) {
@@ -27,5 +27,11 @@ int main() {
   bool rejected=false;
   try {trace.stamp(2,1,0);} catch(const std::runtime_error&) {rejected=true;}
   assert(rejected);
+  // Exceed the old limit while retaining every packet identity without reallocation.
+  const auto* allocation = trace.events.data();
+  for (int i=2; i<650000; ++i) trace.sent(7, 30, 31);
+  assert(trace.events.data()==allocation && trace.events.size()==650000);
+  trace.stamp(649999, 600, 700);
+  assert(trace.events.back().hardware_raw_ns==700);
   std::cout << "coherent sequence and TX identity tests passed\n";
 }

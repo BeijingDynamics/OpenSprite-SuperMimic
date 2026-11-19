@@ -42,9 +42,9 @@ def write_fixture(path: Path, contract: PolicyContract, inputs: np.ndarray,
                   handoff_steps: int) -> None:
     contract.validate_for_replay(PROFILE)
     inputs = np.asarray(inputs, dtype="<f8")
-    if inputs.ndim != 2 or inputs.shape[1] != 71 or not 0 < len(inputs) <= 10000:
-        raise ValueError("fixture must contain 1..10000 recorded 71-value states")
-    if not np.isfinite(inputs).all() or not 0 <= handoff_steps <= 100000:
+    if inputs.ndim != 2 or inputs.shape[1] != 71 or not 0 < len(inputs) <= 16301:
+        raise ValueError("fixture must contain 1..16301 recorded 71-value states")
+    if not np.isfinite(inputs).all() or not 0 <= handoff_steps <= 163010:
         raise ValueError("invalid fixture values or handoff length")
     with path.open("xb") as stream:
         stream.write(struct.pack("<8s6I", MAGIC, 10, 993, 31, 50,

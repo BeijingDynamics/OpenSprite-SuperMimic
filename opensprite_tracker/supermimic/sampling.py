@@ -1,15 +1,19 @@
-"""Equal clip mass, with return-adaptive reset bins only WITHIN each clip."""
+"""Explicit clip mass, with return-adaptive reset bins only within each clip."""
 import torch
 
 
 class ReturnSampler:
-    def __init__(self, motion, gamma=.99, reward_scale=.1):
+    def __init__(self, motion, gamma=.99, reward_scale=.1, clip_weights=None):
         self.motion, self.gamma = motion, gamma
         self.max_return = reward_scale / (1-gamma)
         self.returns = torch.zeros(motion.num_bins, device=motion.root_p.device)
         self.num_clips = len(motion.clip_end)
         self.clip_bin_count = torch.bincount(motion.bin_clip, minlength=self.num_clips)
-        self.uniform = 1. / (self.num_clips * self.clip_bin_count[motion.bin_clip])
+        weights = torch.ones(self.num_clips, device=motion.root_p.device) if clip_weights is None else torch.as_tensor(clip_weights, dtype=torch.float32, device=motion.root_p.device)
+        if weights.shape != (self.num_clips,) or not torch.isfinite(weights).all() or not (weights > 0).all():
+            raise ValueError('Require one finite positive sampling weight per clip')
+        self.clip_mass = weights / weights.sum()
+        self.uniform = self.clip_mass[motion.bin_clip] / self.clip_bin_count[motion.bin_clip]
         self.past = self.uniform.clone()
 
     def _hard_probabilities(self):
@@ -19,12 +23,12 @@ class ReturnSampler:
         peaks.scatter_reduce_(0, clip, logits, reduce="amax", include_self=True)
         weights = (logits - peaks[clip]).exp()
         total = weights.new_zeros(self.num_clips).scatter_add_(0, clip, weights)
-        return weights / total[clip] / self.num_clips
+        return weights / total[clip] * self.clip_mass[clip]
 
     def probabilities(self):
         clip = self.motion.bin_clip
         total = self.past.new_zeros(self.num_clips).scatter_add_(0, clip, self.past)
-        past = self.past / total[clip].clamp_min(torch.finfo(self.past.dtype).tiny) / self.num_clips
+        past = self.past / total[clip].clamp_min(torch.finfo(self.past.dtype).tiny) * self.clip_mass[clip]
         return .5*self.uniform + .4*self._hard_probabilities() + .1*past
 
     def __call__(self, count):

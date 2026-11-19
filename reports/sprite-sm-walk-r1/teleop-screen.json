@@ -1,0 +1,124 @@
+{
+  "checks": {
+    "zero/survival": true,
+    "zero/spacing": true,
+    "forward025/survival": true,
+    "forward025/spacing": true,
+    "forward025/bilateral_lift": true,
+    "forward025/lift_balance": true,
+    "forward025/progress": true,
+    "forward050/survival": true,
+    "forward050/spacing": true,
+    "forward050/bilateral_lift": true,
+    "forward050/lift_balance": true,
+    "forward050/progress": true,
+    "left_curve/survival": true,
+    "left_curve/spacing": true,
+    "left_curve/bilateral_lift": true,
+    "left_curve/lift_balance": true,
+    "left_curve/turn": true,
+    "right_curve/survival": true,
+    "right_curve/spacing": true,
+    "right_curve/bilateral_lift": true,
+    "right_curve/lift_balance": true,
+    "right_curve/turn": true,
+    "start_stop/survival": true,
+    "start_stop/spacing": true,
+    "zero/upright": true,
+    "zero/knee_extension": true,
+    "start_stop/stopped": true,
+    "zero/spacing_retained": true,
+    "forward025/spacing_retained": true,
+    "forward025/clearance_retained": true,
+    "forward025/pitch_retained": true,
+    "forward050/spacing_retained": true,
+    "forward050/clearance_retained": true,
+    "forward050/pitch_retained": true,
+    "left_curve/spacing_retained": false,
+    "left_curve/clearance_retained": true,
+    "left_curve/pitch_retained": true,
+    "right_curve/spacing_retained": true,
+    "right_curve/clearance_retained": true,
+    "right_curve/pitch_retained": true,
+    "start_stop/spacing_retained": true
+  },
+  "failed_checks": [
+    "left_curve/spacing_retained"
+  ],
+  "passed": false,
+  "median_knee_magnitudes_deg": [
+    10.748146057128906,
+    12.588366508483887
+  ],
+  "cases": {
+    "zero": {
+      "pitch": -0.5126897981145779,
+      "spacing": 0.18247894569708542,
+      "peaks": [
+        null,
+        null
+      ],
+      "vx": -3.9467780879931524e-05,
+      "yaw": -0.00046094958088360727
+    },
+    "forward025": {
+      "pitch": 0.8016617608929695,
+      "spacing": 0.12024162377357506,
+      "peaks": [
+        0.023570039517149245,
+        0.01870753485784657
+      ],
+      "vx": 0.17728674411773682,
+      "yaw": -0.019797779619693756
+    },
+    "forward050": {
+      "pitch": 3.0015183638741147,
+      "spacing": 0.11949628299318037,
+      "peaks": [
+        0.030359659163879855,
+        0.018612344160776277
+      ],
+      "vx": 0.32878541946411133,
+      "yaw": -0.0028084584046155214
+    },
+    "left_curve": {
+      "pitch": 1.6932814341518125,
+      "spacing": 0.10836859022588045,
+      "peaks": [
+        0.026762313589922766,
+        0.02100769981146348
+      ],
+      "vx": 0.26593494415283203,
+      "yaw": 0.16786426305770874
+    },
+    "right_curve": {
+      "pitch": 1.2837809683981463,
+      "spacing": 0.11414232698390939,
+      "peaks": [
+        0.02722099426239178,
+        0.019359678260749684
+      ],
+      "vx": 0.26332610845565796,
+      "yaw": -0.17669080197811127
+    },
+    "start_stop": {
+      "pitch": 1.0654862216160002,
+      "spacing": 0.12002813097355837,
+      "peaks": [
+        0.02908170250362129,
+        0.018822119540779093
+      ],
+      "vx": 0.15518838167190552,
+      "yaw": -0.005666191224008799
+    }
+  },
+  "rank": [
+    1,
+    12.588366508483887,
+    0.5126897981145779
+  ],
+  "continue_training": true,
+  "hardware_qualified": false,
+  "relative_baseline_used": true,
+  "scope": "Single-seed nominal physical screen; deployment admission remains separate."
+}

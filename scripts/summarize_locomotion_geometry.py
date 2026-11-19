@@ -58,4 +58,16 @@ if __name__=='__main__':
     parser=argparse.ArgumentParser();parser.add_argument('--evaluation',type=Path,required=True);parser.add_argument('--output',type=Path,required=True)
     args=parser.parse_args();report=summarize(args.evaluation)
     with args.output.open('x') as stream:json.dump(report,stream,indent=2);stream.write('\n')
+    # Candidate selection is stricter than the existing continuation/survival gate.
+    # This local experiment marker does not affect historical evaluation tools.
+    marker=ROOT/'configs/posture-width-selection-enabled.json'
+    if marker.exists() and args.evaluation.parent.name=='posture-width-experiment' and args.evaluation.name!='baseline':
+        from assess_gait_quality import assess_directory
+        selected=assess_directory(args.evaluation)
+        print(json.dumps({'candidate_selection_passed':selected['accepted_for_multiseed_validation'],
+                          'candidate_selection_failures':selected['failed_checks']}))
+    if args.evaluation.parent.name=='targeted-upright-clearance-20261118' and args.evaluation.name.startswith('eval-') and int(args.evaluation.name.rsplit('-',1)[1])>=1600:
+        # This child stage completes before the coordinator starts another GPU job.
+        from audit_motion_interface import audit
+        audit(args.evaluation)
     print(json.dumps(dict(iteration=report['iteration'],seed=report['seed'],cases=len(report['results']),output=str(args.output))))

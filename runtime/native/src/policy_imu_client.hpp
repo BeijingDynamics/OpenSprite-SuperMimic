@@ -1,4 +1,5 @@
 #pragma once
+#include "inference_cpu_layout.hpp"
 #include "imu_packet.hpp"
 #include <atomic>
 #include <chrono>
@@ -126,6 +127,7 @@ public:
     NativeImuClient(const NativeImuClient&)=delete;
     NativeImuClient& operator=(const NativeImuClient&)=delete;
     ~NativeImuClient() { stop_=true;if(worker_.joinable())worker_.join();cleanup(); }
+    void pin_worker(int cpu) { sprite_schedule::pin_thread(worker_.native_handle(),cpu); }
     bool snapshot(ImuSnapshot& result) {
         std::lock_guard<std::mutex> lock(mutex_);
         if (!error_.empty()) throw std::runtime_error(error_);

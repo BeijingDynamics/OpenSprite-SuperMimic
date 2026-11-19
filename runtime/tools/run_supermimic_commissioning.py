@@ -14,6 +14,8 @@ import sys
 import threading
 import time
 
+from cpu_frequency_client import CpuFrequencyLease
+
 import numpy as np
 
 from open_sprite_runtime.contracts import PolicyContract
@@ -27,6 +29,7 @@ CAN_CPU = 2
 CAN_REALTIME_PRIORITY = 50
 ACTOR_CPUS = (4, 5)
 SLING_DURATION = 30.5
+XBOX_DURATION = 326.0
 WALK_DURATION = 49.5
 SLING_COUNTDOWN = [f"COUNTDOWN_{seconds}" for seconds in range(9, 0, -1)]
 INTERNAL_OPERATOR_EVENTS = {"ENABLED_31", "DRY_ENABLE_NOTICE"}
@@ -49,6 +52,11 @@ OPERATOR_MESSAGES = {
     "DISABLED_31": "Individual feedback confirms all 31 motors are disabled.",
     "DISABLE_UNCONFIRMED": "Could not confirm all 31 motors disabled. CUT MOTOR POWER.",
 }
+OPERATOR_MESSAGES.update({
+    "XBOX_READY": "Body stability check passed. Slacken the sling only if self-supported; retain fall protection. The 300-second Xbox window opens next.",
+    "DRY_XBOX_READY": "Disabled validation: 300-second Xbox window opens next. Keep sling support.",
+    "XBOX_END": "Xbox commands have returned to zero. Control is ending; retain fall protection.",
+})
 OPERATOR_MESSAGES.update({
     f"COUNTDOWN_{seconds}": f"Window remaining: {seconds} seconds." for seconds in range(9, 0, -1)
 })
@@ -341,6 +349,10 @@ def run(args, out, mode):
     fingerprints = {p.name: file_sha256(p) for p in (
         Path(__file__), model, args.icm, can_binary, actor_binary, out/"motors.tsv",
         out/"kinematics.tsv", out/"joints.tsv", out/"feedback.bin", out/"target.bin", out/"input.bin")}
+    fingerprints['inference_cpu_frequency_khz'] = 1344000 if args.cpu_frequency_socket else 0
+    if args.cpu_frequency_socket:
+        for name in ('cpu_frequency_client.py','cpu_frequency_guard.py'):
+            fingerprints[name] = file_sha256(Path(__file__).with_name(name))
     if args.coherent_action_send:
         tx_audit_path = Path(__file__).with_name('action_tx_audit.py')
         fingerprints[tx_audit_path.name] = file_sha256(tx_audit_path)
@@ -362,6 +374,7 @@ def run(args, out, mode):
                 prior.get("direct_policy_start", False) != args.direct_policy_start or
                 prior.get("coherent_action_send", False) != args.coherent_action_send or
                 prior.get("can_schedule") != can_schedule or
+                prior.get("command_source") != ("xbox_control" if args.gamepad_control_device else "scripted") or
                 prior["final_disabled_count"] != 31):
                 raise ValueError(f"same-build {expected_mode} gate required before enable")
 
@@ -389,6 +402,8 @@ def run(args, out, mode):
     operator_events, relay_errors = [], []
     pipe_fds = set()
     relay = None
+    cpu_lease = None
+    cpu_frequency = dict(requested_khz=1344000 if args.cpu_frequency_socket else None)
     imu_socket, state_socket = out/"imu.sock", out/"state.sock"
     def launch(name, command, **kwargs):
         with (out/(name+".log")).open("wb") as log:
@@ -401,6 +416,12 @@ def run(args, out, mode):
         pipe_fds.remove(fd)
 
     try:
+        if args.cpu_frequency_socket:
+            cpu_lease = CpuFrequencyLease(args.cpu_frequency_socket)
+            cpu_frequency['acquired'] = cpu_lease.acquired
+            if cpu_lease.acquired.get('guard_sha256') != fingerprints['cpu_frequency_guard.py']:
+                raise RuntimeError('Installed CPU frequency service differs from reviewed source')
+            (out/'cpu-frequency.json').write_text(json.dumps(cpu_frequency,indent=2)+'\n')
         can_status = actor_status = []
         can_fds = actor_fds = ()
         if args.sling_window:
@@ -420,7 +441,7 @@ def run(args, out, mode):
             actor_status = ["--sling-ready-fd", ready_write]
             can_fds, actor_fds = (ready_read, status_write), (ready_write,)
         imu = launch("imu", ["taskset", "-c", "3", args.icm, "capture", "/dev/spidev0.0", "/dev/gpiochip0",
-            "123", "800", "85" if args.walk_speed else "60" if args.sling_window else "35",
+            "123", "800", "360" if args.gamepad_control_device else "85" if args.walk_speed else "60" if args.sling_window else "35",
             out/"imu.csv", "X_DOWN_Z_BACK", "CONFIGURE_ICM45686_RAW_NO_CAN"],
             env=dict(os.environ, ICM_IPC_SOCKET=str(imu_socket)))
         wait = time.monotonic()+25
@@ -436,7 +457,12 @@ def run(args, out, mode):
         xbox_full = ["--xbox-full-leg-waist-gains"] if args.xbox_leg_waist_gains else []
         full_body = ["--training-full-body"] if args.training_full_body else []
         direct = ["--direct-policy-start"] if args.direct_policy_start else []
+        gamepad_preview = ["--gamepad-preview-device", args.gamepad_preview_device] if args.gamepad_preview_device else []
+        if args.gamepad_control_device:
+            gamepad_preview = ["--gamepad-control-device", args.gamepad_control_device]
         coherent = ["--coherent-action-send"] if args.coherent_action_send else []
+        if args.gamepad_control_device:
+            coherent.append("--xbox-body-admission")
         ack = "ZERO_GAIN_SUPERMIMIC_WRITEBACK"
         if mode == "powered":
             ack = "ENABLE_SUSPENDED_SUPERMIMIC_LOW_GAIN"
@@ -448,6 +474,8 @@ def run(args, out, mode):
         if args.walk_speed:
             action = "ENABLE" if mode == "powered" else "PREVIEW"
             ack = f"{action}_SUPERMIMIC_WALK_{walk_code}_10S"
+        if args.gamepad_control_device:
+            ack = "ENABLE_SUPERMIMIC_XBOX_300S_040_FAST_TORQUE_OBSERVE" if mode == "powered" else "PREVIEW_SUPERMIMIC_XBOX_300S_040_FAST_TORQUE_OBSERVE"
         can = launch("can", [can_binary, "--supermimic-commissioning", *options, *tracking, *direct, *coherent, *walking, *can_status,
             "--acknowledge-hardware-tx", ack, "--all-motors-disabled-confirmed", "--config", out/"motors.tsv",
             "--kinematics-config", out/"kinematics.tsv", "--joint-safety-config", out/"joints.tsv",
@@ -473,18 +501,48 @@ def run(args, out, mode):
             policy="SCHED_FIFO", priority=os.sched_getparam(can.pid).sched_priority,
             actor_cpus=list(ACTOR_CPUS), verified_before_actor_connection=True),indent=2))
         actor = launch("actor", ["taskset", "-c", ",".join(map(str,ACTOR_CPUS)), actor_binary, model, out/"input.bin", out/"native.bin",
-            "--threads", "2", "--warmup", "100", "--state-socket", state_socket, "--imu-socket", imu_socket,
+            "--threads", os.environ.get("SPRITE_INFERENCE_THREADS","2"), "--isolated-inference", *(["--no-ort-spinning"] if os.environ.get("SPRITE_NO_ORT_SPINNING")=="1" else []), *(["--diagnose-inference"] if os.environ.get("SPRITE_INFERENCE_DIAGNOSTICS")=="1" else []), "--warmup", "100", "--state-socket", state_socket, "--imu-socket", imu_socket,
             "--feedback-config", out/"feedback.bin", "--target-config", out/"target.bin",
-            "--imu-kind", "icm", *tracking, *xbox_full, *full_body, *direct, *walking, *actor_status], pass_fds=actor_fds)
+            "--imu-kind", "icm", *tracking, *xbox_full, *full_body, *direct, *walking, *actor_status, *gamepad_preview],
+            pass_fds=actor_fds + ((cpu_lease.fileno(),) if cpu_lease else ()))
         for fd in actor_fds:
             close_pipe(fd)
+        if args.gamepad_preview_device:
+            def announce_gamepad_ready():
+                until = time.monotonic() + 10
+                while actor.poll() is None and time.monotonic() < until:
+                    if "GAMEPAD_PREVIEW_READY" in (out/"actor.log").read_text(errors="replace"):
+                        print("GAMEPAD PREVIEW READY. Motors remain disabled. Center sticks; press/release LT, then hold LT and test left-stick forward and right-stick turns. Release LT to return to zero.", flush=True)
+                        return
+                    time.sleep(.05)
+            threading.Thread(target=announce_gamepad_ready, daemon=True).start()
+        if args.gamepad_control_device:
+            def announce_xbox_window():
+                seen = set()
+                while actor.poll() is None:
+                    content = (out/"actor.log").read_text(errors="replace")
+                    for line in content.splitlines():
+                        if line.startswith(("XBOX_WINDOW_OPEN:", "XBOX_WINDOW_CLOSED:")) and line not in seen:
+                            print(line, flush=True)
+                            seen.add(line)
+                    time.sleep(.05)
+            threading.Thread(target=announce_xbox_window, daemon=True).start()
         if mode == "deadline_fault":
-            time.sleep(36.5 if args.walk_speed else 6.5 if args.duration >= 10 else 1.25)
+            inject_at = time.monotonic() + (315.5 if args.gamepad_control_device else 36.5 if args.walk_speed else 6.5 if args.duration >= 10 else 1.25)
+            while time.monotonic() < inject_at:
+                if cpu_lease: cpu_lease.check()
+                time.sleep(min(.05,max(0.,inject_at-time.monotonic())))
             if actor.poll() is not None or can.poll() is not None:
                 raise RuntimeError("process exited before deadline fault injection")
             actor.send_signal(signal.SIGSTOP)
             paused = True
-        can_code = can.wait(timeout=max(15, args.duration+5))
+        can_until = time.monotonic() + max(15,args.duration+5)
+        while can.poll() is None:
+            if cpu_lease: cpu_lease.check()
+            if time.monotonic() >= can_until:
+                raise subprocess.TimeoutExpired(can.args,max(15,args.duration+5))
+            time.sleep(.05)
+        can_code = can.returncode
         report = json.loads((out/"can.json").read_text())
         print(f"CAN_EXIT code={can_code} disabled={sum(m['final_disabled'] for m in report['motors'].values())}", flush=True)
         if report["can_cpu"] != CAN_CPU or report["can_realtime_priority"] != CAN_REALTIME_PRIORITY:
@@ -495,18 +553,20 @@ def run(args, out, mode):
             raise RuntimeError("CAN startup mode differs from admission")
         if report.get("coherent_action_send", False) != args.coherent_action_send:
             raise RuntimeError("CAN coherent-action mode differs from admission")
+        if report.get("xbox_body_admission", False) != bool(args.gamepad_control_device):
+            raise RuntimeError("CAN Xbox body admission differs from the selected command source")
         if paused:
             actor.send_signal(signal.SIGCONT)
             paused = False
         actor_code = actor.wait(timeout=5)
         if args.coherent_action_send:
             tx_audit = subprocess.run([sys.executable, str(Path(__file__).with_name('action_tx_audit.py')), str(out)],
-                                      capture_output=True, text=True, timeout=30)
+                                      capture_output=True, text=True, timeout=90)
             (out/'action-tx-audit.log').write_text(tx_audit.stdout + tx_audit.stderr)
             if tx_audit.returncode:
                 raise RuntimeError('per-action motor TX audit failed; see action-tx-audit.log')
         if mode == "deadline_fault":
-            minimum_targets = 1652 if args.walk_speed else 251 if args.duration >= 10 else 2
+            minimum_targets = 15700 if args.gamepad_control_device else 1652 if args.walk_speed else 251 if args.duration >= 10 else 2
             if (can_code != 2 or report["passed"] or report["policy_target_count"] < minimum_targets or not actor_code or
                 report.get("deadline_stage") != "target_ipc_pending" or
                 not any("oldest-feedback 20 ms deadline exceeded" in error for error in report["errors"])):
@@ -532,10 +592,22 @@ def run(args, out, mode):
                 raise RuntimeError("actor startup mode differs from admission")
             if timing.get("walk_speed_m_s", 0.) != args.walk_speed:
                 raise RuntimeError("actor walking profile differs from admission")
+            if timing.get("gamepad_preview", False) != bool(args.gamepad_preview_device):
+                raise RuntimeError("actor gamepad source differs from admission")
+            if timing.get("gamepad_control", False) != bool(args.gamepad_control_device):
+                raise RuntimeError("actor Xbox control source differs from admission")
             if args.tracked_startup:
                 if not report.get("pd_position_saturation"):
                     raise RuntimeError("pure PD position saturation was not active")
                 feedback = np.fromfile(out/"native.bin.inputs", dtype="<f8").reshape(frames, 71)
+                if args.gamepad_preview_device or args.gamepad_control_device:
+                    command = feedback[:, 68:71]
+                    if (not np.isfinite(command).all() or np.any(command[:, 1] != 0)
+                        or np.any(command[:, 0] < -.050001) or np.any(command[:, 0] > (.400001 if args.gamepad_control_device else .100001))
+                        or np.any(np.abs(command[:, 2]) > .200001)):
+                        raise RuntimeError("gamepad command exceeds its selected envelope")
+                    if args.gamepad_control_device and (np.any(command[:1002] != 0) or np.any(command[16205:] != 0)):
+                        raise RuntimeError("Xbox commands escaped the bounded control window")
                 if args.walk_speed:
                     verify_walk_commands(feedback[:, 68:], args.walk_speed)
                 held = [] if args.training_full_body else [j for j, role in enumerate(roles) if role == 4]
@@ -576,7 +648,7 @@ def run(args, out, mode):
                                last_second_tilt_peak_deg=tilt_peak,
                                body_settled=gyro_peak <= .15 and tilt_peak <= 10.)
                 if mode == "powered" and (not startup["body_settled"] or
-                                          (not args.walk_speed and not startup["joint_settled"])):
+                                          (not (args.walk_speed or args.gamepad_control_device) and not startup["joint_settled"])):
                     raise RuntimeError("tracked startup did not meet the zero-command settling gate")
             if not args.tracked_startup and args.duration >= 6 and (not timing["gain_ramp_completed"] or timing["final_gain_ramp_alpha"] != 1):
                 raise RuntimeError("full startup gain ramp was not verified")
@@ -599,6 +671,13 @@ def run(args, out, mode):
                     failure = failure or "commissioning process did not exit on SIGTERM"
         if relay:
             relay.join(timeout=2)
+        if cpu_lease:
+            try:
+                cpu_frequency['released'] = cpu_lease.close(release=actor is None or actor.poll() is not None)
+            except (OSError,RuntimeError,ValueError) as exc:
+                failure = failure or 'CPU frequency restoration failed: '+str(exc)
+                cpu_frequency['release_error'] = str(exc)
+            (out/'cpu-frequency.json').write_text(json.dumps(cpu_frequency,indent=2)+'\n')
 
     if not report and can is not None and can.poll() is not None and (out/"can.json").is_file():
         report = json.loads((out/"can.json").read_text())
@@ -613,7 +692,11 @@ def run(args, out, mode):
         else:
             expected += (["ENABLED_31", "POLICY_BLEND"] if mode == "powered"
                          else ["DRY_ENABLE_NOTICE", "DRY_POLICY_BLEND"])
-        if args.walk_speed:
+        if args.gamepad_control_device:
+            expected += ["XBOX_READY" if mode == "powered" else "DRY_XBOX_READY"]
+            if mode != "deadline_fault":
+                expected += ["XBOX_END"]
+        elif args.walk_speed:
             expected += [prefix+"WALK_SLING_WINDOW_OPEN", *SLING_COUNTDOWN,
                          prefix+"WALK_RAMP", prefix+"WALK_FULL"]
             if mode != "deadline_fault":
@@ -634,6 +717,11 @@ def run(args, out, mode):
                 operator_message(args.operator_status, OPERATOR_MESSAGES["DISABLED_31"])
             else:
                 operator_message(args.operator_status, OPERATOR_MESSAGES["DISABLE_UNCONFIRMED"])
+    affinity_path = out/"native.bin.affinity.json"
+    inference_affinity = json.loads(affinity_path.read_text()) if affinity_path.exists() else {}
+    if not (inference_affinity.get("verified") is True and inference_affinity.get("main_cpu") == 4
+            and inference_affinity.get("ort_worker_cpu") == (-1 if os.environ.get("SPRITE_INFERENCE_THREADS")=="1" else 5) and inference_affinity.get("io_cpu") == 1):
+        failure = failure or "verified inference thread layout evidence missing"
     passed = not failure and disabled == 31 and enables == (31 if mode == "powered" else 0)
     leg_waist_gain_scale = .20 if args.tracked_startup else GAIN
     if args.xbox_leg_waist_gains or args.training_full_body:
@@ -641,6 +729,8 @@ def run(args, out, mode):
     evidence = dict(mode=mode, passed=bool(passed), failure=failure, duration_s=args.duration,
                     gain_scale=1. if args.training_full_body else GAIN, xbox_leg_waist_gain_scale=leg_waist_gain_scale,
                     training_full_body=args.training_full_body, standing_admission=standing_admission,
+                    feedback_torque_mode="observe_only" if args.gamepad_control_device else "stop",
+                    xbox_forward_acceleration_m_s2=.10 if args.gamepad_control_device else None,
                     direct_policy_start=args.direct_policy_start,
                     coherent_action_send=args.coherent_action_send,
                     action_history="policy_output" if args.training_full_body else "admitted_waypoint",
@@ -650,8 +740,13 @@ def run(args, out, mode):
                     sling_checkpoint={name: value for name, value in report.items() if name.startswith("sling_")},
                     walk_checkpoint={name: value for name, value in report.items() if name.startswith("walk_")},
                     can_schedule=can_schedule,
+                    inference_affinity=inference_affinity,
+                    inference_no_spinning=os.environ.get("SPRITE_NO_ORT_SPINNING")=="1",
+                    cpu_frequency=cpu_frequency,
                     timing_max_ms=timing_max_ms, deadline_stage=report.get("deadline_stage"),
-                    velocity_command=[args.walk_speed,0,0], motor_enable_attempts=enables,
+                    velocity_command=None if (args.gamepad_preview_device or args.gamepad_control_device) else [args.walk_speed,0,0],
+                    command_source="xbox_control" if args.gamepad_control_device else "xbox_preview" if args.gamepad_preview_device else "scripted",
+                    motor_enable_attempts=enables,
                     final_disabled_count=disabled, fingerprints=fingerprints,
                     hardware_qualified=False, powered_walking_ready=False)
     (out/"commissioning.json").write_text(json.dumps(evidence, indent=2)+"\n")
@@ -677,6 +772,12 @@ def main():
     parser.add_argument("--training-full-body", action="store_true")
     parser.add_argument("--direct-policy-start", action="store_true")
     parser.add_argument("--coherent-action-send", action="store_true")
+    parser.add_argument("--cpu-frequency-socket",type=Path,
+                        help="Require the CPU 4/5 1344 MHz lifetime lease; restore on actor shutdown")
+    parser.add_argument("--gamepad-preview-device", type=Path,
+                        help="Input-only command integration; powered mode is forbidden")
+    parser.add_argument("--gamepad-control-device", type=Path,
+                        help="Bounded Xbox trial after the unchanged standing checkpoint")
     walking = parser.add_mutually_exclusive_group()
     walking.add_argument("--walk-020", dest="walk_speed", action="store_const", const=.20, default=0.)
     walking.add_argument("--walk-025", dest="walk_speed", action="store_const", const=.25)
@@ -687,6 +788,11 @@ def main():
                           help="full-body zero-speed evidence stopped only by all-joint settling")
     parser.add_argument("--operator-status", type=Path)
     args = parser.parse_args()
+    if args.gamepad_preview_device and (args.enable_suspended or args.walk_speed or not args.direct_policy_start):
+        parser.error("gamepad preview is restricted to disabled direct-policy tests without scripted walking")
+    if args.gamepad_control_device and (args.gamepad_preview_device or args.walk_speed or
+                                       not args.direct_policy_start or not args.sling_window):
+        parser.error("Xbox control requires direct sling mode without another command source")
     if args.coherent_action_send and not args.direct_policy_start:
         parser.error("coherent action sending requires direct policy start")
     if args.direct_policy_start and not args.training_full_body:
@@ -704,7 +810,7 @@ def main():
     if args.sling_window:
         if not args.tracked_startup or not args.operator_status:
             parser.error("sling window requires a reviewed tracked startup profile and --operator-status")
-        args.duration = WALK_DURATION if args.walk_speed else SLING_DURATION
+        args.duration = XBOX_DURATION if args.gamepad_control_device else WALK_DURATION if args.walk_speed else SLING_DURATION
     elif args.tracked_startup and args.duration != 10:
         parser.error("tracked startup requires the 10-second commissioning tier")
     if args.enable_suspended and not (args.passed_disabled and args.passed_deadline_fault):

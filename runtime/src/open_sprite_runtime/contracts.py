@@ -18,6 +18,8 @@ EXPECTED_OBSERVATION_TERMS = (
     ("velocity_commands", 3, 0),
 )
 SUPERMIMIC_SCHEMA = "sprite_supermimic_joint_velocity_v1"
+SUPERMIMIC_V2_SCHEMA = "sprite_supermimic_joint_velocity_v2"
+SUPERMIMIC_SCHEMAS = (SUPERMIMIC_SCHEMA, SUPERMIMIC_V2_SCHEMA)
 POLICY_REPLAY_PROFILES = {
     "sprite_8f": EXPECTED_OBSERVATION_TERMS,
     "supermimic_v5_10f": tuple(
@@ -118,7 +120,7 @@ class PolicyContract:
         return result
 
     def validate_for_hardware(self, timing: RuntimeTiming) -> None:
-        if self.data.get("schema") == SUPERMIMIC_SCHEMA:
+        if self.data.get("schema") in SUPERMIMIC_SCHEMAS:
             raise ValueError("SuperMimic profile is offline-only; hardware admission is not implemented")
         self._validate(timing, EXPECTED_OBSERVATION_TERMS, require_ankle=True)
 
@@ -126,7 +128,7 @@ class PolicyContract:
         """Validate explicit offline profiles without granting hardware admission."""
         if profile not in POLICY_REPLAY_PROFILES:
             raise ValueError(f"unknown replay policy profile: {profile}")
-        is_supermimic = self.data.get("schema") == SUPERMIMIC_SCHEMA
+        is_supermimic = self.data.get("schema") in SUPERMIMIC_SCHEMAS
         if (profile == "supermimic_v5_10f") != is_supermimic:
             raise ValueError("replay profile does not match contract schema")
         if is_supermimic and self.data.get("normalization") != "embedded_running_norm":
@@ -194,7 +196,7 @@ class PolicyContract:
                     errors.append(f"{name} frame_dim mismatch")
                 if int(term.get("history_length", -1)) != history_length:
                     errors.append(f"{name} history_length mismatch")
-                if self.data.get("schema") == SUPERMIMIC_SCHEMA:
+                if self.data.get("schema") in SUPERMIMIC_SCHEMAS:
                     if term.get("history_order") != "oldest_to_newest":
                         errors.append(f"{name} must use oldest_to_newest history")
                     if term.get("flatten_history_dim") is not True:
@@ -209,9 +211,12 @@ class PolicyContract:
             if int(self.data.get("actor_observation_dim", -1)) != cursor:
                 errors.append("actor_observation_dim does not match observation slices")
 
-        if self.data.get("base_ang_vel_frame") != "root_link_local":
+        v2 = self.data.get("schema") == SUPERMIMIC_V2_SCHEMA
+        expected_frame = "imu_site_local" if v2 and self.data.get("training_revision", {}).get("imu_frame") == "imu_site" else "root_link_local"
+        if self.data.get("base_ang_vel_frame") != expected_frame:
             errors.append("base angular velocity must use the root-link local frame")
-        if self.data.get("projected_gravity_definition") != "R_world_to_base @ [0, 0, -1]":
+        expected_gravity = "R_world_to_sensor @ [0, 0, -1]" if v2 else "R_world_to_base @ [0, 0, -1]"
+        if self.data.get("projected_gravity_definition") != expected_gravity:
             errors.append("unsupported projected-gravity definition")
         if self.data.get("quaternion_order") != "wxyz":
             errors.append("quaternion_order must be wxyz")
@@ -224,9 +229,15 @@ class PolicyContract:
         else:
             if not math.isfinite(handoff_seconds) or handoff_seconds < 0.0:
                 errors.append("deployment_handoff_seconds must be finite and non-negative")
-        if self.data.get("deployment_handoff_mode") != (
-            "smoothstep_from_pose_equivalent_action"
-        ):
+        expected_handoff = "reset_history_at_direct_takeover" if v2 else "smoothstep_from_pose_equivalent_action"
+        if v2:
+            if self.data.get("deployment_handoff_seconds") != 0.:
+                errors.append("v2 requires zero-duration direct takeover")
+            if self.data.get("training_revision", {}).get("imu_frame") not in ("root", "imu_site"):
+                errors.append("v2 requires an explicit trained IMU frame")
+            if self.data.get("previous_action_definition") != "Previous clamped policy output, before target saturation; never a measured position":
+                errors.append("v2 requires raw policy action history")
+        if self.data.get("deployment_handoff_mode") != expected_handoff:
             errors.append("unsupported deployment_handoff_mode")
         if self.data.get("deployment_initial_velocity_mode") != "zero":
             errors.append("deployment_initial_velocity_mode must be zero")

@@ -48,3 +48,13 @@ class Run002BindingTests(unittest.TestCase):
     def test_rejects_hardware_qualification_in_training_artifact(self):
         data=copy.deepcopy(self.data);data['hardware_qualified']=True
         with self.assertRaises(ValueError):self.check(data)
+
+    def test_sm_walk_r1_requires_exact_checkpoint_and_export(self):
+        data=copy.deepcopy(self.data)
+        data.update(schema='sprite_supermimic_joint_velocity_v2',training_run='reference-fusion-walk-stand80',
+            checkpoint_sha256='70cf3e70354c8b574777709f56f24f83864329d589c256cfa97d6a1236afdedd',
+            policy_onnx_sha256='5695b6980746534a11d075befc29bf5f7fe0ef2a7d81e3dadf3147c50f4d6930')
+        self.assertFalse(self.check(data)['hardware_qualified'])
+        for key in ['schema','training_run','checkpoint_sha256','policy_onnx_sha256']:
+            altered=copy.deepcopy(data);altered[key]='unreviewed'
+            with self.subTest(key=key),self.assertRaises(ValueError):self.check(altered)

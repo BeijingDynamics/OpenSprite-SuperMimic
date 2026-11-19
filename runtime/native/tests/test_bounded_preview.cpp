@@ -33,7 +33,12 @@ struct Fixture {
   }
 };
 
+#include "test_feedback_observation.inc"
+#include "test_atomic_commit.inc"
+
 int main() {
+  test_feedback_observation();
+  test_atomic_commit();
   Fixture quantized;
   auto& qm = quantized.motors[0];
   qm.velocity_min = -50; qm.velocity_max = 50;
@@ -213,7 +218,7 @@ int main() {
           "a fresh late reply can complete the batch");
   auto accepts_duration = [](const char* duration, const char* acknowledgement,
                              const char* priority = "50", bool sling = false,
-                             const char* walk_option = nullptr) {
+                             const char* walk_option = nullptr, bool xbox_body = false) {
     std::vector<std::string> args{
         "test", "--supermimic-commissioning", "--policy-actuation", "--config", "unused",
         "--output", "unused", "--ipc-socket", "unused", "--policy-joint-hash", "1",
@@ -223,6 +228,7 @@ int main() {
         "--acknowledge-hardware-tx", acknowledgement};
     if (sling) args.insert(args.end(), {"--tracked-startup", "--sling-ready-fd", "3", "--operator-status-fd", "4"});
     if (walk_option) args.push_back(walk_option);
+    if (xbox_body) args.insert(args.end(), {"--xbox-body-admission", "--direct-policy-start", "--coherent-action-send"});
     std::vector<char*> argv;
     for (auto& arg : args) argv.push_back(arg.data());
     try { (void)parse_options(static_cast<int>(argv.size()), argv.data()); }
@@ -240,6 +246,19 @@ int main() {
           !accepts_duration("11", ten_ack), "ten-second token must not admit a different tier");
   require(!accepts_duration("10", ten_ack, "0"), "powered SuperMimic requires verified real-time scheduling");
   constexpr auto sling_ack = "ENABLE_SUPERMIMIC_ZERO_SPD_SLING_WINDOW";
+  for (const char* invalid : {"54", "120", "146", "300", "325", "327", "600"})
+    require(!accepts_duration(invalid, "ENABLE_SUPERMIMIC_XBOX_300S_040_FAST_TORQUE_OBSERVE", "50", true, nullptr, true),
+            "Xbox extension requires the exact 326-second profile");
+  require(!accepts_duration("326", "ENABLE_SUPERMIMIC_XBOX_30S", "50", true, nullptr, true),
+          "old acknowledgement must not admit the extended profile");
+
+  require(accepts_duration("326", "ENABLE_SUPERMIMIC_XBOX_300S_040_FAST_TORQUE_OBSERVE", "50", true, nullptr, true) &&
+          !accepts_duration("326", "ENABLE_SUPERMIMIC_XBOX_300S_040_FAST_TORQUE_OBSERVE", "50", false, nullptr, true) &&
+          !accepts_duration("30.5", "ENABLE_SUPERMIMIC_XBOX_300S_040_FAST_TORQUE_OBSERVE", "50", true, nullptr, true) &&
+          !accepts_duration("326", sling_ack, "50", true, nullptr, true) &&
+          !accepts_duration("326", "ENABLE_SUPERMIMIC_XBOX_300S_040_FAST_TORQUE_OBSERVE", "50", true, nullptr, false) &&
+          !accepts_duration("49.5", "ENABLE_SUPERMIMIC_WALK_025_10S", "50", true, "--walk-025", true),
+          "Xbox body admission is isolated to direct coherent sling commissioning");
   require(accepts_duration("30.5", sling_ack, "50", true) &&
           !accepts_duration("30.5", sling_ack) &&
           !accepts_duration("30.5", ten_ack, "50", true) &&
@@ -263,12 +282,38 @@ int main() {
           !accepts_duration("49.5", walk025_ack, "50", true, "--walk-030") &&
           !accepts_duration("49.5", walk025_ack, "50", false, "--walk-025"),
           "walk-025 requires its own acknowledgement and unchanged readiness channels");
+  {
+    int pair[2];
+    require(socketpair(AF_UNIX, SOCK_SEQPACKET, 0, pair) == 0, "completion socket pair");
+    IpcSocket completed;
+    completed.client_fd = pair[0];
+    completed.state_sequence = 16301;
+    completed.target_count = 16301;
+    close_ipc(completed);
+    char byte = 0;
+    require(recv(pair[1], &byte, 1, MSG_DONTWAIT) == 0,
+            "actor receives EOF before controller trace serialization");
+    require(completed.state_sequence == 16301 && completed.target_count == 16301,
+            "IPC completion preserves timing evidence counters");
+    close_ipc(completed);
+    close(pair[1]);
+  }
   using sprite_policy::sling_notice_elapsed;
   require(!sling_notice_elapsed(0, 3'000'000'000LL) &&
           !sling_notice_elapsed(1'000'000'000LL, 2'999'999'999LL) &&
           sling_notice_elapsed(1'000'000'000LL, 3'000'000'000LL),
           "policy ramp requires at least two seconds from the enable notice");
   using sprite_policy::sling_ready;
+  using sprite_policy::sling_requires_joint_settling;
+  require(sling_requires_joint_settling(false, false) &&
+          !sling_requires_joint_settling(true, false) &&
+          !sling_requires_joint_settling(false, true),
+          "Xbox uses the walking body-only admission while standing retains its legacy mode");
+  require(sling_ready({1000, 0, 50}, 1000, 1000, sling_requires_joint_settling(false, true)) &&
+          !sling_ready({1000, 0, 49}, 1000, 1000, sling_requires_joint_settling(false, true)) &&
+          !sling_ready({999, 0, 50}, 1000, 1000, sling_requires_joint_settling(false, true)) &&
+          !sling_ready({1000, 0, 50}, 999, 1000, sling_requires_joint_settling(false, true)),
+          "recorded Xbox failure now passes only with full body stability and current acceptance");
   require(sling_ready({1000, 50, 50}, 1000) &&
           !sling_ready({999, 50, 50}, 1000) &&
           !sling_ready({1000, 50, 50}, 999) &&

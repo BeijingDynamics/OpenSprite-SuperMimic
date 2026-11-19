@@ -4,12 +4,15 @@
 #include <cmath>
 #include <cstdint>
 #include <stdexcept>
+#include "sling_window.hpp"
 
 namespace sprite_policy {
 // Input-only candidate limits. Physical reverse/turn operation is not qualified.
 struct GamepadConfig {
   bool forward_only=false;
   bool no_reverse=false;
+  bool xbox_control_025=false;
+  bool xbox_control_040=false;
   int forward_sign=-1,turn_sign=-1;
   double forward=.10,reverse=.05,turn=.20,deadzone=.12;
   double acceleration=.05,deceleration=.10,yaw_acceleration=.20;
@@ -18,7 +21,8 @@ struct GamepadConfig {
       throw std::runtime_error("axis polarity must be +1 or -1");
     for(double v:{forward,reverse,turn,deadzone,acceleration,deceleration,yaw_acceleration})
       if(!std::isfinite(v)||v<=0)throw std::runtime_error("invalid gamepad limits");
-    if(deadzone>=1 || forward>.10 || reverse>.05 || turn>.20)
+    if(xbox_control_025 && xbox_control_040)throw std::runtime_error("conflicting Xbox profiles");
+    if(deadzone>=1 || forward>(xbox_control_040?.40:xbox_control_025?.25:.10) || reverse>.05 || turn>.20)
       throw std::runtime_error("outside candidate command envelope");
   }
 };
@@ -105,6 +109,30 @@ public:
     vx_=approach(vx_,v,(allowed && std::abs(v)>std::abs(vx_)?cfg_.acceleration:cfg_.deceleration)*dt);
     wz_=approach(wz_,w,cfg_.yaw_acceleration*dt);
     return {vx_,0,wz_};
+  }
+};
+
+// Bounded first powered Xbox trial. Keep the existing CAN standing checkpoint.
+// Require a centered LT release inside the window before a new permission edge.
+class GamepadControlWindow {
+  bool released_=false,armed_=false,previous_permitted_=false;
+public:
+  static constexpr std::uint64_t open_frame=kXboxControlOpenFrame,close_frame=kXboxControlCloseFrame;
+  bool allowed(std::uint64_t frame,const GamepadSnapshot& s,std::uint64_t now) {
+    const bool healthy=s.connected && now>=s.stamp && now-s.stamp<=100000000;
+    if(frame<open_frame || frame>=close_frame || !healthy) {
+      released_=armed_=false;previous_permitted_=s.permitted;return false;
+    }
+    if(!s.permitted) {
+      armed_=false;
+      if(s.lt<.60 && std::abs(s.forward)<=.12 && std::abs(s.turn)<=.12)released_=true;
+    }
+    if(s.permitted && !previous_permitted_) {
+      armed_=released_ && std::abs(s.forward)<=.12 && std::abs(s.turn)<=.12;
+      released_=false;
+    }
+    previous_permitted_=s.permitted;
+    return armed_ && s.permitted;
   }
 };
 }

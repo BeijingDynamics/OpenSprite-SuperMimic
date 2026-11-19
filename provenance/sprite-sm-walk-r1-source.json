@@ -1,0 +1,1430 @@
+{
+  "files": {
+    "opensprite_tracker/constants.py": {
+      "origin": "R1 training snapshot",
+      "archived_source_sha256": "70313986716a77928c22de7b52b9ea0749baf3c83352d474385ba0df06990f7e",
+      "published_lf_sha256": "70313986716a77928c22de7b52b9ea0749baf3c83352d474385ba0df06990f7e"
+    },
+    "opensprite_tracker/motion_contract.py": {
+      "origin": "R1 training snapshot",
+      "archived_source_sha256": "7d201f8462be8fcfd3aa1b1b6706d352f40c3f33779c6e4488097190c65aab75",
+      "published_lf_sha256": "7d201f8462be8fcfd3aa1b1b6706d352f40c3f33779c6e4488097190c65aab75"
+    },
+    "opensprite_tracker/robot.py": {
+      "origin": "R1 training snapshot",
+      "archived_source_sha256": "a178566d7d2cb788fa3096fa6170fd47b06a4e95ce2ab4f5efc80e4927893ccb",
+      "published_lf_sha256": "a178566d7d2cb788fa3096fa6170fd47b06a4e95ce2ab4f5efc80e4927893ccb"
+    },
+    "opensprite_tracker/runtime.py": {
+      "origin": "R1 training snapshot",
+      "archived_source_sha256": "1f0bd4d8631390c96812bf0f0eabe03937561e792f3d594d4d0cfaab6f327e19",
+      "published_lf_sha256": "1f0bd4d8631390c96812bf0f0eabe03937561e792f3d594d4d0cfaab6f327e19"
+    },
+    "opensprite_tracker/task.py": {
+      "origin": "R1 training snapshot",
+      "archived_source_sha256": "2abc7f3820a94b62fb560b1ec8e4f36ed67b9596b26406b9f555898834d661a1",
+      "published_lf_sha256": "2abc7f3820a94b62fb560b1ec8e4f36ed67b9596b26406b9f555898834d661a1"
+    },
+    "opensprite_tracker/__init__.py": {
+      "origin": "R1 training snapshot",
+      "archived_source_sha256": "53b8594ce5da2f93a1419bfea1cc00464dcbddfd8414dd8d048d8900ccf781e2",
+      "published_lf_sha256": "53b8594ce5da2f93a1419bfea1cc00464dcbddfd8414dd8d048d8900ccf781e2"
+    },
+    "opensprite_tracker/supermimic/buffer.py": {
+      "origin": "R1 training snapshot",
+      "archived_source_sha256": "d7da2716dda76e8efdcd2ded57a1ac9c4d31a23787624334bd18d5589823dee2",
+      "published_lf_sha256": "d7da2716dda76e8efdcd2ded57a1ac9c4d31a23787624334bd18d5589823dee2"
+    },
+    "opensprite_tracker/supermimic/checkpoints.py": {
+      "origin": "R1 training snapshot",
+      "archived_source_sha256": "1995fcd3bcb7095d71df513794f8846d59bdda7f0ba7441e69da7a5e39d9bd4d",
+      "published_lf_sha256": "1995fcd3bcb7095d71df513794f8846d59bdda7f0ba7441e69da7a5e39d9bd4d"
+    },
+    "opensprite_tracker/supermimic/coverage.py": {
+      "origin": "R1 training snapshot",
+      "archived_source_sha256": "6d46836c09445029d52c576a156af2fec0c00bf6c70bc63e7cbf5b712292f4e5",
+      "published_lf_sha256": "6d46836c09445029d52c576a156af2fec0c00bf6c70bc63e7cbf5b712292f4e5"
+    },
+    "opensprite_tracker/supermimic/engine.py": {
+      "origin": "R1 training snapshot",
+      "archived_source_sha256": "5adb0e874ff51a4c7a987c111976af8348894f0dde181a6b01180e268d8a8f23",
+      "published_lf_sha256": "5adb0e874ff51a4c7a987c111976af8348894f0dde181a6b01180e268d8a8f23"
+    },
+    "opensprite_tracker/supermimic/env.py": {
+      "origin": "R1 training snapshot",
+      "archived_source_sha256": "3c2d47c79b127bf9c95351e44769533191bf411f565b9a5c196513aa51a32e36",
+      "published_lf_sha256": "3c2d47c79b127bf9c95351e44769533191bf411f565b9a5c196513aa51a32e36"
+    },
+    "opensprite_tracker/supermimic/evaluate.py": {
+      "origin": "R1 training snapshot",
+      "archived_source_sha256": "7253a69b27a75aa27661e38b0008dd780054a16c30cf5a49d90399c8404383f6",
+      "published_lf_sha256": "7253a69b27a75aa27661e38b0008dd780054a16c30cf5a49d90399c8404383f6"
+    },
+    "opensprite_tracker/supermimic/full_body.py": {
+      "origin": "R1 training snapshot",
+      "archived_source_sha256": "24815cf6115de8018c3150c344631e95fc07c5890c8e997cdaa74ba2e28bd1d7",
+      "published_lf_sha256": "24815cf6115de8018c3150c344631e95fc07c5890c8e997cdaa74ba2e28bd1d7"
+    },
+    "opensprite_tracker/supermimic/initialization.py": {
+      "origin": "R1 training snapshot",
+      "archived_source_sha256": "f3d3c6a8931b9206a5a8a4c38600707d4fdf5b5b34cd768b2484434baf9c9ee9",
+      "published_lf_sha256": "f3d3c6a8931b9206a5a8a4c38600707d4fdf5b5b34cd768b2484434baf9c9ee9"
+    },
+    "opensprite_tracker/supermimic/joint_interfaces.py": {
+      "origin": "R1 training snapshot",
+      "archived_source_sha256": "b359b2fe0f4aba374ab2ccb457e570f78eae1bba6f3c55259c301ea880c702e3",
+      "published_lf_sha256": "b359b2fe0f4aba374ab2ccb457e570f78eae1bba6f3c55259c301ea880c702e3"
+    },
+    "opensprite_tracker/supermimic/joint_learner.py": {
+      "origin": "R1 training snapshot",
+      "archived_source_sha256": "22bcb2a16ce59e9310cdfaf23af65c3a1740b80b9ee4b0dd87017eef206d73ea",
+      "published_lf_sha256": "22bcb2a16ce59e9310cdfaf23af65c3a1740b80b9ee4b0dd87017eef206d73ea"
+    },
+    "opensprite_tracker/supermimic/kinematics.py": {
+      "origin": "R1 training snapshot",
+      "archived_source_sha256": "bcaac4720edf56010e17b0b8941be616d934e59ee71f47f5a0157fe7a2c58a41",
+      "published_lf_sha256": "bcaac4720edf56010e17b0b8941be616d934e59ee71f47f5a0157fe7a2c58a41"
+    },
+    "opensprite_tracker/supermimic/legacy_rewards.py": {
+      "origin": "R1 training snapshot",
+      "archived_source_sha256": "a57945b7b275f7a7909420abf7de7f30fe4ae281246f2b9bb3dc00e58b0876d5",
+      "published_lf_sha256": "a57945b7b275f7a7909420abf7de7f30fe4ae281246f2b9bb3dc00e58b0876d5"
+    },
+    "opensprite_tracker/supermimic/mdp.py": {
+      "origin": "R1 training snapshot",
+      "archived_source_sha256": "d02e53f8ccb28acf48a2a3723ac9f952156f025206b8a42616086442b3954b19",
+      "published_lf_sha256": "d02e53f8ccb28acf48a2a3723ac9f952156f025206b8a42616086442b3954b19"
+    },
+    "opensprite_tracker/supermimic/motion.py": {
+      "origin": "R1 training snapshot",
+      "archived_source_sha256": "f2aa87a56f115e663d4c3eed3672bbe9452d8e649a4b59c966a959340f5dc79a",
+      "published_lf_sha256": "f2aa87a56f115e663d4c3eed3672bbe9452d8e649a4b59c966a959340f5dc79a"
+    },
+    "opensprite_tracker/supermimic/networks.py": {
+      "origin": "R1 training snapshot",
+      "archived_source_sha256": "2b71dd57f4b5b17c4404243732302e8ccca1056230779667599fed61f7a22092",
+      "published_lf_sha256": "2b71dd57f4b5b17c4404243732302e8ccca1056230779667599fed61f7a22092"
+    },
+    "opensprite_tracker/supermimic/optimizer_schedule.py": {
+      "origin": "R1 training snapshot",
+      "archived_source_sha256": "745c39d89af96920afa87338fcdcf617379360bb3ceeab99314570ee1ad806d3",
+      "published_lf_sha256": "745c39d89af96920afa87338fcdcf617379360bb3ceeab99314570ee1ad806d3"
+    },
+    "opensprite_tracker/supermimic/posture_width.py": {
+      "origin": "R1 training snapshot",
+      "archived_source_sha256": "38703d8ada61cc4c64232226981014d4e3be12359e480e2ee501280397952b71",
+      "published_lf_sha256": "38703d8ada61cc4c64232226981014d4e3be12359e480e2ee501280397952b71"
+    },
+    "opensprite_tracker/supermimic/recovery.py": {
+      "origin": "R1 training snapshot",
+      "archived_source_sha256": "4fd3ce55ebb4196f734fa80d83cdb32d7d649fac520248d328ff73909a695c31",
+      "published_lf_sha256": "4fd3ce55ebb4196f734fa80d83cdb32d7d649fac520248d328ff73909a695c31"
+    },
+    "opensprite_tracker/supermimic/reference_transfer.py": {
+      "origin": "R1 training snapshot",
+      "archived_source_sha256": "e463f9e024acd5a0dbc4a7dc50c3ab570ed4bfba2158fa367fd9cf71d3b0ae62",
+      "published_lf_sha256": "e463f9e024acd5a0dbc4a7dc50c3ab570ed4bfba2158fa367fd9cf71d3b0ae62"
+    },
+    "opensprite_tracker/supermimic/render.py": {
+      "origin": "R1 training snapshot",
+      "archived_source_sha256": "9b20ec9b0204a00332c3cf26682992d31764be76c7a803ab73fae3405d7306a0",
+      "published_lf_sha256": "9b20ec9b0204a00332c3cf26682992d31764be76c7a803ab73fae3405d7306a0"
+    },
+    "opensprite_tracker/supermimic/revisions.py": {
+      "origin": "R1 training snapshot",
+      "archived_source_sha256": "f6e82645e14a13f5e48655fa3dabfd84179f20481c4c14c2b242b59fdb886aac",
+      "published_lf_sha256": "f6e82645e14a13f5e48655fa3dabfd84179f20481c4c14c2b242b59fdb886aac"
+    },
+    "opensprite_tracker/supermimic/robot.py": {
+      "origin": "R1 training snapshot",
+      "archived_source_sha256": "9c1816694afe2829fff11f80a924e59a29c573f397e3d84547fee19374fd703b",
+      "published_lf_sha256": "9c1816694afe2829fff11f80a924e59a29c573f397e3d84547fee19374fd703b"
+    },
+    "opensprite_tracker/supermimic/rotations.py": {
+      "origin": "R1 training snapshot",
+      "archived_source_sha256": "ba6c63fcf567f761ddd8621b8d3dd30d7eaa2690be099cbb0c081e72bc9cb4aa",
+      "published_lf_sha256": "ba6c63fcf567f761ddd8621b8d3dd30d7eaa2690be099cbb0c081e72bc9cb4aa"
+    },
+    "opensprite_tracker/supermimic/sampling.py": {
+      "origin": "R1 training snapshot",
+      "archived_source_sha256": "be8ad8af990ebcc05c7d7912febfc4d98f783a68621dc7266d0e6fd5d494e705",
+      "published_lf_sha256": "be8ad8af990ebcc05c7d7912febfc4d98f783a68621dc7266d0e6fd5d494e705"
+    },
+    "opensprite_tracker/supermimic/sole_tracking.py": {
+      "origin": "R1 training snapshot",
+      "archived_source_sha256": "38119cc2153c1a4578edee975a0c8bb8884e72e9bce423cd159b4e01c303212d",
+      "published_lf_sha256": "38119cc2153c1a4578edee975a0c8bb8884e72e9bce423cd159b4e01c303212d"
+    },
+    "opensprite_tracker/supermimic/state.py": {
+      "origin": "R1 training snapshot",
+      "archived_source_sha256": "9de8d3e854dde13a55ff32ceffe50cc758b8ba80977d240768ead1bb70921903",
+      "published_lf_sha256": "9de8d3e854dde13a55ff32ceffe50cc758b8ba80977d240768ead1bb70921903"
+    },
+    "opensprite_tracker/supermimic/train.py": {
+      "origin": "R1 training snapshot",
+      "archived_source_sha256": "bee0af9c7a236035a9605478c78134498f0243052e82141e1b7c0b8576a0c2ce",
+      "published_lf_sha256": "bee0af9c7a236035a9605478c78134498f0243052e82141e1b7c0b8576a0c2ce"
+    },
+    "opensprite_tracker/supermimic/transition_metrics.py": {
+      "origin": "R1 training snapshot",
+      "archived_source_sha256": "9f48e01d6f1c04dc4c898b61201207ff6cd878da1ff6a375353c4130c8c670c3",
+      "published_lf_sha256": "9f48e01d6f1c04dc4c898b61201207ff6cd878da1ff6a375353c4130c8c670c3"
+    },
+    "opensprite_tracker/supermimic/validate_model.py": {
+      "origin": "R1 training snapshot",
+      "archived_source_sha256": "911ab8f3bad0d0ddb73b91234d7c2ac55277be73c2a6c7ef5efedd57cf36ab20",
+      "published_lf_sha256": "911ab8f3bad0d0ddb73b91234d7c2ac55277be73c2a6c7ef5efedd57cf36ab20"
+    },
+    "opensprite_tracker/supermimic/velocity.py": {
+      "origin": "R1 training snapshot",
+      "archived_source_sha256": "04477225d9fc6855d1b8982ea852193dac514fd0168daa1605cfef28a769d4c7",
+      "published_lf_sha256": "04477225d9fc6855d1b8982ea852193dac514fd0168daa1605cfef28a769d4c7"
+    },
+    "opensprite_tracker/supermimic/__init__.py": {
+      "origin": "R1 training snapshot",
+      "archived_source_sha256": "22dfd23678878c8431f2651853d4c9f67f3406fb29739061677ab061aebb25d2",
+      "published_lf_sha256": "22dfd23678878c8431f2651853d4c9f67f3406fb29739061677ab061aebb25d2"
+    },
+    "scripts/analyze_joint_gait.py": {
+      "origin": "R1 training snapshot",
+      "archived_source_sha256": "8e0cf0fabee5709001816c069dc785db70447114ba02e633bd3c98098daa1caf",
+      "published_lf_sha256": "8e0cf0fabee5709001816c069dc785db70447114ba02e633bd3c98098daa1caf"
+    },
+    "scripts/analyze_velocity_rollout.py": {
+      "origin": "R1 training snapshot",
+      "archived_source_sha256": "39d1abeea9d9e12de412eb5aeb30160d42dbb121fbbd720bc13cd23f74674692",
+      "published_lf_sha256": "39d1abeea9d9e12de412eb5aeb30160d42dbb121fbbd720bc13cd23f74674692"
+    },
+    "scripts/apply_low_speed_review.py": {
+      "origin": "R1 training snapshot",
+      "archived_source_sha256": "44b54c65764218e62b18b0d4ca946bf179cad9de0adc62e5fee6c3eff58ae613",
+      "published_lf_sha256": "44b54c65764218e62b18b0d4ca946bf179cad9de0adc62e5fee6c3eff58ae613"
+    },
+    "scripts/archive_results.py": {
+      "origin": "R1 training snapshot",
+      "archived_source_sha256": "e403d9230575ca27cffa64baa7d1840de00eec32bcdc02d7f51b1c0355a9a782",
+      "published_lf_sha256": "e403d9230575ca27cffa64baa7d1840de00eec32bcdc02d7f51b1c0355a9a782"
+    },
+    "scripts/assess_gait_quality.py": {
+      "origin": "R1 training snapshot",
+      "archived_source_sha256": "0607980c883edbe11f4f9b8186843fa9e93a03e05d58d4c7e5ae3ae8b0b3bc60",
+      "published_lf_sha256": "0607980c883edbe11f4f9b8186843fa9e93a03e05d58d4c7e5ae3ae8b0b3bc60"
+    },
+    "scripts/assess_teleop_candidate.py": {
+      "origin": "R1 training snapshot",
+      "archived_source_sha256": "c3f5d425d742a5958f4a01a3dae6b857cc4d08170a4d7ba203c20d77ecb043d5",
+      "published_lf_sha256": "c3f5d425d742a5958f4a01a3dae6b857cc4d08170a4d7ba203c20d77ecb043d5"
+    },
+    "scripts/audit_g71_reference.py": {
+      "origin": "R1 training snapshot",
+      "archived_source_sha256": "e47c898020253971afcdc6daca3ab9eed23ad6698731aae973114f3d4000ab79",
+      "published_lf_sha256": "e47c898020253971afcdc6daca3ab9eed23ad6698731aae973114f3d4000ab79"
+    },
+    "scripts/audit_motion_interface.py": {
+      "origin": "R1 training snapshot",
+      "archived_source_sha256": "06c15bd8b5c75694f7f549752cf4a454c410d7b83e29aec8589ec3a264c32c6e",
+      "published_lf_sha256": "06c15bd8b5c75694f7f549752cf4a454c410d7b83e29aec8589ec3a264c32c6e"
+    },
+    "scripts/audit_sole_tracking.py": {
+      "origin": "R1 training snapshot",
+      "archived_source_sha256": "1b9ed7d873dfe20b3d11ec63a07ecfbd66d6fd5b5b87c71dfa8ea91161cfd3c6",
+      "published_lf_sha256": "4031a10c378cf1f8fb8ee92657d96d2197020216ffc2ea3544a64a19630d6fac"
+    },
+    "scripts/audit_targeted_reward.py": {
+      "origin": "R1 training snapshot",
+      "archived_source_sha256": "7dd5806898b1ee23dcb268abfffb0ed3a39c0f6fccf4b6a7480b447931be4cbf",
+      "published_lf_sha256": "7dd5806898b1ee23dcb268abfffb0ed3a39c0f6fccf4b6a7480b447931be4cbf"
+    },
+    "scripts/audit_velocity_clearance.py": {
+      "origin": "R1 training snapshot",
+      "archived_source_sha256": "86a4ee88dc89d24e2a108f79e2e709b4cd7aba9a1520c1a11220fc3ceace2ae2",
+      "published_lf_sha256": "86a4ee88dc89d24e2a108f79e2e709b4cd7aba9a1520c1a11220fc3ceace2ae2"
+    },
+    "scripts/brief_training.py": {
+      "origin": "R1 training snapshot",
+      "archived_source_sha256": "04740dce2c98bbd947d1d842594514259ca7158c86cf0b73ebacc9d8c773d591",
+      "published_lf_sha256": "04740dce2c98bbd947d1d842594514259ca7158c86cf0b73ebacc9d8c773d591"
+    },
+    "scripts/build_command_seed.py": {
+      "origin": "R1 training snapshot",
+      "archived_source_sha256": "84a77fac21059c91a12efde01ec01eb3c5abf1032fb77b8092a0092bc93c9e44",
+      "published_lf_sha256": "84a77fac21059c91a12efde01ec01eb3c5abf1032fb77b8092a0092bc93c9e44"
+    },
+    "scripts/build_opensprite_model.py": {
+      "origin": "R1 training snapshot",
+      "archived_source_sha256": "f7b36d19611f32beeeea8bb6c1660bff90a6a56d6b171c2e569c343e5a886f43",
+      "published_lf_sha256": "f7b36d19611f32beeeea8bb6c1660bff90a6a56d6b171c2e569c343e5a886f43"
+    },
+    "scripts/check_correspondence_geometry.py": {
+      "origin": "R1 training snapshot",
+      "archived_source_sha256": "a780c3c4cf09735aa85ff6406872e7a4e9b911f1acc7ef4d5a69221d0e794ba8",
+      "published_lf_sha256": "a780c3c4cf09735aa85ff6406872e7a4e9b911f1acc7ef4d5a69221d0e794ba8"
+    },
+    "scripts/check_install.py": {
+      "origin": "R1 training snapshot",
+      "archived_source_sha256": "990205682207b325f55cab07055320cefe8bc24d141070fcb90c01cda65612d5",
+      "published_lf_sha256": "990205682207b325f55cab07055320cefe8bc24d141070fcb90c01cda65612d5"
+    },
+    "scripts/check_language_policy.py": {
+      "origin": "R1 training snapshot",
+      "archived_source_sha256": "0bfb8ede621cc3ddf24738fe65183f3069e5913b8d4183700a13f28466cd0dfc",
+      "published_lf_sha256": "0bfb8ede621cc3ddf24738fe65183f3069e5913b8d4183700a13f28466cd0dfc"
+    },
+    "scripts/check_mlp_precision.py": {
+      "origin": "R1 training snapshot",
+      "archived_source_sha256": "7cd30f9904b3ca9f3938b0f64dff6bbf49fd56c7437b8ff393423508d14420c2",
+      "published_lf_sha256": "7cd30f9904b3ca9f3938b0f64dff6bbf49fd56c7437b8ff393423508d14420c2"
+    },
+    "scripts/check_reference_fk_precision.py": {
+      "origin": "R1 training snapshot",
+      "archived_source_sha256": "64b82f2724cd88859703cbe6824a87e1c4f6af085164d76a2846a9a2675e9231",
+      "published_lf_sha256": "64b82f2724cd88859703cbe6824a87e1c4f6af085164d76a2846a9a2675e9231"
+    },
+    "scripts/check_retiming_consistency.py": {
+      "origin": "R1 training snapshot",
+      "archived_source_sha256": "1ea1dc5f3aa7cfba41d892a775057ee23648f83b0337f5aef751ede45bcd9f36",
+      "published_lf_sha256": "1ea1dc5f3aa7cfba41d892a775057ee23648f83b0337f5aef751ede45bcd9f36"
+    },
+    "scripts/check_velocity_task.py": {
+      "origin": "R1 training snapshot",
+      "archived_source_sha256": "82965fd2f1ab37b284d749072792323b6bd471a4e5de85a5b96f023b133131ae",
+      "published_lf_sha256": "82965fd2f1ab37b284d749072792323b6bd471a4e5de85a5b96f023b133131ae"
+    },
+    "scripts/configure_contact_retarget.py": {
+      "origin": "R1 training snapshot",
+      "archived_source_sha256": "ba698955ac2c4c6ec9cc729260089c2c71240df8ae6a9ee04cafba6ba70ba639",
+      "published_lf_sha256": "ba698955ac2c4c6ec9cc729260089c2c71240df8ae6a9ee04cafba6ba70ba639"
+    },
+    "scripts/defer_intermediate_evaluations.py": {
+      "origin": "R1 training snapshot",
+      "archived_source_sha256": "79d34c9c07b0bcf08b5731600a6909472b86d1ddd461ffd50bd854fa36030ba6",
+      "published_lf_sha256": "79d34c9c07b0bcf08b5731600a6909472b86d1ddd461ffd50bd854fa36030ba6"
+    },
+    "scripts/demo.py": {
+      "origin": "R1 training snapshot",
+      "archived_source_sha256": "e9ea39a37ccd3ca538b3a027288829a28a9b1276fbee40f898b9e6f74c4c5a66",
+      "published_lf_sha256": "e9ea39a37ccd3ca538b3a027288829a28a9b1276fbee40f898b9e6f74c4c5a66"
+    },
+    "scripts/diagnose_joint_latent.py": {
+      "origin": "R1 training snapshot",
+      "archived_source_sha256": "5c13870a76f7f56ecf5b76226b7a2453b9604bbf980721d5283beceed42a1bf7",
+      "published_lf_sha256": "5c13870a76f7f56ecf5b76226b7a2453b9604bbf980721d5283beceed42a1bf7"
+    },
+    "scripts/download_lafan_walks.py": {
+      "origin": "R1 training snapshot",
+      "archived_source_sha256": "11db8e4e8c2fae1435f6773c03496f18d8d6e164f07464b16e9b0a5c3a718b98",
+      "published_lf_sha256": "11db8e4e8c2fae1435f6773c03496f18d8d6e164f07464b16e9b0a5c3a718b98"
+    },
+    "scripts/evaluate_joint.py": {
+      "origin": "R1 training snapshot",
+      "archived_source_sha256": "1ffefcff0171fea4433b98a4e8c9824934c806eb74cd99e8811386996ef62ac9",
+      "published_lf_sha256": "1ffefcff0171fea4433b98a4e8c9824934c806eb74cd99e8811386996ef62ac9"
+    },
+    "scripts/evaluate_opensprite.py": {
+      "origin": "R1 training snapshot",
+      "archived_source_sha256": "cb9c611c9dc2ee844e29a1725eb15c8acdd0622c71fe884fa5baa40142eebb3b",
+      "published_lf_sha256": "cb9c611c9dc2ee844e29a1725eb15c8acdd0622c71fe884fa5baa40142eebb3b"
+    },
+    "scripts/evaluate_status_20261105.py": {
+      "origin": "R1 training snapshot",
+      "archived_source_sha256": "dcc28856d432ec76f05f6a86393e2abe010b44a2d78c316033affdff1ea3d1d9",
+      "published_lf_sha256": "dcc28856d432ec76f05f6a86393e2abe010b44a2d78c316033affdff1ea3d1d9"
+    },
+    "scripts/evaluate_velocity.py": {
+      "origin": "R1 training snapshot",
+      "archived_source_sha256": "d51f86e03779a1b1598d0498de0b7c35ba06e23203d97128f85b1b35f6739359",
+      "published_lf_sha256": "d51f86e03779a1b1598d0498de0b7c35ba06e23203d97128f85b1b35f6739359"
+    },
+    "scripts/export_joint.py": {
+      "origin": "R1 training snapshot",
+      "archived_source_sha256": "01adbea3d72a61f915d9729be3f61a24fc97dc15636eafda0b9ad24ad3c29147",
+      "published_lf_sha256": "01adbea3d72a61f915d9729be3f61a24fc97dc15636eafda0b9ad24ad3c29147"
+    },
+    "scripts/export_velocity.py": {
+      "origin": "R1 training snapshot",
+      "archived_source_sha256": "dfe449ab199b6714cb6bc24e891c4260a04fb4cea1bb51403404ec98d5771a49",
+      "published_lf_sha256": "dfe449ab199b6714cb6bc24e891c4260a04fb4cea1bb51403404ec98d5771a49"
+    },
+    "scripts/extract_motion_clip.py": {
+      "origin": "R1 training snapshot",
+      "archived_source_sha256": "13e9b7096ad35f5c4044c5611a1a637d57ad26c11a4eea35ddafba31c05b0fad",
+      "published_lf_sha256": "13e9b7096ad35f5c4044c5611a1a637d57ad26c11a4eea35ddafba31c05b0fad"
+    },
+    "scripts/fetch_reference_inputs.py": {
+      "origin": "R1 training snapshot",
+      "archived_source_sha256": "509c616df445ccf50e0a673d18d91c30e0a16d4056431f781a3c0db0b82e2d54",
+      "published_lf_sha256": "509c616df445ccf50e0a673d18d91c30e0a16d4056431f781a3c0db0b82e2d54"
+    },
+    "scripts/fetch_robot_assets.py": {
+      "origin": "R1 training snapshot",
+      "archived_source_sha256": "357eaf6575da32c75be22fe50d2e3060a189f2002e43f5ea7d5816f3e80fcb83",
+      "published_lf_sha256": "357eaf6575da32c75be22fe50d2e3060a189f2002e43f5ea7d5816f3e80fcb83"
+    },
+    "scripts/finalize_contact_candidate.py": {
+      "origin": "R1 training snapshot",
+      "archived_source_sha256": "2a0cbb2e4035805e67cdcefd53fb68ec3985e7d8ed039f519d2a0c92cc93c3af",
+      "published_lf_sha256": "2a0cbb2e4035805e67cdcefd53fb68ec3985e7d8ed039f519d2a0c92cc93c3af"
+    },
+    "scripts/finalize_joint_run.py": {
+      "origin": "R1 training snapshot",
+      "archived_source_sha256": "55828f6ab53cb42b8e72d4c2470429f0c06ac00541d881128de957f33e254fbf",
+      "published_lf_sha256": "55828f6ab53cb42b8e72d4c2470429f0c06ac00541d881128de957f33e254fbf"
+    },
+    "scripts/freeze_sim_baseline.py": {
+      "origin": "R1 training snapshot",
+      "archived_source_sha256": "1a51d0c82a75c9cff2b03e8b91e94c8162c649f66c81f860f1208ce19fdc928e",
+      "published_lf_sha256": "1a51d0c82a75c9cff2b03e8b91e94c8162c649f66c81f860f1208ce19fdc928e"
+    },
+    "scripts/hourly_audit.py": {
+      "origin": "R1 training snapshot",
+      "archived_source_sha256": "a8249da6a404f72d2528bfb74574be2767ed8ed0e3528f796aaa6cf6f0283cd9",
+      "published_lf_sha256": "a8249da6a404f72d2528bfb74574be2767ed8ed0e3528f796aaa6cf6f0283cd9"
+    },
+    "scripts/improvement_retention.py": {
+      "origin": "R1 training snapshot",
+      "archived_source_sha256": "fe7503d9bb33d7afa1409c3c66d3e01d9fe72fe3f3c41f738f3a5e48d81453a8",
+      "published_lf_sha256": "97eda4930ed063ef4a2d6c1d473ea7d7cbc79b940aeadfdd9aa00f9c134e3896"
+    },
+    "scripts/initial_tilt_probe.py": {
+      "origin": "R1 training snapshot",
+      "archived_source_sha256": "cbaa08780afc2964f772d6c14d682fe87f36ce44629996b8e888ad459af969fc",
+      "published_lf_sha256": "cbaa08780afc2964f772d6c14d682fe87f36ce44629996b8e888ad459af969fc"
+    },
+    "scripts/inspect_reference_clip.py": {
+      "origin": "R1 training snapshot",
+      "archived_source_sha256": "6c392be6cc7d5eebf66ebb8f9bc32fa43f5d8ba89e383c5fb2676c070c9eaf23",
+      "published_lf_sha256": "6c392be6cc7d5eebf66ebb8f9bc32fa43f5d8ba89e383c5fb2676c070c9eaf23"
+    },
+    "scripts/inspect_retarget_geometry.py": {
+      "origin": "R1 training snapshot",
+      "archived_source_sha256": "bd0e8a3a0277dfab6f1a5e223a6b43eec7b9b4ee732e0306e92a2ae2060e3f9a",
+      "published_lf_sha256": "bd0e8a3a0277dfab6f1a5e223a6b43eec7b9b4ee732e0306e92a2ae2060e3f9a"
+    },
+    "scripts/inspect_source_alignment.py": {
+      "origin": "R1 training snapshot",
+      "archived_source_sha256": "844fdf1f5bd3d8baa3ec806d840b8549a2b3dbd5746faadc246dad8896bb106e",
+      "published_lf_sha256": "844fdf1f5bd3d8baa3ec806d840b8549a2b3dbd5746faadc246dad8896bb106e"
+    },
+    "scripts/inspect_umr_correspondence.py": {
+      "origin": "R1 training snapshot",
+      "archived_source_sha256": "76ca9d2efe22b88fe42528cd2f5e30ee0032e4cbbd4740ac4c76f0ae9c87f014",
+      "published_lf_sha256": "76ca9d2efe22b88fe42528cd2f5e30ee0032e4cbbd4740ac4c76f0ae9c87f014"
+    },
+    "scripts/install_reference_bank.py": {
+      "origin": "R1 training snapshot",
+      "archived_source_sha256": "0121f767a36bdd883f83ded62161e686859ccead4d40b79f891c7fdaa238b93d",
+      "published_lf_sha256": "0121f767a36bdd883f83ded62161e686859ccead4d40b79f891c7fdaa238b93d"
+    },
+    "scripts/monitor_training.py": {
+      "origin": "R1 training snapshot",
+      "archived_source_sha256": "112d6c56c570a57e5c6af79fc32e26184596dbe540b93d6a6a0b5e134d8e7766",
+      "published_lf_sha256": "112d6c56c570a57e5c6af79fc32e26184596dbe540b93d6a6a0b5e134d8e7766"
+    },
+    "scripts/package_joint_results.py": {
+      "origin": "R1 training snapshot",
+      "archived_source_sha256": "7500b04a61476cbc99d76fcbb644318760c1715de496c02e28239ed12aed305a",
+      "published_lf_sha256": "7500b04a61476cbc99d76fcbb644318760c1715de496c02e28239ed12aed305a"
+    },
+    "scripts/pack_contact_references.py": {
+      "origin": "R1 training snapshot",
+      "archived_source_sha256": "ad9cf848370fe9fc4374102fae96d9d79868b5c2a8ef0a184efc2a9f575fcc8b",
+      "published_lf_sha256": "ad9cf848370fe9fc4374102fae96d9d79868b5c2a8ef0a184efc2a9f575fcc8b"
+    },
+    "scripts/plot_umr_correspondence.py": {
+      "origin": "R1 training snapshot",
+      "archived_source_sha256": "b0b56f1d15d7c0092472a9afbdbc10ce5fe6f499c72cc022062e74558a9e264a",
+      "published_lf_sha256": "b0b56f1d15d7c0092472a9afbdbc10ce5fe6f499c72cc022062e74558a9e264a"
+    },
+    "scripts/post_training_run002.py": {
+      "origin": "R1 training snapshot",
+      "archived_source_sha256": "374adf13eca34d7b2083b8de4d4352ab94d1a7810bdd43d9d16ea17233b15d22",
+      "published_lf_sha256": "374adf13eca34d7b2083b8de4d4352ab94d1a7810bdd43d9d16ea17233b15d22"
+    },
+    "scripts/preflight_run002.py": {
+      "origin": "R1 training snapshot",
+      "archived_source_sha256": "48a9c0db7330f79e98ffcb891a105791bc9ef4a638f0eb602832da27e4aa0c67",
+      "published_lf_sha256": "48a9c0db7330f79e98ffcb891a105791bc9ef4a638f0eb602832da27e4aa0c67"
+    },
+    "scripts/prepare_autonomy_config.py": {
+      "origin": "R1 training snapshot",
+      "archived_source_sha256": "50b744180e59cf672057bb05dd97c0b279952cff35473575d7a8dbb6bd7562e6",
+      "published_lf_sha256": "50b744180e59cf672057bb05dd97c0b279952cff35473575d7a8dbb6bd7562e6"
+    },
+    "scripts/prepare_pm01_baseline.py": {
+      "origin": "R1 training snapshot",
+      "archived_source_sha256": "6eded157c8877647915dd1597302ddae362ef307f6f1f3c53b49b8a9b9c903ac",
+      "published_lf_sha256": "6eded157c8877647915dd1597302ddae362ef307f6f1f3c53b49b8a9b9c903ac"
+    },
+    "scripts/prepare_pm01_clearance_candidate.py": {
+      "origin": "R1 training snapshot",
+      "archived_source_sha256": "aea2a3ee447c2d9d86fac1fa9ce6b72ec460031ee3d60a5eb377d5a5daf9faeb",
+      "published_lf_sha256": "aea2a3ee447c2d9d86fac1fa9ce6b72ec460031ee3d60a5eb377d5a5daf9faeb"
+    },
+    "scripts/prepare_runtime_scene_run002.py": {
+      "origin": "R1 training snapshot",
+      "archived_source_sha256": "4072b901834c8cb8f16b43c050e6e51fc9e81759a8b2044d4a69eb7b3293e302",
+      "published_lf_sha256": "4072b901834c8cb8f16b43c050e6e51fc9e81759a8b2044d4a69eb7b3293e302"
+    },
+    "scripts/prepare_slow_reference_candidate.py": {
+      "origin": "R1 training snapshot",
+      "archived_source_sha256": "98163c3902388ce02b6cb0e5114393deee3c14cc3bb3da15786882983fb647a2",
+      "published_lf_sha256": "98163c3902388ce02b6cb0e5114393deee3c14cc3bb3da15786882983fb647a2"
+    },
+    "scripts/process_reference_candidates.py": {
+      "origin": "R1 training snapshot",
+      "archived_source_sha256": "8678c7cc3d5c6d3e91f779e751fff535a21cc0dcd68fc0a7283282f03cbdc145",
+      "published_lf_sha256": "8678c7cc3d5c6d3e91f779e751fff535a21cc0dcd68fc0a7283282f03cbdc145"
+    },
+    "scripts/record_reference_review.py": {
+      "origin": "R1 training snapshot",
+      "archived_source_sha256": "be46ca17511fe8dcc89ca5348811b3463e06fa13f11ae18885d6eb21c6de80a0",
+      "published_lf_sha256": "be46ca17511fe8dcc89ca5348811b3463e06fa13f11ae18885d6eb21c6de80a0"
+    },
+    "scripts/record_retarget.py": {
+      "origin": "R1 training snapshot",
+      "archived_source_sha256": "e1ed3e3cc965b7301c113bf8afd9779827d9c8d3cd97c201db402794f2d729ac",
+      "published_lf_sha256": "e1ed3e3cc965b7301c113bf8afd9779827d9c8d3cd97c201db402794f2d729ac"
+    },
+    "scripts/refine_reference_contacts.py": {
+      "origin": "R1 training snapshot",
+      "archived_source_sha256": "ccac29945e5058d74677aa4819cf5f746f804727c20709cc2efe946c20809e03",
+      "published_lf_sha256": "ccac29945e5058d74677aa4819cf5f746f804727c20709cc2efe946c20809e03"
+    },
+    "scripts/render_reference_preview.py": {
+      "origin": "R1 training snapshot",
+      "archived_source_sha256": "19ed54e7ec1071a07a1559cc2aa0e352957c16ecc58fa96ca2d2cbdc2642eca5",
+      "published_lf_sha256": "19ed54e7ec1071a07a1559cc2aa0e352957c16ecc58fa96ca2d2cbdc2642eca5"
+    },
+    "scripts/render_reference_views.py": {
+      "origin": "R1 training snapshot",
+      "archived_source_sha256": "4713db113314b4f3b631d4a6e5e33c21a7919fad8628795380c57cc7b606b3a5",
+      "published_lf_sha256": "4713db113314b4f3b631d4a6e5e33c21a7919fad8628795380c57cc7b606b3a5"
+    },
+    "scripts/render_velocity.py": {
+      "origin": "R1 training snapshot",
+      "archived_source_sha256": "3a0302f8fdc86d34085addc86c8f99bfbbb2ed8139266981002c0d083c5cb4eb",
+      "published_lf_sha256": "3a0302f8fdc86d34085addc86c8f99bfbbb2ed8139266981002c0d083c5cb4eb"
+    },
+    "scripts/retarget_lafan.py": {
+      "origin": "R1 training snapshot",
+      "archived_source_sha256": "74f3209ea345a03e4346a9278abc4ccf78a898ff5ad1d30809cc69371536099b",
+      "published_lf_sha256": "74f3209ea345a03e4346a9278abc4ccf78a898ff5ad1d30809cc69371536099b"
+    },
+    "scripts/review_loaded_foot_slip.py": {
+      "origin": "R1 training snapshot",
+      "archived_source_sha256": "43201ae0a4bd3ebe47cb6cc58351ae58487182d9a514c93fd1f81c025938f3e3",
+      "published_lf_sha256": "43201ae0a4bd3ebe47cb6cc58351ae58487182d9a514c93fd1f81c025938f3e3"
+    },
+    "scripts/run_day_campaign.py": {
+      "origin": "R1 training snapshot",
+      "archived_source_sha256": "e7122feed8af96712be6eed50c39151e39f5c77ae0ed414dc893fd0073791a6a",
+      "published_lf_sha256": "e7122feed8af96712be6eed50c39151e39f5c77ae0ed414dc893fd0073791a6a"
+    },
+    "scripts/run_evidence_followup.py": {
+      "origin": "R1 training snapshot",
+      "archived_source_sha256": "adf25df0810099c03c71d4ba837a0907d3ba7e46db69057d0f9065afd1d8eb1c",
+      "published_lf_sha256": "adf25df0810099c03c71d4ba837a0907d3ba7e46db69057d0f9065afd1d8eb1c"
+    },
+    "scripts/run_final_readiness.py": {
+      "origin": "R1 training snapshot",
+      "archived_source_sha256": "93a0be6da5ac17d099b6363491ebcbf3d601366de61886d87dc9e82860878337",
+      "published_lf_sha256": "93a0be6da5ac17d099b6363491ebcbf3d601366de61886d87dc9e82860878337"
+    },
+    "scripts/run_posture_width_experiment.py": {
+      "origin": "R1 training snapshot",
+      "archived_source_sha256": "d34dc3fba015a665495a115e54382d8a7418dcb70e549b4c01add5f279b8bb84",
+      "published_lf_sha256": "d34dc3fba015a665495a115e54382d8a7418dcb70e549b4c01add5f279b8bb84"
+    },
+    "scripts/run_reference_fusion_campaign.py": {
+      "origin": "R1 training snapshot",
+      "archived_source_sha256": "1310852dce6ba92445be124ac872f2eddb741a51aaddeca0ddce491767f473d6",
+      "published_lf_sha256": "1310852dce6ba92445be124ac872f2eddb741a51aaddeca0ddce491767f473d6"
+    },
+    "scripts/run_requested_speed_probe.py": {
+      "origin": "R1 training snapshot",
+      "archived_source_sha256": "a352115f92b266ade36b007632868dd775e192c627644659d0ac0f5a9e6233d8",
+      "published_lf_sha256": "a352115f92b266ade36b007632868dd775e192c627644659d0ac0f5a9e6233d8"
+    },
+    "scripts/run_targeted_comparison.py": {
+      "origin": "R1 training snapshot",
+      "archived_source_sha256": "b0b0e1a84919d5f7be02d911898f10085285936ca5bdacdc52d45f41b0525c1e",
+      "published_lf_sha256": "b0b0e1a84919d5f7be02d911898f10085285936ca5bdacdc52d45f41b0525c1e"
+    },
+    "scripts/run_velocity_envelope.py": {
+      "origin": "R1 training snapshot",
+      "archived_source_sha256": "9c06a282a6bfbf86db7ede9342d292e9c76fdb4787a5fca54b7573c18b7c30b8",
+      "published_lf_sha256": "9c06a282a6bfbf86db7ede9342d292e9c76fdb4787a5fca54b7573c18b7c30b8"
+    },
+    "scripts/score_posture_width.py": {
+      "origin": "R1 training snapshot",
+      "archived_source_sha256": "3c8d0e3f07da1d2b9bab617f10ce6045c11779973426ca498fdb8f0da58c2568",
+      "published_lf_sha256": "3c8d0e3f07da1d2b9bab617f10ce6045c11779973426ca498fdb8f0da58c2568"
+    },
+    "scripts/screen_natural_lafan.py": {
+      "origin": "R1 training snapshot",
+      "archived_source_sha256": "b4eef0eed1007ab6c549ad529ad8c4ffdca1f246e5deb70d05de8cabde238e05",
+      "published_lf_sha256": "b4eef0eed1007ab6c549ad529ad8c4ffdca1f246e5deb70d05de8cabde238e05"
+    },
+    "scripts/seal_velocity_envelope.py": {
+      "origin": "R1 training snapshot",
+      "archived_source_sha256": "04ee177a091ffc3338ef969843c51d9d66dadc91504eaa506703854cb33d6597",
+      "published_lf_sha256": "04ee177a091ffc3338ef969843c51d9d66dadc91504eaa506703854cb33d6597"
+    },
+    "scripts/select_lafan_segments.py": {
+      "origin": "R1 training snapshot",
+      "archived_source_sha256": "d106df4cdb65d60e28dcb595aa3310ba06dbbb70ab35b948f1b24dc8105bbad8",
+      "published_lf_sha256": "d106df4cdb65d60e28dcb595aa3310ba06dbbb70ab35b948f1b24dc8105bbad8"
+    },
+    "scripts/snapshot_joint_run.py": {
+      "origin": "R1 training snapshot",
+      "archived_source_sha256": "a6c4da654962a89d1f1aec716bf1079d01b0b1a23dc772407d8a1c86170f97fa",
+      "published_lf_sha256": "a6c4da654962a89d1f1aec716bf1079d01b0b1a23dc772407d8a1c86170f97fa"
+    },
+    "scripts/status.py": {
+      "origin": "R1 training snapshot",
+      "archived_source_sha256": "83eb5fcd28488178e1cc70f325c229e077d6131e232505e4499a3e61c1d492dd",
+      "published_lf_sha256": "83eb5fcd28488178e1cc70f325c229e077d6131e232505e4499a3e61c1d492dd"
+    },
+    "scripts/summarize_locomotion_geometry.py": {
+      "origin": "R1 training snapshot",
+      "archived_source_sha256": "5536ef830edd10a0d67eea0aa8c7a823309b1d7c631da5c448e972cfaeaa626c",
+      "published_lf_sha256": "5536ef830edd10a0d67eea0aa8c7a823309b1d7c631da5c448e972cfaeaa626c"
+    },
+    "scripts/summarize_recovery.py": {
+      "origin": "R1 training snapshot",
+      "archived_source_sha256": "92b54558909900044b0ac1958b831b2487e74ab228b6ae1f0e8bbb8565f96ae9",
+      "published_lf_sha256": "92b54558909900044b0ac1958b831b2487e74ab228b6ae1f0e8bbb8565f96ae9"
+    },
+    "scripts/summarize_velocity_envelope.py": {
+      "origin": "R1 training snapshot",
+      "archived_source_sha256": "0aba49c7e1c6bb7401d3c606f660eb723f8791875ffe51e63bf08aff516128e4",
+      "published_lf_sha256": "0aba49c7e1c6bb7401d3c606f660eb723f8791875ffe51e63bf08aff516128e4"
+    },
+    "scripts/test_joint_gradient_routing.py": {
+      "origin": "R1 training snapshot",
+      "archived_source_sha256": "a9690961b09f0e1b5c86e5d702bcc59d83c160aee522015fbed444eeaa087640",
+      "published_lf_sha256": "a9690961b09f0e1b5c86e5d702bcc59d83c160aee522015fbed444eeaa087640"
+    },
+    "scripts/test_joint_simulation.py": {
+      "origin": "R1 training snapshot",
+      "archived_source_sha256": "175d1d187dfd4b638c178fb7f8366ec0ab8d047a0036d1ebf1811ff7712a632a",
+      "published_lf_sha256": "175d1d187dfd4b638c178fb7f8366ec0ab8d047a0036d1ebf1811ff7712a632a"
+    },
+    "scripts/test_sole_audit.py": {
+      "origin": "R1 training snapshot",
+      "archived_source_sha256": "0be32fd685b0fc96d32be76419371449a1067a8cafe3b4f7a42d3f2f6b05fea0",
+      "published_lf_sha256": "0be32fd685b0fc96d32be76419371449a1067a8cafe3b4f7a42d3f2f6b05fea0"
+    },
+    "scripts/test_velocity_torso_reward.py": {
+      "origin": "R1 training snapshot",
+      "archived_source_sha256": "f27e5465c7610afc3acb22be2ea7d0340cdcbd4fcba8ea4599efbc4a7a3a1dde",
+      "published_lf_sha256": "f27e5465c7610afc3acb22be2ea7d0340cdcbd4fcba8ea4599efbc4a7a3a1dde"
+    },
+    "scripts/training_snapshot.py": {
+      "origin": "R1 training snapshot",
+      "archived_source_sha256": "90305a093fe553f4abd74c58882de3d0f0679e5a7f4142848353038a70b38c2a",
+      "published_lf_sha256": "90305a093fe553f4abd74c58882de3d0f0679e5a7f4142848353038a70b38c2a"
+    },
+    "scripts/train_joint.py": {
+      "origin": "R1 training snapshot",
+      "archived_source_sha256": "1804f4e54d276156324109e32c5c8e9ac8c9aa13ccf5ec588465f1cab9d5f966",
+      "published_lf_sha256": "1804f4e54d276156324109e32c5c8e9ac8c9aa13ccf5ec588465f1cab9d5f966"
+    },
+    "scripts/train_opensprite.py": {
+      "origin": "R1 training snapshot",
+      "archived_source_sha256": "616c36e48927d0183015653aeae9f4700799d355ab1e3bf4a7c9effff64988c2",
+      "published_lf_sha256": "616c36e48927d0183015653aeae9f4700799d355ab1e3bf4a7c9effff64988c2"
+    },
+    "scripts/validate_opensprite_model.py": {
+      "origin": "R1 training snapshot",
+      "archived_source_sha256": "5475e6ff60f400d9cd06a01fd109af3564c41933b96359f2046ad5f2ea06af0e",
+      "published_lf_sha256": "5475e6ff60f400d9cd06a01fd109af3564c41933b96359f2046ad5f2ea06af0e"
+    },
+    "scripts/validate_opensprite_umr.py": {
+      "origin": "R1 training snapshot",
+      "archived_source_sha256": "6e47d54faea1aa9f7b9d2b7516688bdb1e71cd12ce1caf409beec17cc1cc90f7",
+      "published_lf_sha256": "6e47d54faea1aa9f7b9d2b7516688bdb1e71cd12ce1caf409beec17cc1cc90f7"
+    },
+    "scripts/validate_recovery_sim.py": {
+      "origin": "R1 training snapshot",
+      "archived_source_sha256": "25605f9d3112ef4bad4bec223734565a99919f2aeb8675edfb64b0fbf91d4b0b",
+      "published_lf_sha256": "25605f9d3112ef4bad4bec223734565a99919f2aeb8675edfb64b0fbf91d4b0b"
+    },
+    "scripts/validate_reference_bank.py": {
+      "origin": "R1 training snapshot",
+      "archived_source_sha256": "c30999f9734a790b66313536e10f87f17d81e10f2d79579ab453f579d03d6bfd",
+      "published_lf_sha256": "c30999f9734a790b66313536e10f87f17d81e10f2d79579ab453f579d03d6bfd"
+    },
+    "scripts/validate_runtime_replay.py": {
+      "origin": "R1 training snapshot",
+      "archived_source_sha256": "4421d01b7661b0098dc68b01ae356689b8b6d42a696036f2d5ce9759afa400c2",
+      "published_lf_sha256": "4421d01b7661b0098dc68b01ae356689b8b6d42a696036f2d5ce9759afa400c2"
+    },
+    "scripts/verify_fusion_export.py": {
+      "origin": "R1 training snapshot",
+      "archived_source_sha256": "b07d03c1fa5cf4e943980a5904fe9812f128bebd4aa2ca1fa32fae0279ae9679",
+      "published_lf_sha256": "b07d03c1fa5cf4e943980a5904fe9812f128bebd4aa2ca1fa32fae0279ae9679"
+    },
+    "scripts/watch_joint_training.py": {
+      "origin": "R1 training snapshot",
+      "archived_source_sha256": "f2408825dc0d7e825f2d07b6f14acc1921341e5cb44ce6717939d8833bd57fe1",
+      "published_lf_sha256": "f2408825dc0d7e825f2d07b6f14acc1921341e5cb44ce6717939d8833bd57fe1"
+    },
+    "scripts/watch_recovery_training.py": {
+      "origin": "R1 training snapshot",
+      "archived_source_sha256": "6725dc673ac294083c013579f09f10766ead630b0845b61962b4cf5e880294d5",
+      "published_lf_sha256": "6725dc673ac294083c013579f09f10766ead630b0845b61962b4cf5e880294d5"
+    },
+    "configs/posture-width-evaluation.json": {
+      "origin": "R1 training snapshot",
+      "archived_source_sha256": "3f5f63476904bfc37f5979d03dd71eb26ba088ae8177574fe7bda5741126937b",
+      "published_lf_sha256": "8eda72417a45ea5940f2f146e4b48ce2b85a5102e3ccff2718111cecceaa85e1"
+    },
+    "configs/posture-width-pilot.json": {
+      "origin": "R1 training snapshot",
+      "archived_source_sha256": "d371be1ebf8029b7a1528a8cb0bcc9882dff0d44abf658d59491ae0ba6052ffb",
+      "published_lf_sha256": "d11f25cbf04c98fdd8d41c958da796edb09779ea9cefedd6287062e7c1189b4b"
+    },
+    "configs/posture-width-selection-enabled.json": {
+      "origin": "R1 training snapshot",
+      "archived_source_sha256": "40f7a73a8abb15aa27613b65c20a441f84bfc59de944c1fcb35a5fd812a9c67d",
+      "published_lf_sha256": "40f7a73a8abb15aa27613b65c20a441f84bfc59de944c1fcb35a5fd812a9c67d"
+    },
+    "configs/retarget_inputs.json": {
+      "origin": "R1 training snapshot",
+      "archived_source_sha256": "f6a2b6c80e4a8e3b1056820d29879862f1ccdb16277473b8ef2954224c6bacfe",
+      "published_lf_sha256": "f6a2b6c80e4a8e3b1056820d29879862f1ccdb16277473b8ef2954224c6bacfe"
+    },
+    "configs/run002.json": {
+      "origin": "R1 training snapshot",
+      "archived_source_sha256": "2b22da48034ccc3fcd22e61dd90b4246180afafbaf25a9ff6d9e2868c964cfe4",
+      "published_lf_sha256": "2b22da48034ccc3fcd22e61dd90b4246180afafbaf25a9ff6d9e2868c964cfe4"
+    },
+    "configs/runtime-plant-commands.json": {
+      "origin": "R1 training snapshot",
+      "archived_source_sha256": "6feba3e6a1ec8529d1aa4bd75483974874f87ba9d4c33a5f1397e583d23b3fcd",
+      "published_lf_sha256": "6feba3e6a1ec8529d1aa4bd75483974874f87ba9d4c33a5f1397e583d23b3fcd"
+    },
+    "configs/targeted-control-20261118.json": {
+      "origin": "R1 training snapshot",
+      "archived_source_sha256": "da4b704ba300939b653065f7edf5a48bc91a6985164014551471ced02a238ac0",
+      "published_lf_sha256": "6e30c0c540dbe1cd9f71b70e1128243c143d0846e8984ed869a32d7ccd2e74b8"
+    },
+    "configs/targeted-upright-20261118.json": {
+      "origin": "R1 training snapshot",
+      "archived_source_sha256": "75dc202b1a20f96b542b3abc40295ac22553a74b70c2370bcbd1700d82442e6f",
+      "published_lf_sha256": "bed6dae5409f1913e4f602dec6026d60ab2a1790acc18c7111f61cb84c21bcc7"
+    },
+    "configs/targeted-upright-clearance-20261118.json": {
+      "origin": "R1 training snapshot",
+      "archived_source_sha256": "c9983debabc5a9c50261d409062bb3a84c70f733afe8a04ada245b5151c0ed04",
+      "published_lf_sha256": "40d102ad37f3df5c7f1884e5230de8f243d7a6090a4d14472f17878dfa8d79df"
+    },
+    "configs/velocity-recovery-evaluation.json": {
+      "origin": "R1 training snapshot",
+      "archived_source_sha256": "be74fdffa65e22e91ca468a4855ef69566e38e3b348e029a7f9db48e519d316e",
+      "published_lf_sha256": "062e86f910808409aab939bc297132671642a44394fca11bc198bcd35604a6f3"
+    },
+    "configs/velocity-v2-pm01-clearance-reference-only.json": {
+      "origin": "R1 training snapshot",
+      "archived_source_sha256": "4b4d0f75f6c89ba6ec5e1f1873e50f51d3d52c263e5b9f619244bc0ab8d99ce7",
+      "published_lf_sha256": "e8d73d612a2bb69bda0c5ba4a0b8a4146a30d6a43b987290b0d369b4e9161a62"
+    },
+    "configs/velocity-v2-pm01-clearance-sole-height.json": {
+      "origin": "R1 training snapshot",
+      "archived_source_sha256": "efb4608f4cc083397ce6a5a90786db7be353bc4a2f085c6e53fdd52bc4cc59ea",
+      "published_lf_sha256": "7479118e956c8312fc72445077af209fa1c0c76eff81b2d4d204c283ffab0fa7"
+    },
+    "configs/velocity-v2-pm01-recovery.json": {
+      "origin": "R1 training snapshot",
+      "archived_source_sha256": "17506ee6ae3d8997299179ef2f1a0ba1003e1ee639092db954a46ae3480339e7",
+      "published_lf_sha256": "b00f82321dc596f943e78073076c1074f87d231162bfd67bc3d9aa8e1d79e8f1"
+    },
+    "configs/velocity-v2.json": {
+      "origin": "R1 training snapshot",
+      "archived_source_sha256": "ad874b5a9169d1217302056e1df2a8dffcd528f0a96ef46b39ead375e1d263e7",
+      "published_lf_sha256": "7e4293a44fa2a27ee436f4dcf38b322541d6a2654028b759acf2b2613fd29843"
+    },
+    "configs/evaluation/commands.json": {
+      "origin": "R1 training snapshot",
+      "archived_source_sha256": "b40c78165082dec9092aa6cf9d84faf067eeac49b7b07bbd8a5824b310fd5a6f",
+      "published_lf_sha256": "b40c78165082dec9092aa6cf9d84faf067eeac49b7b07bbd8a5824b310fd5a6f"
+    },
+    "configs/evaluation/sequences.json": {
+      "origin": "R1 training snapshot",
+      "archived_source_sha256": "528ce358bde8dd3c9b9ad805c28c72bdc39a7854aa008279b8d8e39a14c5b90d",
+      "published_lf_sha256": "528ce358bde8dd3c9b9ad805c28c72bdc39a7854aa008279b8d8e39a14c5b90d"
+    },
+    "configs/evaluation/slew-continuous-commands.json": {
+      "origin": "R1 training snapshot",
+      "archived_source_sha256": "e96b8c49fc55d545d92591121700e1ec7c5d0673d42d1742f3e3bbcf7bcb5fbc",
+      "published_lf_sha256": "e96b8c49fc55d545d92591121700e1ec7c5d0673d42d1742f3e3bbcf7bcb5fbc"
+    },
+    "configs/evaluation/slew-static-commands.json": {
+      "origin": "R1 training snapshot",
+      "archived_source_sha256": "b3f16cea73ad278ccb490e6f35f0ec24756a5172bb936b26edb73fc8662edc62",
+      "published_lf_sha256": "b3f16cea73ad278ccb490e6f35f0ec24756a5172bb936b26edb73fc8662edc62"
+    },
+    "configs/runtime/hardware-source.json": {
+      "origin": "R1 training snapshot",
+      "archived_source_sha256": "9ddf06034f24bbca49cb06f80236caa4cea7aee0040516d11209f848da1f2c10",
+      "published_lf_sha256": "9ddf06034f24bbca49cb06f80236caa4cea7aee0040516d11209f848da1f2c10"
+    },
+    "configs/runtime/scene.json": {
+      "origin": "R1 training snapshot",
+      "archived_source_sha256": "68c25c46b7074c9138533026c2a8192477b311f40bb8f4e26e06caf6aa87f509",
+      "published_lf_sha256": "68c25c46b7074c9138533026c2a8192477b311f40bb8f4e26e06caf6aa87f509"
+    },
+    "configs/umr/opensprite.json": {
+      "origin": "R1 training snapshot",
+      "archived_source_sha256": "21444b94e86c003f8ecd9b5a8a8045f61b3a487fdb47bd9f5f495c72138616e7",
+      "published_lf_sha256": "21444b94e86c003f8ecd9b5a8a8045f61b3a487fdb47bd9f5f495c72138616e7"
+    },
+    "tests/test_day_campaign_selection.py": {
+      "origin": "R1 training snapshot",
+      "archived_source_sha256": "89eec7782171ce24f95ee6ab1b4d0823100ecdb81a9093ae139d8a249739c724",
+      "published_lf_sha256": "89eec7782171ce24f95ee6ab1b4d0823100ecdb81a9093ae139d8a249739c724"
+    },
+    "tests/test_engine_microbatch.py": {
+      "origin": "R1 training snapshot",
+      "archived_source_sha256": "f66c853319408343d74bb636e095221e0e9f460584522f3e93b5916764895941",
+      "published_lf_sha256": "f66c853319408343d74bb636e095221e0e9f460584522f3e93b5916764895941"
+    },
+    "tests/test_evaluation_continuation.py": {
+      "origin": "R1 training snapshot",
+      "archived_source_sha256": "7cd2db0f905789b102292493874e2377ff13e82b65aa6db51855fc9be9fa47b8",
+      "published_lf_sha256": "7cd2db0f905789b102292493874e2377ff13e82b65aa6db51855fc9be9fa47b8"
+    },
+    "tests/test_failure_replay.py": {
+      "origin": "R1 training snapshot",
+      "archived_source_sha256": "1e5cde91a7fb8d26c71852be02368f52bf87d44972e521976b9f70cfc0be6ac9",
+      "published_lf_sha256": "1e5cde91a7fb8d26c71852be02368f52bf87d44972e521976b9f70cfc0be6ac9"
+    },
+    "tests/test_gait_quality_selection.py": {
+      "origin": "R1 training snapshot",
+      "archived_source_sha256": "a3b241aa9c95374cabefc4730175e94eb9e97052793aefde6780f97aa9bbc200",
+      "published_lf_sha256": "a3b241aa9c95374cabefc4730175e94eb9e97052793aefde6780f97aa9bbc200"
+    },
+    "tests/test_hourly_audit.py": {
+      "origin": "R1 training snapshot",
+      "archived_source_sha256": "bf75e5cebd636e65a338a7f27ffc59fc36958e391988f78fb8e042dce960b694",
+      "published_lf_sha256": "bf75e5cebd636e65a338a7f27ffc59fc36958e391988f78fb8e042dce960b694"
+    },
+    "tests/test_initial_tilt_probe.py": {
+      "origin": "R1 training snapshot",
+      "archived_source_sha256": "182ef98031eb4d59ddd2b635ff97800f4c853a6a26b608f5626384984f44dc51",
+      "published_lf_sha256": "182ef98031eb4d59ddd2b635ff97800f4c853a6a26b608f5626384984f44dc51"
+    },
+    "tests/test_joint_v2_contract.py": {
+      "origin": "R1 training snapshot",
+      "archived_source_sha256": "8434c71c8e488eaaf5160823a7207b6b2bdae7c3219345f2309d672b8d3eda50",
+      "published_lf_sha256": "8434c71c8e488eaaf5160823a7207b6b2bdae7c3219345f2309d672b8d3eda50"
+    },
+    "tests/test_moving_sole.py": {
+      "origin": "R1 training snapshot",
+      "archived_source_sha256": "0e93f74e247d997d4254bf9d2c779f3875121f53985028dc79e7db8b021a6e14",
+      "published_lf_sha256": "0e93f74e247d997d4254bf9d2c779f3875121f53985028dc79e7db8b021a6e14"
+    },
+    "tests/test_posture_width.py": {
+      "origin": "R1 training snapshot",
+      "archived_source_sha256": "7e9adda99c5b56d470d84c5286e765e6f8e2e86dc498cf140d4b81ec58db3097",
+      "published_lf_sha256": "7e9adda99c5b56d470d84c5286e765e6f8e2e86dc498cf140d4b81ec58db3097"
+    },
+    "tests/test_recovery_curriculum.py": {
+      "origin": "R1 training snapshot",
+      "archived_source_sha256": "e898f04d14936230b83e66a1c7bf4a0ce225274dcdf3e1439287a0e6945be543",
+      "published_lf_sha256": "e898f04d14936230b83e66a1c7bf4a0ce225274dcdf3e1439287a0e6945be543"
+    },
+    "tests/test_reference_fusion_sampling.py": {
+      "origin": "R1 training snapshot",
+      "archived_source_sha256": "38c8538458fe6f1e6538db5028452c27ce0638b8e9f46951e289c89d21f84d7d",
+      "published_lf_sha256": "38c8538458fe6f1e6538db5028452c27ce0638b8e9f46951e289c89d21f84d7d"
+    },
+    "tests/test_render_continuation.py": {
+      "origin": "R1 training snapshot",
+      "archived_source_sha256": "afd7e8e1a29b1a482323e908a035cc5023c42c945c3cc278fc249a510f4b3cbe",
+      "published_lf_sha256": "afd7e8e1a29b1a482323e908a035cc5023c42c945c3cc278fc249a510f4b3cbe"
+    },
+    "tests/test_replay_storage.py": {
+      "origin": "R1 training snapshot",
+      "archived_source_sha256": "6bee01b4e6ff864d546fba8b238ba9bcec295931888a5d185d2b76ff4f3448b5",
+      "published_lf_sha256": "6bee01b4e6ff864d546fba8b238ba9bcec295931888a5d185d2b76ff4f3448b5"
+    },
+    "tests/test_resume_budget_transfer.py": {
+      "origin": "R1 training snapshot",
+      "archived_source_sha256": "c58255d3dc635e6ce463e96b7b9bba507760bdccfad3163545ed61952f511cee",
+      "published_lf_sha256": "c58255d3dc635e6ce463e96b7b9bba507760bdccfad3163545ed61952f511cee"
+    },
+    "tests/test_retarget_contract.py": {
+      "origin": "R1 training snapshot",
+      "archived_source_sha256": "6688d9b510fc3d04539743b57a10857f8c51ccfef28d1ba89819852460671146",
+      "published_lf_sha256": "6688d9b510fc3d04539743b57a10857f8c51ccfef28d1ba89819852460671146"
+    },
+    "tests/test_sole_tracking_extension.py": {
+      "origin": "R1 training snapshot",
+      "archived_source_sha256": "247f5f37c1909df6e786646e8d307eb7e7e6f9ca7aea53f538f92b96c22b1e67",
+      "published_lf_sha256": "247f5f37c1909df6e786646e8d307eb7e7e6f9ca7aea53f538f92b96c22b1e67"
+    },
+    "tests/test_standing_knee.py": {
+      "origin": "R1 training snapshot",
+      "archived_source_sha256": "d8c38007d21b031682e3bea577ab1a105a7be19d73ffdd15317d0a537a55996c",
+      "published_lf_sha256": "d8c38007d21b031682e3bea577ab1a105a7be19d73ffdd15317d0a537a55996c"
+    },
+    "tests/test_torque_lag_disabled.py": {
+      "origin": "R1 training snapshot",
+      "archived_source_sha256": "f61f500ce2fdb0cf5e5561546db06477d6ce06187a87e057459795a53336124b",
+      "published_lf_sha256": "f61f500ce2fdb0cf5e5561546db06477d6ce06187a87e057459795a53336124b"
+    },
+    "tests/test_torque_lag_training_contract.py": {
+      "origin": "R1 training snapshot",
+      "archived_source_sha256": "df0bb6080a59a235bc61ca72e8551315240036b7aa11e5926628b304c11f75fe",
+      "published_lf_sha256": "df0bb6080a59a235bc61ca72e8551315240036b7aa11e5926628b304c11f75fe"
+    },
+    "tests/test_tracker_contract.py": {
+      "origin": "R1 training snapshot",
+      "archived_source_sha256": "1618c034fb644df36a821f6ee1509f3315ccc30ecc6c15e5192bd73e0b5d1c39",
+      "published_lf_sha256": "1618c034fb644df36a821f6ee1509f3315ccc30ecc6c15e5192bd73e0b5d1c39"
+    },
+    "tests/test_training_coverage.py": {
+      "origin": "R1 training snapshot",
+      "archived_source_sha256": "839ce15576621d25f891a8edc6217449b8451e89bededbfb57119da0ae6f8a9c",
+      "published_lf_sha256": "839ce15576621d25f891a8edc6217449b8451e89bededbfb57119da0ae6f8a9c"
+    },
+    "tests/test_training_supervision.py": {
+      "origin": "R1 training snapshot",
+      "archived_source_sha256": "6b9a9f8ee89eec9b34fde05c0fca47a2677c31afb8de04321b4ab7fa32a12d1f",
+      "published_lf_sha256": "6b9a9f8ee89eec9b34fde05c0fca47a2677c31afb8de04321b4ab7fa32a12d1f"
+    },
+    "tests/test_wm_loss_scale.py": {
+      "origin": "R1 training snapshot",
+      "archived_source_sha256": "a7c27d345c3af32f14c021eb0b89a3f596b1f2876c36f23566d81d451d9475e4",
+      "published_lf_sha256": "a7c27d345c3af32f14c021eb0b89a3f596b1f2876c36f23566d81d451d9475e4"
+    },
+    "tests/test_world_model_initialization.py": {
+      "origin": "R1 training snapshot",
+      "archived_source_sha256": "7395c8ce3a7b4355ed3455bf769bb3fcb42ff2286fae4aa2866b0767e1894fe5",
+      "published_lf_sha256": "7395c8ce3a7b4355ed3455bf769bb3fcb42ff2286fae4aa2866b0767e1894fe5"
+    },
+    "runtime/native/CMakeLists.txt": {
+      "origin": "Qualified R1 Xbox300 deployment",
+      "archived_source_sha256": "6050eb5a8ce0427184ec39fcae1102e1a716863ead63104917667681a1758c8f",
+      "published_lf_sha256": "6050eb5a8ce0427184ec39fcae1102e1a716863ead63104917667681a1758c8f"
+    },
+    "runtime/native/src/action_tx_trace.hpp": {
+      "origin": "Qualified R1 Xbox300 deployment",
+      "archived_source_sha256": "6a8eea1b6ae196aa59c68fb27bae39341bd1c4fa0363627ea1c2450d3be2cceb",
+      "published_lf_sha256": "6a8eea1b6ae196aa59c68fb27bae39341bd1c4fa0363627ea1c2450d3be2cceb"
+    },
+    "runtime/native/src/bno_read_length_benchmark.cpp": {
+      "origin": "Qualified R1 Xbox300 deployment",
+      "archived_source_sha256": "79f40ae2e6e67eb0b678b2fcaca26cb9df15d096c9b775352c556d57e5390328",
+      "published_lf_sha256": "1cf6772c5d2ff8843780c4870f5d6376b7164040956908e12752660ae6404682"
+    },
+    "runtime/native/src/gamepad_disable_probe.cpp": {
+      "origin": "Qualified R1 Xbox300 deployment",
+      "archived_source_sha256": "b9ce3de4347382e1ba3ccea62dccd2425a98391aaeac6ef974f0bffd24902d48",
+      "published_lf_sha256": "3a321c90a44c7b89e521f31eee4df1533108d446ecccce2c5afb746478e40955"
+    },
+    "runtime/native/src/gamepad_probe.cpp": {
+      "origin": "Qualified R1 Xbox300 deployment",
+      "archived_source_sha256": "1ae73db8482221dbb2255138f4f56a8c017d0b2a86155424a463d55d788e0fed",
+      "published_lf_sha256": "aedb49065b704d97228be793e1503c51d8548f78f70436911c32fe5938d2a4f9"
+    },
+    "runtime/native/src/gamepad_test.cpp": {
+      "origin": "Qualified R1 Xbox300 deployment",
+      "archived_source_sha256": "53a21a9a7c2eeaf6cecb20b2c69420ab1e407046b70d8b3edf9f8b6eeb7287e8",
+      "published_lf_sha256": "7cf0913b694a488ad066c0cd90e980c95e548aa32c1ea08a94acd05d7b1a50a2"
+    },
+    "runtime/native/src/icm_packet.hpp": {
+      "origin": "Qualified R1 Xbox300 deployment",
+      "archived_source_sha256": "d2808088497e9b83920321698e648028ea023db6aad53829505031ff6f1be15b",
+      "published_lf_sha256": "748ce3f7dd3cc211d7d0083d0cf4c32fa6c204532ff040f8da6320932b2143c4"
+    },
+    "runtime/native/src/imu_packet.hpp": {
+      "origin": "Qualified R1 Xbox300 deployment",
+      "archived_source_sha256": "f3c75f1c207758596b5694175abcda2ce9f4200c4f260658650c7c19436273d3",
+      "published_lf_sha256": "6b559e44397895bca62e6fbff041dc7c1a246312ff5cce68a8bf11bd208cee7e"
+    },
+    "runtime/native/src/imu_six_axis.hpp": {
+      "origin": "Qualified R1 Xbox300 deployment",
+      "archived_source_sha256": "5ffff696c5972ce3ab800ca0d1fd322e5f60a344b2cc5a3da95471b5ccd87bde",
+      "published_lf_sha256": "bf5a51770009206fb49a2fd1a1432f0ddab92ad41d40781129c50cdf43f62a78"
+    },
+    "runtime/native/src/inference_cpu_layout.hpp": {
+      "origin": "Qualified R1 Xbox300 deployment",
+      "archived_source_sha256": "851a45b6d6cd7f0177fb877313fb3df1ff57895fb5d039d057d5becfc1fb2152",
+      "published_lf_sha256": "851a45b6d6cd7f0177fb877313fb3df1ff57895fb5d039d057d5becfc1fb2152"
+    },
+    "runtime/native/src/inference_diagnostics.hpp": {
+      "origin": "Qualified R1 Xbox300 deployment",
+      "archived_source_sha256": "0564dddfe38726005162b39af3ff735ad904d2dca47b991b1852c1e81fc9619f",
+      "published_lf_sha256": "0564dddfe38726005162b39af3ff735ad904d2dca47b991b1852c1e81fc9619f"
+    },
+    "runtime/native/src/policy_command_schedule.hpp": {
+      "origin": "Qualified R1 Xbox300 deployment",
+      "archived_source_sha256": "b20e906d42f93bc35be01c65198a191563cb058aa38502b144b31cef5dd82e24",
+      "published_lf_sha256": "8b045fc24eacf162c7c5900509873a6859b0d7e1b7b0389f6792c503b1cf2384"
+    },
+    "runtime/native/src/policy_core.hpp": {
+      "origin": "Qualified R1 Xbox300 deployment",
+      "archived_source_sha256": "c4478496f6b7ae865091c2409f193fb5c86e881836a2d9e10187210c573659a2",
+      "published_lf_sha256": "22460f975aafebeec95602a9a88a9c37d869d5cf2dbff01cecbf164e6bb4809a"
+    },
+    "runtime/native/src/policy_evidence_buffer.hpp": {
+      "origin": "Qualified R1 Xbox300 deployment",
+      "archived_source_sha256": "e4146243be3c65244332700cc4fbcff73d7e3c889aa7c1e23c1e0c73b99406bc",
+      "published_lf_sha256": "33535f5c09557a70ae98a1da784977ff106059da8fbf89755e4a0d4d267c7db3"
+    },
+    "runtime/native/src/policy_feedback.hpp": {
+      "origin": "Qualified R1 Xbox300 deployment",
+      "archived_source_sha256": "68697d194bc2abc965503846b2ce5f700fa64fb26f26a90997d8d0fc606e5a19",
+      "published_lf_sha256": "459e9718caa4b5e0c4b3f1213444720af56e7747c6ecd662a65b2c373a837944"
+    },
+    "runtime/native/src/policy_gamepad.hpp": {
+      "origin": "Qualified R1 Xbox300 deployment",
+      "archived_source_sha256": "b3c2e3ee062503b777b2210132241742876b011439ba9ec1cc317653488e5868",
+      "published_lf_sha256": "71a8408c30e8ccf464a281759bebda0bf0abc3ceb6168332b0f6682e5c70d6a8"
+    },
+    "runtime/native/src/policy_gamepad_fake.hpp": {
+      "origin": "Qualified R1 Xbox300 deployment",
+      "archived_source_sha256": "d37fde7d77802c79c0394e68a81de1ba69f2a8338e2922c981c98ff7b99c7dce",
+      "published_lf_sha256": "79a155bb83b952ecf09b2291c977441c0d06d343f95eadb4656ed292b5ad7e91"
+    },
+    "runtime/native/src/policy_gamepad_linux.hpp": {
+      "origin": "Qualified R1 Xbox300 deployment",
+      "archived_source_sha256": "c38db162c69489b75199a9d4dfe8b850042ac5d0b2b39ff2d150ca93e149f713",
+      "published_lf_sha256": "c38db162c69489b75199a9d4dfe8b850042ac5d0b2b39ff2d150ca93e149f713"
+    },
+    "runtime/native/src/policy_imu_client.hpp": {
+      "origin": "Qualified R1 Xbox300 deployment",
+      "archived_source_sha256": "519e42e43b2e0d6c1d10b766967558252cea3e17185209ee7df2e579dd70cda2",
+      "published_lf_sha256": "519e42e43b2e0d6c1d10b766967558252cea3e17185209ee7df2e579dd70cda2"
+    },
+    "runtime/native/src/policy_protection.hpp": {
+      "origin": "Qualified R1 Xbox300 deployment",
+      "archived_source_sha256": "cba37ac9385121a1978c4bef4345d3d0e27ec092430fbdbbc325de3ad43dcd6e",
+      "published_lf_sha256": "6d5b3bd760c63580264f980a5799269264ceba85bca54990cabe6d847ce0bd21"
+    },
+    "runtime/native/src/policy_state_ipc.hpp": {
+      "origin": "Qualified R1 Xbox300 deployment",
+      "archived_source_sha256": "b075c1af0ac455604f9d11cf4ebcc75881a298c13b800478bddf8f877ec3d50b",
+      "published_lf_sha256": "e0b3b8f860bed42cf7a0cdb17dc77721ef28a9c510a0e7e6679a5252c0ca4a1b"
+    },
+    "runtime/native/src/readonly_state_server.hpp": {
+      "origin": "Qualified R1 Xbox300 deployment",
+      "archived_source_sha256": "344274f36633afab711356c86c377cb56b99d20430665497145f1c8b749cc12d",
+      "published_lf_sha256": "f86b50574795f7c1ed14c8b40295e5a9fb5fbd85bfb218c16669268e60d625bd"
+    },
+    "runtime/native/src/run002_pose_limits.hpp": {
+      "origin": "Qualified R1 Xbox300 deployment",
+      "archived_source_sha256": "6888bb3c3b758650123b2d0b6706a770507b15c779aad5e9a0148b6414d08639",
+      "published_lf_sha256": "0fb5a27d747c3dfc1dee64c70a7706db90b6c1ff6ff6ba3bc4b066275ef3e035"
+    },
+    "runtime/native/src/sling_window.hpp": {
+      "origin": "Qualified R1 Xbox300 deployment",
+      "archived_source_sha256": "ae396944e3871dd03c82b01ab835e1fbb616168923a4e619d46fd80fc3aeee1e",
+      "published_lf_sha256": "ae396944e3871dd03c82b01ab835e1fbb616168923a4e619d46fd80fc3aeee1e"
+    },
+    "runtime/native/src/sprite_can_shadow.cpp": {
+      "origin": "Qualified R1 Xbox300 deployment",
+      "archived_source_sha256": "536c2aad5f787bd46ba250b754abc10de804184013f0d90a91a40b90e559fc52",
+      "published_lf_sha256": "536c2aad5f787bd46ba250b754abc10de804184013f0d90a91a40b90e559fc52"
+    },
+    "runtime/native/src/sprite_feedback_replay.cpp": {
+      "origin": "Qualified R1 Xbox300 deployment",
+      "archived_source_sha256": "0ed5d82522f0aea4852daa161d32db0d0a704eb73920bd7822b5ebd11386c5e5",
+      "published_lf_sha256": "667d3dc0ca350925136b4f950e5758f77cec1c3984f72351d0d651550dbb9266"
+    },
+    "runtime/native/src/sprite_imu_bno.cpp": {
+      "origin": "Qualified R1 Xbox300 deployment",
+      "archived_source_sha256": "bc4450ef53979c7731f8ee83dd0a6390e6547853bc6231325de08a942d563c35",
+      "published_lf_sha256": "95784cbd28421aa0be835df65c15fa1bb0c2a98abf93a01a91f28fe1539a20b6"
+    },
+    "runtime/native/src/sprite_imu_ipc_probe.cpp": {
+      "origin": "Qualified R1 Xbox300 deployment",
+      "archived_source_sha256": "34d2741266ea7f4f4349da1d334544ffb9cacd2a8bc16415a3deaf6f21d18a0d",
+      "published_lf_sha256": "8c438b191448ff274ef327ccab24544e5493e36dda69cc5605f82cb976365160"
+    },
+    "runtime/native/src/sprite_policy_replay.cpp": {
+      "origin": "Qualified R1 Xbox300 deployment",
+      "archived_source_sha256": "e9cf9e06fe0a848fe03290930c5f11a6ec9b57b88da8b911244991dfdc68096f",
+      "published_lf_sha256": "ebde30ee1123ced781b7aab5aafb74f06ce3171053a667ed3b222a1df3796ab0"
+    },
+    "runtime/native/src/sprite_protection_replay.cpp": {
+      "origin": "Qualified R1 Xbox300 deployment",
+      "archived_source_sha256": "fe9dc0580f603b2419e17c5f7f27d9322f16d7e73001a2d1af38f655406db3b9",
+      "published_lf_sha256": "7c1cae5c51eef4bbd15d1f2921fb979f8eed33c6d08e9cf726c03e131c685ae6"
+    },
+    "runtime/native/src/sprite_rt_timing.cpp": {
+      "origin": "Qualified R1 Xbox300 deployment",
+      "archived_source_sha256": "e446f047b1eedc82ef10743ae8b8b2d366813348d2457ace2e8e6514c87fa669",
+      "published_lf_sha256": "4acacc9e51bbf519f28b6a932f349620b45448c4c64ccb3578a66f98f16499b6"
+    },
+    "runtime/native/src/sprite_state_ipc_probe.cpp": {
+      "origin": "Qualified R1 Xbox300 deployment",
+      "archived_source_sha256": "f32ec5618bd1b0b940f3ac3129c6d2d8ad51e0df835902c00cb681f61f4f7851",
+      "published_lf_sha256": "db5c7d6b89944221e4c0b6bfe27376f78930144df7d1cf909a97e9e29ef9e153"
+    },
+    "runtime/native/src/sprite_supermimic_pose_gate.cpp": {
+      "origin": "Qualified R1 Xbox300 deployment",
+      "archived_source_sha256": "29a6ef26effb2a223d364e36d8154060d2c2059d32a668e9186cf99f25920f88",
+      "published_lf_sha256": "e4d7151a0fa44663a21d43dc1dec8ca5814ca5ad74a9c68520a13b43d0d0ca41"
+    },
+    "runtime/native/src/sprite_supermimic_replay.cpp": {
+      "origin": "Qualified R1 Xbox300 deployment",
+      "archived_source_sha256": "148965a46dabfbc62af3f69fd6c4bf283d96866b1d6834fafb96185ffe73c69f",
+      "published_lf_sha256": "148965a46dabfbc62af3f69fd6c4bf283d96866b1d6834fafb96185ffe73c69f"
+    },
+    "runtime/native/src/test_xbox120_options.cpp": {
+      "origin": "Qualified R1 Xbox300 deployment",
+      "archived_source_sha256": "0042caceecf33fe6a94a1aa7638c2ebccbf0936f20fe03cc95392da53813464e",
+      "published_lf_sha256": "a2c302ec9f56ea78d838920d32801d424e340d94af1f4cdcd35dea7f0d19dada"
+    },
+    "runtime/native/src/zero_gain_can_probe.cpp": {
+      "origin": "Qualified R1 Xbox300 deployment",
+      "archived_source_sha256": "d285c53ee65bfa3c2d29b764f5fefff82c72c1a240f4d16380ca438b07c6548b",
+      "published_lf_sha256": "badcd21b21ad68e59482162f038be948a015bdac5008a74d2284bbda20f0bbcc"
+    },
+    "runtime/native/tests/test_action_tx.cpp": {
+      "origin": "Qualified R1 Xbox300 deployment",
+      "archived_source_sha256": "59af16d311badb801437e01a3651f8517348ea47646888de7dc6de258f14812b",
+      "published_lf_sha256": "59af16d311badb801437e01a3651f8517348ea47646888de7dc6de258f14812b"
+    },
+    "runtime/native/tests/test_atomic_commit.inc": {
+      "origin": "Qualified R1 Xbox300 deployment",
+      "archived_source_sha256": "78198d0edfc206525194f466288b1aed7c384ddacb9e58d479522a3795e0c718",
+      "published_lf_sha256": "78198d0edfc206525194f466288b1aed7c384ddacb9e58d479522a3795e0c718"
+    },
+    "runtime/native/tests/test_bounded_preview.cpp": {
+      "origin": "Qualified R1 Xbox300 deployment",
+      "archived_source_sha256": "06ba6dd6f592976208edc04f9bdee7e711d6fb9b82203816d5f8ff53fa1ff969",
+      "published_lf_sha256": "06ba6dd6f592976208edc04f9bdee7e711d6fb9b82203816d5f8ff53fa1ff969"
+    },
+    "runtime/native/tests/test_feedback_observation.inc": {
+      "origin": "Qualified R1 Xbox300 deployment",
+      "archived_source_sha256": "9c0036a50f1b872d147c712f23677d83d5c3c9ff5407bce263fc979441fa6be2",
+      "published_lf_sha256": "9c0036a50f1b872d147c712f23677d83d5c3c9ff5407bce263fc979441fa6be2"
+    },
+    "runtime/native/tests/test_gamepad_control.cpp": {
+      "origin": "Qualified R1 Xbox300 deployment",
+      "archived_source_sha256": "060d3a8258d0d7522eae4c3d01497bc73f2d3c84c0dd81c707660b9abe3f679e",
+      "published_lf_sha256": "060d3a8258d0d7522eae4c3d01497bc73f2d3c84c0dd81c707660b9abe3f679e"
+    },
+    "runtime/native/tests/test_imu_packet.cpp": {
+      "origin": "Qualified R1 Xbox300 deployment",
+      "archived_source_sha256": "6965c0aaa8bb512a9c6407b7dffe51441508e6f0b71ff3291a93d35deda6d798",
+      "published_lf_sha256": "5cd326e36c1a6c1996ef13cf7a888f059138cd9c268e44d58d8cbeebe2e83ab1"
+    },
+    "runtime/native/tests/test_imu_six_axis.cpp": {
+      "origin": "Qualified R1 Xbox300 deployment",
+      "archived_source_sha256": "3de6a44d64776926c65f1923e94cc90c609e91bfb4dbba528b376c5c17368f93",
+      "published_lf_sha256": "b6374d7ed89887bc9f5909b517853f6d89ae54522e21fb3b642a1796fccbe763"
+    },
+    "runtime/native/tests/test_policy_command_schedule.cpp": {
+      "origin": "Qualified R1 Xbox300 deployment",
+      "archived_source_sha256": "62f355ac4e2e14e5cb0ba25f2ed5b4ac8d7af926464297b963e4cef0cffd6141",
+      "published_lf_sha256": "575e0c64776fb743d7fb12f1b877d572d396cf5c478f76594d0c8dee1620668b"
+    },
+    "runtime/native/tests/test_policy_completion.cpp": {
+      "origin": "Qualified R1 Xbox300 deployment",
+      "archived_source_sha256": "d6ac26dc51febf81760d435410be0233d798f86c4658dd7f667d7670d1ac3de3",
+      "published_lf_sha256": "a25f058b9d6051aee8c761cb69a24540fc11780c3f20ee61a5ce5bec8d7f1c2a"
+    },
+    "runtime/native/tests/test_policy_core.cpp": {
+      "origin": "Qualified R1 Xbox300 deployment",
+      "archived_source_sha256": "403f0238f4ef22c9dddabfb918640e43481a3874b531f572756e406fbc94008e",
+      "published_lf_sha256": "5e49425b5cbd0b01ca619dd97afae457b30f8c01a608a66b5294bedd7f5b1a08"
+    },
+    "runtime/native/tests/test_policy_evidence_buffer.cpp": {
+      "origin": "Qualified R1 Xbox300 deployment",
+      "archived_source_sha256": "62f5155ce79813607c00876603c9de9d798bf94573a3c1ad5d35f4451a6fcc0f",
+      "published_lf_sha256": "3b69402e8c1852ee1d04305e3d92c1452312fe743f4b830c576cbb6b6cdb6f96"
+    },
+    "runtime/native/tests/test_readonly_state_server.cpp": {
+      "origin": "Qualified R1 Xbox300 deployment",
+      "archived_source_sha256": "8450950e95da499afe770252f173ff1750e4f02f491a76d99ec99d464c7fc0d4",
+      "published_lf_sha256": "401a3d8adf1394ce66ebdf75266e10eaee160bcd5ae456597c465dd38aa3c315"
+    },
+    "runtime/native/tests/test_supermimic_core.cpp": {
+      "origin": "Qualified R1 Xbox300 deployment",
+      "archived_source_sha256": "2a7e3c47feeb27f0bcafdf60dd3baef8c5c354c6bff9c1d80577a817ce913ab5",
+      "published_lf_sha256": "b8516355074bc02d5991035070ecf031e443f545dadc02e1c757dd3a1645766f"
+    },
+    "runtime/src/open_sprite_runtime/action_trace_replay.py": {
+      "origin": "Qualified R1 Xbox300 deployment",
+      "archived_source_sha256": "1719a8037393c8c3336be750be5c21dbdc602bb81780abad06bc375351d66ac9",
+      "published_lf_sha256": "1719a8037393c8c3336be750be5c21dbdc602bb81780abad06bc375351d66ac9"
+    },
+    "runtime/src/open_sprite_runtime/ankle.py": {
+      "origin": "Qualified R1 Xbox300 deployment",
+      "archived_source_sha256": "382ee461668d6d162f4df86a8a67f473ee6a0f4ec698e1bde82e971248161b2b",
+      "published_lf_sha256": "382ee461668d6d162f4df86a8a67f473ee6a0f4ec698e1bde82e971248161b2b"
+    },
+    "runtime/src/open_sprite_runtime/ankle_pair_commissioning.py": {
+      "origin": "Qualified R1 Xbox300 deployment",
+      "archived_source_sha256": "27d0176b5ef4b4f4671d8bfa65196fdcaedcca76ec4defcdf02e5a8a55097a40",
+      "published_lf_sha256": "27d0176b5ef4b4f4671d8bfa65196fdcaedcca76ec4defcdf02e5a8a55097a40"
+    },
+    "runtime/src/open_sprite_runtime/bno055.py": {
+      "origin": "Qualified R1 Xbox300 deployment",
+      "archived_source_sha256": "7064ea96db3ed819c12f59ee9b6cc19093e2ccb6e8f719d0e5fa151c707c8fe4",
+      "published_lf_sha256": "7064ea96db3ed819c12f59ee9b6cc19093e2ccb6e8f719d0e5fa151c707c8fe4"
+    },
+    "runtime/src/open_sprite_runtime/bno055_source.py": {
+      "origin": "Qualified R1 Xbox300 deployment",
+      "archived_source_sha256": "91f504387ce4f53718b5410a115df4dd19f29c99e97f84df0fbeb993ae163cf6",
+      "published_lf_sha256": "91f504387ce4f53718b5410a115df4dd19f29c99e97f84df0fbeb993ae163cf6"
+    },
+    "runtime/src/open_sprite_runtime/cli.py": {
+      "origin": "Qualified R1 Xbox300 deployment",
+      "archived_source_sha256": "70ef184d0523064a3c2ba0e54e98e42835586803b88e99555af4850009fa71f8",
+      "published_lf_sha256": "70ef184d0523064a3c2ba0e54e98e42835586803b88e99555af4850009fa71f8"
+    },
+    "runtime/src/open_sprite_runtime/command_schedule.py": {
+      "origin": "Qualified R1 Xbox300 deployment",
+      "archived_source_sha256": "30837b1b3e10ac72298601c4357f70c7f15618374d72c16f5163f57a29156c20",
+      "published_lf_sha256": "30837b1b3e10ac72298601c4357f70c7f15618374d72c16f5163f57a29156c20"
+    },
+    "runtime/src/open_sprite_runtime/command_slew.py": {
+      "origin": "Qualified R1 Xbox300 deployment",
+      "archived_source_sha256": "434ac79cdbc50b4d9096e28e103ac877f960ec8bc804a8a3acaab6a25efbe302",
+      "published_lf_sha256": "434ac79cdbc50b4d9096e28e103ac877f960ec8bc804a8a3acaab6a25efbe302"
+    },
+    "runtime/src/open_sprite_runtime/contracts.py": {
+      "origin": "Qualified R1 Xbox300 deployment",
+      "archived_source_sha256": "4733161cc4cf8b648a41c050286e7b274bc83cc99741a4dc0853660e6a288b81",
+      "published_lf_sha256": "4733161cc4cf8b648a41c050286e7b274bc83cc99741a4dc0853660e6a288b81"
+    },
+    "runtime/src/open_sprite_runtime/damiao.py": {
+      "origin": "Qualified R1 Xbox300 deployment",
+      "archived_source_sha256": "25b850ca0a77cd8523a355b2d23b180ed9528d94580749773aafe4ee6b7be9a7",
+      "published_lf_sha256": "25b850ca0a77cd8523a355b2d23b180ed9528d94580749773aafe4ee6b7be9a7"
+    },
+    "runtime/src/open_sprite_runtime/damiao_registers.py": {
+      "origin": "Qualified R1 Xbox300 deployment",
+      "archived_source_sha256": "09228cc0609bffb96a558261adea69c6bd7c5edc0aef42b3b2fc3deb3b2820d3",
+      "published_lf_sha256": "09228cc0609bffb96a558261adea69c6bd7c5edc0aef42b3b2fc3deb3b2820d3"
+    },
+    "runtime/src/open_sprite_runtime/full_body_probe.py": {
+      "origin": "Qualified R1 Xbox300 deployment",
+      "archived_source_sha256": "9901e0533b330e9fa049f3af7ea5799e4b709fbd3e0dd43989cf8a2ebee3a3f4",
+      "published_lf_sha256": "9901e0533b330e9fa049f3af7ea5799e4b709fbd3e0dd43989cf8a2ebee3a3f4"
+    },
+    "runtime/src/open_sprite_runtime/handoff.py": {
+      "origin": "Qualified R1 Xbox300 deployment",
+      "archived_source_sha256": "6d737108390c8b4b6646480284a0bd339976c4b6515a905c2367a88173e1bc07",
+      "published_lf_sha256": "6d737108390c8b4b6646480284a0bd339976c4b6515a905c2367a88173e1bc07"
+    },
+    "runtime/src/open_sprite_runtime/hardware.py": {
+      "origin": "Qualified R1 Xbox300 deployment",
+      "archived_source_sha256": "69a5dbb0f2b8d587edd5e78f1a8d0d35f63a7d0f90993ff457fafd00e6090dee",
+      "published_lf_sha256": "69a5dbb0f2b8d587edd5e78f1a8d0d35f63a7d0f90993ff457fafd00e6090dee"
+    },
+    "runtime/src/open_sprite_runtime/heading.py": {
+      "origin": "Qualified R1 Xbox300 deployment",
+      "archived_source_sha256": "c9765a99d32f7dcf71c9a6d03786e8aa2e0ebc5943eefb67435766129925a175",
+      "published_lf_sha256": "c9765a99d32f7dcf71c9a6d03786e8aa2e0ebc5943eefb67435766129925a175"
+    },
+    "runtime/src/open_sprite_runtime/imu.py": {
+      "origin": "Qualified R1 Xbox300 deployment",
+      "archived_source_sha256": "8f8c691bc0cc4af43ae4fe049a12b2b305b008532cbdb0538b9e979fbfa25416",
+      "published_lf_sha256": "8f8c691bc0cc4af43ae4fe049a12b2b305b008532cbdb0538b9e979fbfa25416"
+    },
+    "runtime/src/open_sprite_runtime/imu_commissioning.py": {
+      "origin": "Qualified R1 Xbox300 deployment",
+      "archived_source_sha256": "2809e05f76ca3194706ac8337ecbfd43c5c45fc5baa6ee37fedef5e30d0d6fa9",
+      "published_lf_sha256": "2809e05f76ca3194706ac8337ecbfd43c5c45fc5baa6ee37fedef5e30d0d6fa9"
+    },
+    "runtime/src/open_sprite_runtime/imu_fusion.py": {
+      "origin": "Qualified R1 Xbox300 deployment",
+      "archived_source_sha256": "7527d5fd3ae66e233c7e86c5a4e6a8f9c3866f638552e57366cca6dfb959e997",
+      "published_lf_sha256": "7527d5fd3ae66e233c7e86c5a4e6a8f9c3866f638552e57366cca6dfb959e997"
+    },
+    "runtime/src/open_sprite_runtime/imu_receive.py": {
+      "origin": "Qualified R1 Xbox300 deployment",
+      "archived_source_sha256": "7bd1f5eb26b46dada752747ece2cb00a279000dc92797e406001df5349e6773e",
+      "published_lf_sha256": "7bd1f5eb26b46dada752747ece2cb00a279000dc92797e406001df5349e6773e"
+    },
+    "runtime/src/open_sprite_runtime/imu_serial.py": {
+      "origin": "Qualified R1 Xbox300 deployment",
+      "archived_source_sha256": "2324202e9806910523a2aebe0c704b3f4bc0eafedb77f67283442c4a5f21c5ca",
+      "published_lf_sha256": "2324202e9806910523a2aebe0c704b3f4bc0eafedb77f67283442c4a5f21c5ca"
+    },
+    "runtime/src/open_sprite_runtime/limit_derivation.py": {
+      "origin": "Qualified R1 Xbox300 deployment",
+      "archived_source_sha256": "dca13963f24075cdcf75340748ae5a152914de3256360599447cf299f3ccc536",
+      "published_lf_sha256": "dca13963f24075cdcf75340748ae5a152914de3256360599447cf299f3ccc536"
+    },
+    "runtime/src/open_sprite_runtime/motor_group_hold.py": {
+      "origin": "Qualified R1 Xbox300 deployment",
+      "archived_source_sha256": "e41bfb5d664c51715fd617d3ece99b5ec84fcbaf97ef20ac08453fd2c1fdceaa",
+      "published_lf_sha256": "e41bfb5d664c51715fd617d3ece99b5ec84fcbaf97ef20ac08453fd2c1fdceaa"
+    },
+    "runtime/src/open_sprite_runtime/motor_mapping.py": {
+      "origin": "Qualified R1 Xbox300 deployment",
+      "archived_source_sha256": "75644ed07724e4f6c86fad5ff0090a99afdbfcbe6cbf557783a59f7dd566e113",
+      "published_lf_sha256": "75644ed07724e4f6c86fad5ff0090a99afdbfcbe6cbf557783a59f7dd566e113"
+    },
+    "runtime/src/open_sprite_runtime/mujoco_rx_viewer.py": {
+      "origin": "Qualified R1 Xbox300 deployment",
+      "archived_source_sha256": "ba1c62852097a4998257c0e80bfae1504ca3adaacfc30b00727d7d2233741884",
+      "published_lf_sha256": "ba1c62852097a4998257c0e80bfae1504ca3adaacfc30b00727d7d2233741884"
+    },
+    "runtime/src/open_sprite_runtime/multirate_control.py": {
+      "origin": "Qualified R1 Xbox300 deployment",
+      "archived_source_sha256": "f0dad7c1f1766e06028a5e548b9ccd3a1a9db55d05695263cc8d046c828fecf1",
+      "published_lf_sha256": "f0dad7c1f1766e06028a5e548b9ccd3a1a9db55d05695263cc8d046c828fecf1"
+    },
+    "runtime/src/open_sprite_runtime/native_bno_source.py": {
+      "origin": "Qualified R1 Xbox300 deployment",
+      "archived_source_sha256": "3501d6dddead360ce7d623cef758a0e8dcb8bca5a3b2e117f607080a5089e0b8",
+      "published_lf_sha256": "3501d6dddead360ce7d623cef758a0e8dcb8bca5a3b2e117f607080a5089e0b8"
+    },
+    "runtime/src/open_sprite_runtime/native_imu_packet.py": {
+      "origin": "Qualified R1 Xbox300 deployment",
+      "archived_source_sha256": "6eb984279d1b928d60c3c01e1c62fc6f0082ee676a335ec0d60ea3e80607c5c3",
+      "published_lf_sha256": "6eb984279d1b928d60c3c01e1c62fc6f0082ee676a335ec0d60ea3e80607c5c3"
+    },
+    "runtime/src/open_sprite_runtime/native_ipc.py": {
+      "origin": "Qualified R1 Xbox300 deployment",
+      "archived_source_sha256": "2a3dca44fa78ba99ba44d8f1284846146dfb4a2d91a0ddf815f5ddaecb1ab4a1",
+      "published_lf_sha256": "2a3dca44fa78ba99ba44d8f1284846146dfb4a2d91a0ddf815f5ddaecb1ab4a1"
+    },
+    "runtime/src/open_sprite_runtime/native_ipc_fault_client.py": {
+      "origin": "Qualified R1 Xbox300 deployment",
+      "archived_source_sha256": "6782547f6ab13f9c26a3b9e239de9711060dfc84efa85e1657433a3a513bb6a8",
+      "published_lf_sha256": "6782547f6ab13f9c26a3b9e239de9711060dfc84efa85e1657433a3a513bb6a8"
+    },
+    "runtime/src/open_sprite_runtime/native_policy_client.py": {
+      "origin": "Qualified R1 Xbox300 deployment",
+      "archived_source_sha256": "78873505312370e6a2965c76146eed871426d4a1b7188d6f5f41cdab30d80d0b",
+      "published_lf_sha256": "78873505312370e6a2965c76146eed871426d4a1b7188d6f5f41cdab30d80d0b"
+    },
+    "runtime/src/open_sprite_runtime/physical_startup.py": {
+      "origin": "Qualified R1 Xbox300 deployment",
+      "archived_source_sha256": "79cbe0e76ee915fb79335243c4813e34afe84a6bf8a304207c08d20f7b4f4ba4",
+      "published_lf_sha256": "79cbe0e76ee915fb79335243c4813e34afe84a6bf8a304207c08d20f7b4f4ba4"
+    },
+    "runtime/src/open_sprite_runtime/policy_shadow.py": {
+      "origin": "Qualified R1 Xbox300 deployment",
+      "archived_source_sha256": "20ccfa405d677457d50b72d750297d076abb8ab5bf3c18bcf55482ccd56607b9",
+      "published_lf_sha256": "20ccfa405d677457d50b72d750297d076abb8ab5bf3c18bcf55482ccd56607b9"
+    },
+    "runtime/src/open_sprite_runtime/safety.py": {
+      "origin": "Qualified R1 Xbox300 deployment",
+      "archived_source_sha256": "c57dec3926d869e6efe668ae89166f3c64f38003a1c86f6ef5df3759bd1bde84",
+      "published_lf_sha256": "c57dec3926d869e6efe668ae89166f3c64f38003a1c86f6ef5df3759bd1bde84"
+    },
+    "runtime/src/open_sprite_runtime/scheduled_drives.py": {
+      "origin": "Qualified R1 Xbox300 deployment",
+      "archived_source_sha256": "9858cbf9c90b97ac3bc87701f8faa3014b84a52d05a9aec8237b49e9553f50ab",
+      "published_lf_sha256": "9858cbf9c90b97ac3bc87701f8faa3014b84a52d05a9aec8237b49e9553f50ab"
+    },
+    "runtime/src/open_sprite_runtime/session_heading.py": {
+      "origin": "Qualified R1 Xbox300 deployment",
+      "archived_source_sha256": "a61e604e2cbcdd635b7a13810cad190a486decf7d23e432d18cc85e74cf1cbe3",
+      "published_lf_sha256": "a61e604e2cbcdd635b7a13810cad190a486decf7d23e432d18cc85e74cf1cbe3"
+    },
+    "runtime/src/open_sprite_runtime/shadow.py": {
+      "origin": "Qualified R1 Xbox300 deployment",
+      "archived_source_sha256": "fe131c27c6cc8718b4d7613ed04a6ce3c86aee8e03e6b15aafd8df4fc0faca42",
+      "published_lf_sha256": "fe131c27c6cc8718b4d7613ed04a6ce3c86aee8e03e6b15aafd8df4fc0faca42"
+    },
+    "runtime/src/open_sprite_runtime/simulation_drives.py": {
+      "origin": "Qualified R1 Xbox300 deployment",
+      "archived_source_sha256": "20b1f5b9e87fe5c9cff22487e4ef667bf8afa6e04d2c2fae72bb3263f52d0ce2",
+      "published_lf_sha256": "20b1f5b9e87fe5c9cff22487e4ef667bf8afa6e04d2c2fae72bb3263f52d0ce2"
+    },
+    "runtime/src/open_sprite_runtime/single_joint_hold.py": {
+      "origin": "Qualified R1 Xbox300 deployment",
+      "archived_source_sha256": "56e4d8a0aa3f4757751980823e1ba87c054ae6323b3fb6d7e3ad2e1a0f7af0c7",
+      "published_lf_sha256": "56e4d8a0aa3f4757751980823e1ba87c054ae6323b3fb6d7e3ad2e1a0f7af0c7"
+    },
+    "runtime/src/open_sprite_runtime/socketcan.py": {
+      "origin": "Qualified R1 Xbox300 deployment",
+      "archived_source_sha256": "d719820478a72e9c8cb72b4f9f3d2e376f0481d3e8e2760f468498ee7384560d",
+      "published_lf_sha256": "d719820478a72e9c8cb72b4f9f3d2e376f0481d3e8e2760f468498ee7384560d"
+    },
+    "runtime/src/open_sprite_runtime/supermimic_replay.py": {
+      "origin": "Qualified R1 Xbox300 deployment",
+      "archived_source_sha256": "f2aa5d9cfb9e26032aac8349b659d79ddc3deb84cc62c32c0ac3af1c50cfcbf5",
+      "published_lf_sha256": "f2aa5d9cfb9e26032aac8349b659d79ddc3deb84cc62c32c0ac3af1c50cfcbf5"
+    },
+    "runtime/src/open_sprite_runtime/supermimic_run002.py": {
+      "origin": "Qualified R1 Xbox300 deployment",
+      "archived_source_sha256": "e91ae22a3a93827746b1c0a040e121630248eda4c505adf9aa8af5cdc964bc46",
+      "published_lf_sha256": "e91ae22a3a93827746b1c0a040e121630248eda4c505adf9aa8af5cdc964bc46"
+    },
+    "runtime/src/open_sprite_runtime/supported_startup.py": {
+      "origin": "Qualified R1 Xbox300 deployment",
+      "archived_source_sha256": "3c56751d6bb22dae5ff7ad1ff8fd86bee9290e65e9381c2d6a14512ae486a79a",
+      "published_lf_sha256": "3c56751d6bb22dae5ff7ad1ff8fd86bee9290e65e9381c2d6a14512ae486a79a"
+    },
+    "runtime/src/open_sprite_runtime/system_id_capture.py": {
+      "origin": "Qualified R1 Xbox300 deployment",
+      "archived_source_sha256": "8846137f5b8bf4f093c869ec6253f2536a32bf348571b0c60b3f406779b1e7de",
+      "published_lf_sha256": "8846137f5b8bf4f093c869ec6253f2536a32bf348571b0c60b3f406779b1e7de"
+    },
+    "runtime/src/open_sprite_runtime/system_id_merge.py": {
+      "origin": "Qualified R1 Xbox300 deployment",
+      "archived_source_sha256": "0f31a28a5d274b2bead3db647956d10681b402d64f64e9afb3430669dc64d131",
+      "published_lf_sha256": "0f31a28a5d274b2bead3db647956d10681b402d64f64e9afb3430669dc64d131"
+    },
+    "runtime/src/open_sprite_runtime/target_projection.py": {
+      "origin": "Qualified R1 Xbox300 deployment",
+      "archived_source_sha256": "61e012ccc42fe607e42805ebdf7729be2bcde280063c22023c89bd81a61fde7f",
+      "published_lf_sha256": "61e012ccc42fe607e42805ebdf7729be2bcde280063c22023c89bd81a61fde7f"
+    },
+    "runtime/src/open_sprite_runtime/telemetry.py": {
+      "origin": "Qualified R1 Xbox300 deployment",
+      "archived_source_sha256": "64b1aab72e5008869c3325ca3a8b255e97f0ec2c5a915ae403a7d1bb8a03bc72",
+      "published_lf_sha256": "64b1aab72e5008869c3325ca3a8b255e97f0ec2c5a915ae403a7d1bb8a03bc72"
+    },
+    "runtime/src/open_sprite_runtime/timing.py": {
+      "origin": "Qualified R1 Xbox300 deployment",
+      "archived_source_sha256": "1f2005589be180b5749617a8243407aa5d81bf59dcae7687a1670e0207d613d4",
+      "published_lf_sha256": "1f2005589be180b5749617a8243407aa5d81bf59dcae7687a1670e0207d613d4"
+    },
+    "runtime/src/open_sprite_runtime/yahboom_imu.py": {
+      "origin": "Qualified R1 Xbox300 deployment",
+      "archived_source_sha256": "d788c463ecb180c82979e19d6a84f0e64576bb8397985eaf84cca6f44071c665",
+      "published_lf_sha256": "d788c463ecb180c82979e19d6a84f0e64576bb8397985eaf84cca6f44071c665"
+    },
+    "runtime/src/open_sprite_runtime/__init__.py": {
+      "origin": "Qualified R1 Xbox300 deployment",
+      "archived_source_sha256": "5b79ff4eb7a76271775c762b0500e02f2c0be2bfdac2d7bf8242a7190001bb68",
+      "published_lf_sha256": "5b79ff4eb7a76271775c762b0500e02f2c0be2bfdac2d7bf8242a7190001bb68"
+    },
+    "runtime/tools/action_tx_audit.py": {
+      "origin": "Qualified R1 Xbox300 deployment",
+      "archived_source_sha256": "79371a8a147b15f02c616367fa55fe5cc2c58c4ae5aebc998819602ad24e3bb8",
+      "published_lf_sha256": "79371a8a147b15f02c616367fa55fe5cc2c58c4ae5aebc998819602ad24e3bb8"
+    },
+    "runtime/tools/can_tx_timestamp_setup.py": {
+      "origin": "Qualified R1 Xbox300 deployment",
+      "archived_source_sha256": "ebdb2d9c3c4ba7d3066ce64ba7904d6b85abe7c513b8adf9c42df598c8367354",
+      "published_lf_sha256": "ebdb2d9c3c4ba7d3066ce64ba7904d6b85abe7c513b8adf9c42df598c8367354"
+    },
+    "runtime/tools/cpu_frequency_client.py": {
+      "origin": "Qualified R1 Xbox300 deployment",
+      "archived_source_sha256": "0e9bf869466aebcd6043a9178c459b58a3752817f349caa68b92012af8976f29",
+      "published_lf_sha256": "0e9bf869466aebcd6043a9178c459b58a3752817f349caa68b92012af8976f29"
+    },
+    "runtime/tools/cpu_frequency_guard.py": {
+      "origin": "Qualified R1 Xbox300 deployment",
+      "archived_source_sha256": "5b2b9a4c25f4f75cf6252a222874798cbe0bd5f9716fac886741be2f594a2ace",
+      "published_lf_sha256": "5b2b9a4c25f4f75cf6252a222874798cbe0bd5f9716fac886741be2f594a2ace"
+    },
+    "runtime/tools/install_cpu_frequency_guard.sh": {
+      "origin": "Qualified R1 Xbox300 deployment",
+      "archived_source_sha256": "4cbeddb2193078425a21a14b472404f7f1d973870c3e6b2736f3d036962fccbf",
+      "published_lf_sha256": "4cbeddb2193078425a21a14b472404f7f1d973870c3e6b2736f3d036962fccbf"
+    },
+    "runtime/tools/run_supermimic_commissioning.py": {
+      "origin": "Qualified R1 Xbox300 deployment",
+      "archived_source_sha256": "a205de2d1f47ae756c6941f094ea20869101106863a8c9121e3cc5e91201a08c",
+      "published_lf_sha256": "a205de2d1f47ae756c6941f094ea20869101106863a8c9121e3cc5e91201a08c"
+    }
+  },
+  "note": "Training and native deployment snapshots are selected independently. LF hashes describe Git text. The sole audit merges existing multi-clip boundaries with the snapshot reward factory; it is a diagnostic-only merge."
+}

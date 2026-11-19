@@ -114,11 +114,13 @@ def tracking_reward_diagnostic(motion_path, rollout_path, env=0):
     from opensprite_tracker.supermimic.robot import make_kinematics, default_joint_pos, velocity_limits
     from opensprite_tracker.supermimic.motion import MotionLib
     from opensprite_tracker.supermimic.rotations import quat_to_mat, yaw_mat
-    from opensprite_tracker.supermimic.joint_interfaces import MotionTrackingMDP
+    from opensprite_tracker.supermimic.sole_tracking import make_motion_mdp
     torch.set_num_threads(2)
     kin = make_kinematics('cpu', True)
     motion = MotionLib(motion_path, kin, 'cpu')
-    mdp = MotionTrackingMDP(kin, motion, default_joint_pos(), velocity_limits())
+    summary_path = Path(rollout_path).parent / 'summary.json'
+    summary = json.loads(summary_path.read_text()) if summary_path.exists() else {}
+    mdp = make_motion_mdp(summary, kin, motion, default_joint_pos(), velocity_limits())
     z = load(rollout_path)
     start, length = int(motion.clip_start[env]), int(motion.clip_len[env])
     # An environment stops being a motion-tracking case at its own clip end,

@@ -32,7 +32,10 @@ class MeasuredPoseActionHandoff:
 
     def __init__(self, contract: PolicyContract):
         mode = contract.data.get("deployment_handoff_mode")
-        if mode != self._SUPPORTED_MODE:
+        direct = (contract.data.get("schema") == "sprite_supermimic_joint_velocity_v2"
+                  and mode == "reset_history_at_direct_takeover"
+                  and contract.data.get("deployment_handoff_seconds") == 0.)
+        if mode != self._SUPPORTED_MODE and not direct:
             raise ValueError(f"unsupported deployment handoff mode: {mode!r}")
         if contract.data.get("deployment_initial_velocity_mode") != "zero":
             raise ValueError("deployment initial velocity mode must be zero")

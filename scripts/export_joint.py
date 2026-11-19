@@ -67,7 +67,7 @@ def export(args):
                   parity_max_abs_error=float(np.abs(actual-reference).max()))
     if revision['schema']==V2_SCHEMA:
         contract.update(schema='sprite_supermimic_joint_velocity_v2',training_revision=revision,
-                        training_run=ck['config']['experiment_id'],
+                        training_run=ck['config']['experiment_id'],motion_reward_extension=ck['config'].get('motion_reward_extension'),
                         base_ang_vel_frame='imu_site_local' if revision['imu_frame']=='imu_site' else 'root_link_local',
                         projected_gravity_definition='R_world_to_sensor @ [0, 0, -1]',
                         previous_action_definition='Previous clamped policy output, before target saturation; never a measured position',

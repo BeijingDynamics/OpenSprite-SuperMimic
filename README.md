@@ -8,38 +8,54 @@ actuator-level validation, and supervised hardware experiments.
 **License: [AGPL-3.0](LICENSE).** External code, assets, and motion datasets retain
 their own terms; see [Data and licenses](DATA_AND_LICENSES.md).
 
-## Current progress — November 11, 2026
+## Current progress — November 19, 2026
 
-**The robot has walked under the SuperMimic policy in supervised hardware tests.**
-Two direct-start trials completed using a **0.25 m/s forward command**, full
-training gains on all 31 joints, and fall protection. That value is the command,
-not an externally measured walking speed. The operator reported intermittent
-steps, right-foot dragging, outward-facing feet, and startup yaw. Reliable gait
-quality and unrestricted operation remain open work.
+**Sprite SM-Walk R1 is the current supervised hardware candidate.** It has
+walked under Xbox commands on Open Sprite v5. The operator reported quieter
+foot contact and useful walking/turning; torso roll, slow initiation and gait
+asymmetry remain areas for improvement. Commanded speed is not a measured
+hardware speed benchmark, and the robot is not qualified for unrestricted use.
 
-**The selected runtime remains the original mixed-rate schedule**, with 50 Hz
-policy inference and 500 Hz parallel-ankle refresh. The coherent-action and
-all-joint 500 Hz candidates were subsequently tried during supervised walking;
-the operator reported no clear gait improvement. The all-joint experiment is
-retained on `supermimic_500hz`, rather than adopted as the default. Full training
-gains, direct takeover, raw action history and protection limits remain in place.
-See the [runtime selection record](docs/RUNTIME_SELECTION_20261111.md).
+R1 combines reviewed **PM01/G71 walking and 100STYLE Neutral standing** with
+80/20 reset sampling. It retains the full joint SuperMimic method: motion and
+velocity interfaces, shared decoder/world model, separate critics and latent
+alignment. The world model learns simulator transitions. Deployment needs the
+velocity actor and real feedback, not reference motions or an AMP discriminator.
 
-| Stage | Recorded result | Scope |
+The selected runtime uses **50 Hz policy inference, 50 Hz nominal direct-joint
+sends and 500 Hz parallel-joint refresh**, with coherent new-action commits.
+The all-joint 500 Hz experiment remains separate. All 31 joints use training
+Kp/Kd; raw previous policy actions enter history. The current Xbox window is
+**300 seconds**, preceded by supported standing and followed by braking and
+31-motor disable verification. Its complete no-enable validation has passed;
+a five-minute powered walking result is not claimed.
+
+| Evidence | Result | Scope |
 |---|---|---|
-| Joint training, run002 | L40S 48 GB, 12 hours, 15,398 updates from random weights | 4,096 environments; FP32; TF32 disabled |
-| Training-environment velocity evaluation | 60/60 trials of 30 s; 4/4 continuous sequences of 62 s | Serial-joint training actuators; simulation |
-| Motion tracking | 15/15 trials of approximately 7.98 s | Five native reference clips, three seeds |
-| Native policy interface | 10 history frames, 993 inputs, 31 outputs, 50 Hz | C++/ONNX Runtime CPU inference |
-| Supervised hardware walking | Two direct-start trials completed; all 31 motors disabled afterward | Existing send schedule; remaining gait issues above |
-| Coherent action sending | 2,475 actions × 31 motors = 76,725 matched hardware TX records | Motors remained disabled throughout |
-| Transport timing | Maximum per-bus physical group span **0.646 ms**; target-to-TX-completion upper bound **3.109 ms** | Adapter timestamps and host receipt bounds; not motor execution timing |
-| Timeout verification | Intentional policy pause triggered the original **20 ms** guard | Zero enables; **31/31 disabled** on both final validation runs |
+| Standing-reference continuation | Standing knees approximately 10.7/12.6°, torso backward pitch 0.51° | Simulation, selected seed; parent and matched control retained |
+| Forward walking | 0.329 m/s measured for 0.50 m/s command; swing peaks 30.4/18.6 mm | Simulation; speed bias and asymmetry remain |
+| Bounded robustness | 14/14 initial-tilt, 12/12 disturbance, 14/14 delay and 4/4 additional 60 s cases survived | Specified simulator tests, not arbitrary pushes |
+| Supervised hardware | R1 Xbox walking reported; first faster-start 120 s trial completed and 31 motors disabled | Operator observations and controller logs |
+| Five-minute no-enable integration | Full 326 s schedule, late 20 ms fault injection and Ctrl+C shutdown passed | Zero enables; 31/31 disabled after each |
+| CPU inference / transport | Median inference 2.788 ms, max 5.789 ms; max oldest-feedback-to-all-TX-receipt 13.864 ms | Final normal no-enable run; hardware TX is not motor execution |
 
-Read the [action-history contract](docs/ACTION_HISTORY_CONTRACT_20261110.md),
-[direct-start validation](docs/DIRECT_POLICY_START_20261110.md), and
-[coherent-send results](docs/COHERENT_ACTION_SEND_20261110.md). Dated historical
-reports describe earlier stages and may retain their original language.
+**Known failures stay visible:** right-foot clearance remains lower; the selected
+candidate failed a relative left-turn spacing-retention check; earlier live
+attempts hit the unchanged 20 ms guard after an approximately 11.5 ms receipt
+delay whose scheduler cause remains unresolved. Passing later runs does not
+remove that uncertainty. The four-architecture experiment is ongoing separately
+and has not replaced R1.
+
+Start with the [R1 model card and reproduction notes](docs/SPRITE_SM_WALK_R1.md),
+[matched training results](docs/REFERENCE_FUSION_RESULTS_20261119.md),
+[five-minute runtime evidence](docs/JETSON_SM_WALK_R1_XBOX300_20261119.md), and
+[thread/driver corrections](docs/R1_LIVE_THREAD_LAYOUT_FIX_20261119.md).
+[Download R1 policy, checkpoint and simulation video](https://github.com/BeijingDynamics/OpenSprite-SuperMimic/releases/tag/sprite-sm-walk-r1-20261119).
+
+| Current R1 artifact | SHA256 |
+|---|---|
+| Checkpoint | `70cf3e70354c8b574777709f56f24f83864329d589c256cfa97d6a1236afdedd` |
+| ONNX actor | `5695b6980746534a11d075befc29bf5f7fe0ef2a7d81e3dadf3147c50f4d6930` |
 
 ## Why the deployment contract matters
 
@@ -58,7 +74,11 @@ reports describe earlier stages and may retain their original language.
   The transport audit records their identities and bounds rather than
   subtracting unrelated timestamps.
 
-## Reproduce the training experiment
+## Training setup and the original run002 baseline
+
+For the current R1 continuation, use [its model card](docs/SPRITE_SM_WALK_R1.md)
+and [recorded configuration](configs/sprite-sm-walk-r1.json). The commands below
+reproduce the older run002 baseline and do not train R1 unchanged.
 
 The recorded training environment used Linux, Python 3.12, and CUDA 12.8.
 Install the pinned dependencies and robot meshes:
@@ -100,7 +120,7 @@ include checkpoints, the ONNX actor, scenes, and validation results with hashes.
 The exported CPU velocity interface does not require reference motion data.
 Retraining and motion-tracking evaluation require separately prepared references.
 
-## Frozen model and training configuration
+## Original run002 model and training configuration
 
 - Robot: `sprite0825_v5_4340_shoulders_waist20261105`; waist yaw link mass 3.7391 kg.
 - Published Kp/Kd, effort limits, and default pose are matched by joint name.
@@ -147,10 +167,14 @@ prompts, and generated labels are **English** so contributors worldwide can
 use and review the project. Preserve original third-party notices and historical
 measurement records. Run `python scripts/check_language_policy.py` before publishing.
 
-Training builds on a pinned version of
+The original training baseline builds on a pinned version of
 [lzjever/opensprite-tracker](https://github.com/lzjever/opensprite-tracker) and its
 [SuperMimic](https://arxiv.org/abs/2610.28480) implementation, with Open Sprite v5
-references and actuator/deployment work. Retargeting uses
+references and actuator/deployment work. The velocity-v2/R1 changes follow the
+released [official SuperMimic](https://github.com/HybridRobotics/supermimic) and
+[C. Zhang implementation](https://github.com/zita-ch/supermimic_vibed) comparison
+recorded in [the v2 design audit](docs/VELOCITY_V2_RETRAIN.md); this is not a claim
+of reproducing the paper's G1 benchmark. Retargeting uses
 [UMR](https://hanyang9.github.io/UMR/); source motions include
 [LAFAN1](https://github.com/ubisoft/ubisoft-laforge-animation-dataset).
 

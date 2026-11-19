@@ -44,3 +44,19 @@ archive CRCs, SHA-256 hashes, official trims and any further crop boundaries.
 Screened human data and native UMR outputs are not automatically qualified for
 robot training. Generic source BVHs remain outside Git and local result backups.
 Derived references retain attribution and a description of their changes.
+
+## Sprite SM-Walk R1 release
+
+R1 uses the reviewed PM01/G71 walking source obtained from
+`BeijingDynamics/open_sprite_rl`, with a documented clearance correction,
+and one 100STYLE Neutral standing clip. Preserve the PM01 source provenance
+and the 100STYLE attribution and citation above. Source code remains AGPL-3.0;
+this does not relicense motion datasets or character assets or establish
+commercial clearance for data-derived weights.
+
+The R1 release contains the frozen trained checkpoint, ONNX/contract package
+and a velocity-policy physical simulation video. It contains no raw or
+retargeted motion sequences, reference-motion video, Geno character, or raw
+CAN/IMU logs. Detailed original data and hardware records remain in local
+archives. See [the R1 model card](docs/SPRITE_SM_WALK_R1.md) for hashes,
+reference selection, measured limitations and reproduction requirements.

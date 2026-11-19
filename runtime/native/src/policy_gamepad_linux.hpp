@@ -1,4 +1,5 @@
 #pragma once
+#include "inference_cpu_layout.hpp"
 #include "policy_gamepad.hpp"
 #include <linux/joystick.h>
 #include <fcntl.h>
@@ -64,6 +65,7 @@ class LinuxGamepad {
 public:
   explicit LinuxGamepad(const std::string& path):worker_([this,path]{try{run(path);}catch(...){publish({});}}){}
   ~LinuxGamepad(){stop_=true;if(worker_.joinable())worker_.join();}
+    void pin_worker(int cpu) { sprite_schedule::pin_thread(worker_.native_handle(),cpu); }
   GamepadSnapshot snapshot(){std::lock_guard<std::mutex> lock(mutex_);return latest_;}
 };
 }

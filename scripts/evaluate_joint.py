@@ -8,9 +8,12 @@ from opensprite_tracker.supermimic.robot import make_kinematics,default_joint_po
 from opensprite_tracker.supermimic.motion import MotionLib
 from opensprite_tracker.supermimic.env import TrackingSim
 from opensprite_tracker.supermimic.joint_interfaces import SharedController,MotionActor,VelocityActor,MotionTrackingMDP,VelocityMDP
+from opensprite_tracker.supermimic.sole_tracking import make_motion_mdp
+from opensprite_tracker.supermimic.posture_width import make_velocity_mdp
 from opensprite_tracker.supermimic.rotations import mat_to_quat,yaw_mat
 from opensprite_tracker.supermimic.revisions import revision_contract,motion_goal
 from opensprite_tracker.supermimic.recovery import force_schedule,validate_force_cases
+from initial_tilt_probe import sample_tilt
 
 @torch.no_grad()
 def evaluate(args):
@@ -18,21 +21,16 @@ def evaluate(args):
     ck=torch.load(args.checkpoint,map_location=args.device,weights_only=False)
     revision=revision_contract(ck['config'])
     if ck.get('schema')!=revision['schema']:raise ValueError('Joint-interface schema/semantics mismatch')
-    reference_review=dict(mode='training_reference',evaluation_sha256=hashlib.sha256(args.motion.read_bytes()).hexdigest())
-    heldout_training=getattr(args,'heldout_training_bank',None)
-    if heldout_training is not None:
-        if args.interface!='motion':raise ValueError('Held-out reference evaluation is limited to the motion interface')
-        from verify_heldout_reference import verify_heldout_reference
-        from opensprite_tracker.robot import ASSET_REVISION
-        reference_review=verify_heldout_reference(heldout_training,args.motion,ck['motion_sha256'],ASSET_REVISION)
-    elif ck['motion_sha256']!=reference_review['evaluation_sha256']:raise ValueError('Reference bank changed')
+    if ck['motion_sha256']!=hashlib.sha256(args.motion.read_bytes()).hexdigest():raise ValueError('Reference bank changed')
     if ck['physical_contract']!=physical_contract(torque_lag_enabled=False):raise ValueError('Physics contract changed')
     shared=SharedController(hidden=tuple(ck['config']['network_hidden']),normalized_gelu=revision['normalized_gelu']).to(args.device);shared.load_state_dict(ck['shared']);shared.eval()
     velocity=args.interface=='velocity'
     actor=VelocityActor(shared) if velocity else MotionActor(shared)
     kin=make_kinematics(args.device,True)
     motion=MotionLib(args.motion,kin,args.device,goal_mode=revision['goal_mode'],goal_stride=revision['goal_stride']);motion.reference_commands=reference_commands(motion)
-    mdp=(VelocityMDP if velocity else MotionTrackingMDP)(kin,motion,default_joint_pos(args.device),velocity_limits(args.device),imu_frame=revision['imu_frame'])
+    mdp_args=(kin,motion,default_joint_pos(args.device),velocity_limits(args.device))
+    mdp=(make_velocity_mdp(ck['config'],*mdp_args,imu_frame=revision['imu_frame']) if velocity else
+         make_motion_mdp(ck['config'],*mdp_args,imu_frame=revision['imu_frame']))
     default_commands=[[0,0,0],[.15,0,0],[.3,0,0],[.15,0,.15],[.15,0,-.15],[.3,0,.15],[.3,0,-.15]]
     cases=json.loads(args.commands_file.read_text()) if args.commands_file else [dict(name='case_'+str(i),command=c) for i,c in enumerate(default_commands)]
     if not isinstance(cases,list) or not cases:raise ValueError('Command cases must be a nonempty list')
@@ -58,6 +56,12 @@ def evaluate(args):
             initial_p=torch.zeros_like(S[0]);initial_R=torch.eye(3,device=args.device)[None].expand_as(S[1]).clone()
             bottom=kin.ground_clearance(initial_p,initial_R,torch.zeros_like(S[2]),torch.zeros_like(S[3]),initial_q,torch.zeros_like(S[5]))
             initial_p[:,2]=.001-bottom
+        tilt_bound=getattr(args,'initial_tilt_noise_deg',0.0)
+        tilt_matrices,tilt_angles=sample_tilt(N,tilt_bound,args.seed)
+        if tilt_bound:
+            initial_R=initial_R@torch.as_tensor(tilt_matrices,device=args.device,dtype=initial_R.dtype)
+            bottom=kin.ground_clearance(initial_p,initial_R,torch.zeros_like(S[2]),torch.zeros_like(S[3]),initial_q,torch.zeros_like(S[5]))
+            initial_p[:,2]+=.001-bottom
         root=torch.cat((initial_p+env.scene.env_origins,mat_to_quat(initial_R),torch.zeros(N,6,device=args.device)),-1)
         env.robot.write_root_state_to_sim(root)
         env.robot.write_joint_state_to_sim(initial_q,torch.zeros_like(S[5]),joint_ids=env.joint_ids)
@@ -65,6 +69,11 @@ def evaluate(args):
         initial_description=dict(mode=args.initial_pose,reference_frame=quiet if args.initial_pose=='reference-quiet' else None,
             root_position_m=initial_p[0].cpu().tolist(),root_quaternion_wxyz=mat_to_quat(initial_R)[0].cpu().tolist(),joint_position_rad=initial_q[0].cpu().tolist(),
             ground_placement='root translated vertically until minimum active collider is1mm above flat floor' if args.initial_pose!='reference-quiet' else 'reference pose with reset ground-clearance correction')
+        if tilt_bound:
+            initial_description.update(tilt_probe_bound_deg=tilt_bound,tilt_probe_seed=args.seed,
+                applied_local_roll_pitch_rad=tilt_angles.tolist(),
+                all_root_positions_m=initial_p.cpu().tolist(),all_root_quaternions_wxyz=mat_to_quat(initial_R).cpu().tolist(),
+                tilt_probe_note='Local root tilt, no joint noise; ground clearance restored to 1 mm. No dynamics randomization.')
         steps=round(args.seconds/.02)
     else:
         env.reset(frames=motion.clip_start);steps=int(motion.clip_len.max())-1
@@ -129,8 +138,8 @@ def evaluate(args):
                     last5s_velocity_error_m_s=float(np.linalg.norm(measured[:,:2]-target[:,:2],axis=-1).mean()),last5s_yaw_error_rad_s=float(abs(yaw-target[:,2]).mean()))
         per.append(item)
     report=dict(interface=args.interface,iteration=ck['iteration'],seed=args.seed,steps=steps,seconds=steps*.02,results=per,
-                initialization=initial_description,revision=revision,reference_review=reference_review,
-                training_random_command_ranges=ck['config']['command_ranges'],
+                initialization=initial_description,revision=revision,
+                training_random_command_ranges=ck['config']['command_ranges'],motion_reward_extension=ck['config'].get('motion_reward_extension'),
                 policy_dt=.02,physics_dt=.002,history=10,checkpoint_sha256=hashlib.sha256(args.checkpoint.read_bytes()).hexdigest(),
                 protocol='No failure reset; velocity starts from physical rest and steps command after 2s; motion starts at each source first frame; pre-failure scoring only',
                 disturbance_protocol='World-frame force at torso body COM; exact force samples saved; no force observation supplied to actor',
@@ -142,5 +151,5 @@ if __name__=='__main__':
     p.add_argument('--interface',choices=['motion','velocity'],required=True);p.add_argument('--output',type=Path,required=True)
     p.add_argument('--seconds',type=float,default=30);p.add_argument('--seed',type=int,default=101);p.add_argument('--device',default='cuda:0')
     p.add_argument('--initial-pose',choices=['reference-quiet','urdf-zero','controller-default'],default='reference-quiet')
-    p.add_argument('--heldout-training-bank',type=Path,help='Explicit held-out motion review; both banks require hash-bound QA and sibling source-manifest.json with disjoint train/validation intervals')
+    p.add_argument('--initial-tilt-noise-deg',type=float,default=0.0)
     p.add_argument('--commands-file',type=Path);evaluate(p.parse_args())

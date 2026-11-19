@@ -9,6 +9,14 @@ constexpr int kSlingStandSeconds = 20;
 constexpr int kSlingCountdownSeconds = 10;
 // Leave half a second for delivery of the local operator notification.
 constexpr double kSlingDurationSeconds = kSlingStandSeconds + kSlingCountdownSeconds + 0.5;
+constexpr std::uint64_t kXboxControlOpenFrame = 1002;
+constexpr std::uint64_t kXboxControlFrames = 300 * 50;
+constexpr std::uint64_t kXboxControlCloseFrame = kXboxControlOpenFrame + kXboxControlFrames;
+// Full command window plus 4 s maximum braking and a final quiet interval.
+constexpr double kXboxDurationSeconds = 326.0;
+// Round window close upward, then allow the full maximum braking time.
+constexpr int kXboxEndNoticeSeconds = (kXboxControlCloseFrame + 49) / 50 + 4;
+static_assert(kXboxEndNoticeSeconds == 325);
 constexpr std::uint64_t kSlingReadySequence = kSlingStandSeconds * 50;
 constexpr std::uint64_t kSlingStableFrames = 50;
 constexpr int kWalkStartSeconds = kSlingStandSeconds + kSlingCountdownSeconds;
@@ -43,6 +51,10 @@ inline bool sling_notice_elapsed(std::int64_t notice_ns, std::int64_t now_ns) {
 struct SlingReadiness {
     std::uint64_t sequence, joint_stable_frames, body_stable_frames;
 };
+
+inline bool sling_requires_joint_settling(bool walking, bool xbox_body_admission) {
+    return !walking && !xbox_body_admission;
+}
 
 inline bool sling_ready(const SlingReadiness& ready, std::uint64_t accepted_sequence,
                        std::uint64_t expected_sequence = kSlingReadySequence,

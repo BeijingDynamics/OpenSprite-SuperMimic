@@ -113,7 +113,8 @@ def joint_policy_update(motion_learner,velocity_learner,shared):
         norm=nn.utils.clip_grad_norm_(shared.parameters(),1.)
         nn.utils.clip_grad_value_(shared.parameters(),.1)
         if not torch.isfinite(norm):raise RuntimeError('Nonfinite joint policy gradient')
-        motion_learner.opt_pi.step();velocity_learner.opt_pi.step()
+        if not getattr(motion_learner.args,'freeze_actor_updates',False):
+            motion_learner.opt_pi.step();velocity_learner.opt_pi.step()
         metrics['actor_grad_norm']=float(norm)
     finally:
         for module in frozen:set_grad(module,True)

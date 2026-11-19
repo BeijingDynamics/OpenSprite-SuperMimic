@@ -1,0 +1,7 @@
+{
+  "revision": "posture_width_clearance_turn_selection_v1",
+  "requested_on": "2026-11-17",
+  "purpose": "Reject selecting foot-spacing improvements that sacrifice upright posture, bilateral clearance, low-speed command tracking or either turn direction.",
+  "changes_training_reward": false,
+  "changes_hardware_protection": false
+}

@@ -1,0 +1,17 @@
+{
+  "control_window_s": 300,
+  "duration_s": 326,
+  "policy_frames": 16301,
+  "expected_driver_srcversion": "404E8D65A6EFF60079EAEC1",
+  "files": {
+    "build/sprite_can_shadow": "d94fd40af0d27801fcb15ffb50b4081d3f735b7a612e142d5f52af52e3b59826",
+    "build/sprite_supermimic_protected_ipc": "0fac1b2c893637448791e708980d01b08e461a5368212edfa0c48d24623d2c3f",
+    "bundle/policy.onnx": "5695b6980746534a11d075befc29bf5f7fe0ef2a7d81e3dadf3147c50f4d6930",
+    "tools/run_supermimic_commissioning.py": "a205de2d1f47ae756c6941f094ea20869101106863a8c9121e3cc5e91201a08c",
+    "operator-xbox.sh": "155f6e3a4f2ee0a8cfd9de3cc2591d9e2fb7c3dda34acb7f0771257dd95214a1",
+    "run-disabled.py": "45b324fbcdf315c5687101d68865f9ba150eb8b40ef3220770338b6ffcc2158a",
+    "native/src/action_tx_trace.hpp": "6a8eea1b6ae196aa59c68fb27bae39341bd1c4fa0363627ea1c2450d3be2cceb",
+    "native/src/sling_window.hpp": "ae396944e3871dd03c82b01ab835e1fbb616168923a4e619d46fd80fc3aeee1e",
+    "runtime/src/open_sprite_runtime/supermimic_replay.py": "f2aa5d9cfb9e26032aac8349b659d79ddc3deb84cc62c32c0ac3af1c50cfcbf5"
+  }
+}

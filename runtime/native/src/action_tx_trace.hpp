@@ -32,7 +32,7 @@ public:
   bool enabled=false;
   ActionTxContext context;
   std::vector<ActionTxEvent> events;
-  void prepare() { enabled=true; events.reserve(200000); }
+  void prepare() { enabled=true; events.reserve(700000); }
   void sent(int motor_id, std::int64_t begin, std::int64_t end, std::int64_t realtime=0) {
     if (!enabled) return;
     if (events.size()==events.capacity()) throw std::runtime_error("TX evidence capacity exceeded");
@@ -89,8 +89,8 @@ inline std::int64_t realtime_now_ns() {
   if(clock_gettime(CLOCK_REALTIME,&t)) throw std::runtime_error("TX realtime clock read failed");
   return static_cast<std::int64_t>(t.tv_sec)*1000000000LL+t.tv_nsec;
 }
-inline bool coherent_commit_due(std::size_t slot,std::uint64_t pending,std::uint64_t active) {
+inline bool coherent_commit_due(std::size_t /*slot*/,std::uint64_t pending,std::uint64_t active) {
   if(pending<active || pending>active+1) throw std::runtime_error("coherent action sequence skipped/regressed");
-  return slot%4==0 && pending!=active;
+  return pending!=active;
 }
 }

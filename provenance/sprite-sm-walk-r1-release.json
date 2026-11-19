@@ -1,0 +1,28 @@
+{
+  "tag": "sprite-sm-walk-r1-20261119",
+  "prerelease": true,
+  "reference_data_included": false,
+  "raw_robot_logs_included": false,
+  "assets": [
+    {
+      "name": "sprite-sm-walk-r1-checkpoint.pt",
+      "bytes": 233682629,
+      "sha256": "70cf3e70354c8b574777709f56f24f83864329d589c256cfa97d6a1236afdedd"
+    },
+    {
+      "name": "sprite-sm-walk-r1-policy.zip",
+      "bytes": 19313351,
+      "sha256": "661c1cf7a7bf01ecfa70d9c80ccc8189203479c0b66efab893a45d8fb4ca236f"
+    },
+    {
+      "name": "sprite-sm-walk-r1-simulation.mp4",
+      "bytes": 14801484,
+      "sha256": "c243ecf6509496f19d3beacc2a89715d281cd46ac2d5eacad44c2d0efd5aec6e"
+    },
+    {
+      "name": "SHA256SUMS",
+      "bytes": 295,
+      "sha256": "6f07a6e22aee7f033a6822b938fc6142c0902db18ddd831264597664b146848b"
+    }
+  ]
+}

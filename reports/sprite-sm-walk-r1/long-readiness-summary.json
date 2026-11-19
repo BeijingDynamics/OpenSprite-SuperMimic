@@ -1,0 +1,312 @@
+{
+  "interface": "velocity",
+  "iteration": 6000,
+  "seed": 404,
+  "steps": 3000,
+  "seconds": 60.0,
+  "results": [
+    {
+      "env": 0,
+      "label": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "survived": true,
+      "first_failure_seconds": null,
+      "scored_steps": 2850,
+      "forces": [],
+      "case_name": "joystick_sequence",
+      "command_category": "unspecified",
+      "within_training_random_command_range": true,
+      "stages": [
+        {
+          "at_seconds": 2,
+          "command": [
+            0,
+            0,
+            0
+          ]
+        },
+        {
+          "at_seconds": 5,
+          "command": [
+            0.25,
+            0,
+            0
+          ]
+        },
+        {
+          "at_seconds": 15,
+          "command": [
+            0.5,
+            0,
+            0
+          ]
+        },
+        {
+          "at_seconds": 25,
+          "command": [
+            0.35,
+            0,
+            -0.2
+          ]
+        },
+        {
+          "at_seconds": 35,
+          "command": [
+            0.35,
+            0,
+            0.2
+          ]
+        },
+        {
+          "at_seconds": 45,
+          "command": [
+            0,
+            0,
+            0
+          ]
+        }
+      ],
+      "velocity_error_m_s": 0.0883445292711258,
+      "yaw_error_rad_s": 0.0379842184484005,
+      "mean_vx_m_s": 0.1806790679693222,
+      "mean_yaw_rad_s": -0.006739513948559761,
+      "last5s_mean_velocity_m_s": [
+        -3.395770545466803e-05,
+        -0.00011507793533382937,
+        2.621684870973695e-05
+      ],
+      "last5s_mean_yaw_rad_s": 0.0007158188964240253,
+      "last5s_velocity_error_m_s": 0.00016380299348384142,
+      "last5s_yaw_error_rad_s": 0.0007158188964240253
+    },
+    {
+      "env": 1,
+      "label": [
+        0.5,
+        0.0,
+        0.0
+      ],
+      "survived": true,
+      "first_failure_seconds": null,
+      "scored_steps": 2850,
+      "forces": [],
+      "case_name": "long_forward_stop",
+      "command_category": "unspecified",
+      "within_training_random_command_range": true,
+      "stages": [
+        {
+          "at_seconds": 2,
+          "command": [
+            0.5,
+            0,
+            0
+          ]
+        },
+        {
+          "at_seconds": 45,
+          "command": [
+            0,
+            0,
+            0
+          ]
+        }
+      ],
+      "velocity_error_m_s": 0.13551348447799683,
+      "yaw_error_rad_s": 0.04606475681066513,
+      "mean_vx_m_s": 0.24275247752666473,
+      "mean_yaw_rad_s": -0.0014820442302152514,
+      "last5s_mean_velocity_m_s": [
+        -4.9543461500434205e-05,
+        -8.817240450298414e-05,
+        2.3116466763895005e-05
+      ],
+      "last5s_mean_yaw_rad_s": 0.0007888705586083233,
+      "last5s_velocity_error_m_s": 0.00015956554852891713,
+      "last5s_yaw_error_rad_s": 0.0007888705586083233
+    },
+    {
+      "env": 2,
+      "label": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "survived": true,
+      "first_failure_seconds": null,
+      "scored_steps": 2850,
+      "forces": [
+        {
+          "at_seconds": 12,
+          "duration_seconds": 1,
+          "force_world_n": [
+            10,
+            0,
+            0
+          ]
+        },
+        {
+          "at_seconds": 35,
+          "duration_seconds": 1,
+          "force_world_n": [
+            -10,
+            0,
+            0
+          ]
+        }
+      ],
+      "case_name": "standing_sustained_push",
+      "command_category": "unspecified",
+      "within_training_random_command_range": true,
+      "stages": [],
+      "velocity_error_m_s": 0.016217021271586418,
+      "yaw_error_rad_s": 0.00983547791838646,
+      "mean_vx_m_s": 0.0048179239965975285,
+      "mean_yaw_rad_s": 0.00022495645680464804,
+      "last5s_mean_velocity_m_s": [
+        1.5599664038745686e-05,
+        -8.038157102419063e-05,
+        1.4347691831062548e-05
+      ],
+      "last5s_mean_yaw_rad_s": 0.0016809592489153147,
+      "last5s_velocity_error_m_s": 8.188300853362307e-05,
+      "last5s_yaw_error_rad_s": 0.0016809592489153147
+    },
+    {
+      "env": 3,
+      "label": [
+        0.5,
+        0.0,
+        0.0
+      ],
+      "survived": true,
+      "first_failure_seconds": null,
+      "scored_steps": 2850,
+      "forces": [
+        {
+          "at_seconds": 12,
+          "duration_seconds": 1,
+          "force_world_n": [
+            0,
+            10,
+            0
+          ]
+        },
+        {
+          "at_seconds": 35,
+          "duration_seconds": 1,
+          "force_world_n": [
+            0,
+            -10,
+            0
+          ]
+        }
+      ],
+      "case_name": "walking_sustained_lateral",
+      "command_category": "unspecified",
+      "within_training_random_command_range": true,
+      "stages": [],
+      "velocity_error_m_s": 0.19643017649650574,
+      "yaw_error_rad_s": 0.06482334434986115,
+      "mean_vx_m_s": 0.3245052397251129,
+      "mean_yaw_rad_s": -0.0045265816152095795,
+      "last5s_mean_velocity_m_s": [
+        0.3290886878967285,
+        0.0169028639793396,
+        -0.0016250238986685872
+      ],
+      "last5s_mean_yaw_rad_s": -0.003233841387555003,
+      "last5s_velocity_error_m_s": 0.17928297817707062,
+      "last5s_yaw_error_rad_s": 0.05942240729928017
+    }
+  ],
+  "initialization": {
+    "mode": "controller-default",
+    "reference_frame": null,
+    "root_position_m": [
+      0.0,
+      0.0,
+      0.4662967622280121
+    ],
+    "root_quaternion_wxyz": [
+      1.0,
+      0.0,
+      0.0,
+      0.0
+    ],
+    "joint_position_rad": [
+      -0.15000000596046448,
+      0.0,
+      0.0,
+      0.30000001192092896,
+      0.15000000596046448,
+      0.0,
+      0.15000000596046448,
+      0.0,
+      0.0,
+      -0.30000001192092896,
+      0.15000000596046448,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.08281613141298294,
+      0.0,
+      -0.6000000238418579,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      -0.07632176578044891,
+      0.0,
+      0.6000000238418579,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0
+    ],
+    "ground_placement": "root translated vertically until minimum active collider is1mm above flat floor"
+  },
+  "revision": {
+    "schema": "sprite_v5_joint_supermimic_v2",
+    "imu_frame": "root",
+    "dynamics_mode": "acceleration_v2",
+    "goal_mode": "robot_relative_v2",
+    "goal_stride": 5,
+    "normalized_gelu": true,
+    "critic_relative_positions": true,
+    "critic_upper_bound": true,
+    "wm_warmup_iterations": 500
+  },
+  "training_random_command_ranges": [
+    [
+      -0.3,
+      0.6
+    ],
+    [
+      -0.2,
+      0.2
+    ],
+    [
+      -0.6,
+      0.6
+    ]
+  ],
+  "motion_reward_extension": {
+    "revision": "sprite_motion_sole_height_v1",
+    "std_m": 0.015,
+    "weight": 0.25
+  },
+  "policy_dt": 0.02,
+  "physics_dt": 0.002,
+  "history": 10,
+  "checkpoint_sha256": "70cf3e70354c8b574777709f56f24f83864329d589c256cfa97d6a1236afdedd",
+  "protocol": "No failure reset; velocity starts from physical rest and steps command after 2s; motion starts at each source first frame; pre-failure scoring only",
+  "disturbance_protocol": "World-frame force at torso body COM; exact force samples saved; no force observation supplied to actor",
+  "hardware_qualified": false,
+  "wall_seconds": 153.20760141313076
+}

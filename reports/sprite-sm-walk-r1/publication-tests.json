@@ -1,0 +1,20 @@
+{
+  "python": {
+    "passed": 551,
+    "subtests_passed": 55,
+    "failed": 0,
+    "skipped": 0,
+    "environment": "Linux CPU-only"
+  },
+  "native": {
+    "passed": 10,
+    "failed": 0
+  },
+  "echo_registration_tests": 4,
+  "language_policy_files_checked": 561,
+  "logs": {
+    "sprite-r1-publication-native.log": "077102c74bb6f66ea5ab004c3f9d9d2bed3db4d2c8c6ece6788187c00c8558b4",
+    "sprite-r1-publication-tests.log": "e5ad67515dbf3cbefb2325b8d3fce1b5df42f1db397814e389032b7c4ae2d046",
+    "sprite-r1-publication-tests.xml": "909efec3ab86a3dd4fb063db93aa5449bf4233472092db1c958b44ad85627a8f"
+  }
+}

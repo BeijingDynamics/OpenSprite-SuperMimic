@@ -16,7 +16,16 @@ SCHEMA = 'sprite_supermimic_run002_offline_bundle_v1'
 def validate_binding(contract: PolicyContract, profile_path: Path) -> dict:
     checked_model(contract)
     data=contract.data
-    if data.get('training_run')!='joint-waist-v5-002' or data.get('asset_revision')!=ASSET_REVISION:
+    pm01 = (data.get('schema') == 'sprite_supermimic_joint_velocity_v2'
+            and data.get('training_run') == 'seed45-7500-actor-quarter-20261114'
+            and data.get('checkpoint_sha256') in (
+                'aab860df068d5ccc67aa94ea315f5517dd333373c0e7be52fe6344bb5a98ee8a',
+                '50a6aa050b9b3f6c78fff4e0dcd60e5cbc87a3cfb5912a6a0f6517c49e1d9492'))
+    sm_walk_r1 = (data.get('schema') == 'sprite_supermimic_joint_velocity_v2'
+                  and data.get('training_run') == 'reference-fusion-walk-stand80'
+                  and data.get('checkpoint_sha256') == '70cf3e70354c8b574777709f56f24f83864329d589c256cfa97d6a1236afdedd'
+                  and data.get('policy_onnx_sha256') == '5695b6980746534a11d075befc29bf5f7fe0ef2a7d81e3dadf3147c50f4d6930')
+    if (data.get('training_run')!='joint-waist-v5-002' and not pm01 and not sm_walk_r1) or data.get('asset_revision')!=ASSET_REVISION:
         raise ValueError('run002 training/model identity mismatch')
     digest=file_sha256(profile_path)
     if digest!=PROFILE_SHA256 or data.get('control_profile_sha256')!=digest:
