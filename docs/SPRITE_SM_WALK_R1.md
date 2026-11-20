@@ -98,11 +98,52 @@ reported supervised hardware observations.
 
 `configs/sprite-sm-walk-r1.json` preserves the exact recorded continuation
 configuration, including the parent/reference transfer identities. For an exact
-continuation, obtain the named parent checkpoint and locally regenerate the
-reviewed motion bank using the procedures in the reference-selection documents.
-The parent checkpoint and source motions are not included in this R1 release;
-the exported policy can be evaluated without them. Do not describe a fresh run
-with a different parent or bank as an exact reproduction.
+continuation, obtain the named parent checkpoint and the reviewed motion bank
+identified below. The parent checkpoint and source motions are not included in
+this R1 release. ONNX actor inference does not require reference motions, but
+the current training and `scripts/evaluate_joint.py` utilities load the bank.
+Do not describe a fresh run with a different parent or bank as an exact reproduction.
+
+### Missing `walk_stand.npz` on a fresh clone
+
+The historical local path is:
+
+```text
+outputs/reference-fusion-20261118/reference/walk_stand.npz
+```
+
+This file is **not included in Git or the R1 release**. It is the reviewed
+PM01/G71 walk plus 100STYLE Neutral standing bank, not a downloaded LAFAN1
+sequence. Its exact file identity is:
+
+```text
+Size: 1528892 bytes
+SHA-256: edd4ddd6f54e8a8a710481d11340ac6e38d6b944e75613c48e318fc3b32d296f
+```
+
+Obtain the reviewed file from your authorized project archive or the project
+maintainer. From the repository root, install the supplied file and verify it:
+
+```bash
+mkdir -p outputs/reference-fusion-20261118/reference
+cp /path/to/received/walk_stand.npz outputs/reference-fusion-20261118/reference/
+python -c "from pathlib import Path; import hashlib; p=Path('outputs/reference-fusion-20261118/reference/walk_stand.npz'); actual=hashlib.sha256(p.read_bytes()).hexdigest(); assert actual=='edd4ddd6f54e8a8a710481d11340ac6e38d6b944e75613c48e318fc3b32d296f', actual; print('Verified:', p)"
+```
+
+For training, also obtain the matching `walk_stand.qa.json` and place it beside
+the NPZ. Its `motion_bank_sha256` must match the verified file. Do not manufacture
+a passing QA record or bypass the checkpoint's reference-hash check.
+
+The assembly script is `scripts/prepare_stand_walk_fusion.py`. It combines an
+already reviewed clearance-corrected PM01 bank with the specifically selected
+Neutral standing clip. **It is not a standalone downloader or a complete
+fresh-clone regeneration pipeline:** its two prepared source banks and their QA
+records are external inputs at the dated paths in that script. The
+[reference-selection record](REFERENCE_FUSION_CAMPAIGN_20261118.md) explains the
+selection; having only the public repository does not supply those inputs.
+A newly retargeted or corrected bank is a new reference version unless its bytes
+match the recorded SHA-256. Preserve source attribution and data terms from
+[Data and licenses](../DATA_AND_LICENSES.md).
 
 The campaign scripts preserve dated paths and deadlines as experiment records.
 For a new run, use `scripts/train_joint.py --help` and provide new output paths,
